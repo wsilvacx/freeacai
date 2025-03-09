@@ -53,6 +53,7 @@
       background: linear-gradient(45deg, #333, #555);
       border-radius: 25px;
       transition: background 0.3s, transform 0.2s;
+      font-size: 16px;
     }
     nav ul li:hover, nav ul li.active {
       background: linear-gradient(45deg, #555, #777);
@@ -94,6 +95,22 @@
       margin-top: 20px;
       border-top: 1px solid #444;
       padding-top: 10px;
+    }
+    /* Ajustes responsivos para telas pequenas */
+    @media (max-width: 600px) {
+      header h1 {
+        font-size: 20px;
+      }
+      nav ul li {
+        padding: 8px 10px;
+        font-size: 14px;
+      }
+      .item {
+        padding: 8px 10px;
+      }
+      .descricao {
+        font-size: 12px;
+      }
     }
   </style>
   <script>
