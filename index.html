@@ -18,50 +18,61 @@
       background: url('IMG_6008.jpeg') no-repeat center center fixed;
       background-size: cover;
       color: #fff;
-      text-align: center;
       padding: 20px;
     }
 
     .container {
-      width: 100%;
       max-width: 960px;
       margin: auto;
       background-color: rgba(28, 28, 28, 0.85);
       border-radius: 20px;
-      padding: 40px;
+      padding: 30px;
       box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
     }
 
-    h1 {
-      font-size: 32px;
-      color: #fff;
-      margin-bottom: 20px;
-      text-transform: uppercase;
-      letter-spacing: 2px;
+    header {
+      text-align: center;
+      margin-bottom: 30px;
     }
 
     .logo img {
-      width: 120px;
-      height: 120px;
+      width: 100px;
+      height: 100px;
       border-radius: 50%;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
       box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
     }
 
-    /* Botões mais modernos */
+    header h1 {
+      font-size: 28px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 10px;
+    }
+
+    .content {
+      display: flex;
+      gap: 20px;
+    }
+
+    /* Sidebar com as categorias */
+    .sidebar {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
     .categoria {
       background: linear-gradient(135deg, #4b4b4b, #2a2a2a);
       color: #fff;
-      padding: 15px 20px;
-      margin: 12px 0;
+      padding: 15px;
       border-radius: 30px;
-      font-size: 20px;
+      font-size: 18px;
       font-weight: 700;
+      border: none;
       cursor: pointer;
       transition: transform 0.2s ease, box-shadow 0.2s ease;
-      width: 100%;
-      display: block;
-      border: none;
     }
 
     .categoria:hover {
@@ -70,27 +81,38 @@
       background: linear-gradient(135deg, #5e5e5e, #3c3c3c);
     }
 
+    /* Área principal para os itens */
+    .main {
+      flex: 2;
+      background-color: rgba(0, 0, 0, 0.3);
+      border-radius: 20px;
+      padding: 20px;
+      overflow-y: auto;
+      max-height: 500px;
+    }
+
     .itens {
       display: none;
-      margin-top: 20px;
+    }
+
+    .itens.active {
+      display: block;
     }
 
     .item {
       background-color: #2a2a2a;
-      margin: 8px 0;
+      margin: 10px 0;
       padding: 12px;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .item > div {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-radius: 8px;
-      font-size: 18px;
-      font-weight: 500;
-      transition: background-color 0.3s ease;
-      cursor: default;
-    }
-
-    .item:hover {
-      background-color: #3c3c3c;
     }
 
     .preco {
@@ -99,81 +121,113 @@
     }
 
     .descricao {
-      display: block;
-      font-size: 16px;
+      font-size: 14px;
       color: #bbb;
-      margin-top: 8px;
       text-align: left;
     }
 
-    .rodape {
+    footer.rodape {
       margin-top: 30px;
       font-size: 14px;
       color: #ddd;
       border-top: 1px solid #333;
       padding-top: 20px;
+      text-align: center;
     }
 
-    .rodape p {
+    footer.rodape p {
       margin: 5px 0;
     }
   </style>
   <script>
-    function toggleCategoria(id) {
-      // Fecha todas as categorias abertas, exceto a selecionada
-      var categorias = document.querySelectorAll('.itens');
-      categorias.forEach(function(categoria) {
-        if (categoria.id !== id) {
-          categoria.style.display = 'none';
-        }
+    function showCategory(catId) {
+      // Esconde todas as categorias
+      const categorias = document.querySelectorAll('.itens');
+      categorias.forEach(cat => {
+        cat.classList.remove('active');
       });
-      // Alterna a visibilidade da categoria selecionada
-      var itens = document.getElementById(id);
-      itens.style.display = itens.style.display === "block" ? "none" : "block";
+      // Mostra apenas a categoria selecionada
+      document.getElementById(catId).classList.add('active');
+    }
+
+    // Exibe a primeira categoria ("refeicoes") por padrão
+    window.onload = function() {
+      showCategory('refeicoes');
     }
   </script>
 </head>
 <body>
   <div class="container">
-    <div class="logo">
-      <img src="https://via.placeholder.com/120" alt="Logo Pesque e Pague União">
+    <header>
+      <div class="logo">
+        <img src="https://via.placeholder.com/100" alt="Logo Pesque e Pague União">
+      </div>
+      <h1>Pesque e Pague União</h1>
+    </header>
+    <div class="content">
+      <nav class="sidebar">
+        <button class="categoria" onclick="showCategory('refeicoes')">🍽️ Refeições</button>
+        <button class="categoria" onclick="showCategory('petiscos')">🍢 Tira-Gosto/Petiscos</button>
+        <button class="categoria" onclick="showCategory('bebidas')">🥤 Bebidas</button>
+        <button class="categoria" onclick="showCategory('sobremesas')">🍮 Sobremesas</button>
+      </nav>
+      <section class="main">
+        <div id="refeicoes" class="itens active">
+          <div class="item">
+            <div>
+              <span>Peixe Frito</span>
+              <span class="preco">R$ 65,00</span>
+            </div>
+            <div class="descricao">Peixe frito crocante servido com acompanhamentos.</div>
+          </div>
+          <div class="item">
+            <div>
+              <span>Carne de Sol</span>
+              <span class="preco">R$ 60,00</span>
+            </div>
+            <div class="descricao">Carne de sol macia com arroz, feijão e farofa.</div>
+          </div>
+          <div class="item">
+            <div>
+              <span>Panelada</span>
+              <span class="preco">R$ 45,00</span>
+            </div>
+            <div class="descricao">Prato típico nordestino com miúdos e temperos especiais.</div>
+          </div>
+        </div>
+        <div id="petiscos" class="itens">
+          <div class="item">
+            <div>
+              <span>Tábua de Frios</span>
+              <span class="preco">R$ 35,00</span>
+            </div>
+            <div class="descricao">Queijos, embutidos e azeitonas.</div>
+          </div>
+        </div>
+        <div id="bebidas" class="itens">
+          <div class="item">
+            <div>
+              <span>Heineken 600ml</span>
+              <span class="preco">R$ 14,00</span>
+            </div>
+            <div class="descricao">Cerveja premium puro malte.</div>
+          </div>
+        </div>
+        <div id="sobremesas" class="itens">
+          <div class="item">
+            <div>
+              <span>Pudim de Leite</span>
+              <span class="preco">R$ 5,00</span>
+            </div>
+            <div class="descricao">Pudim cremoso com calda de caramelo.</div>
+          </div>
+        </div>
+      </section>
     </div>
-    <h1>Pesque e Pague União</h1>
-
-    <div class="categoria" onclick="toggleCategoria('refeicoes')">🍽️ Refeições</div>
-    <div id="refeicoes" class="itens">
-      <div class="item"><span>Peixe Frito</span> <span class="preco">R$ 65,00</span></div>
-      <div class="descricao">Peixe frito crocante servido com acompanhamentos.</div>
-
-      <div class="item"><span>Carne de Sol</span> <span class="preco">R$ 60,00</span></div>
-      <div class="descricao">Carne de sol macia com arroz, feijão e farofa.</div>
-
-      <div class="item"><span>Panelada</span> <span class="preco">R$ 45,00</span></div>
-      <div class="descricao">Prato típico nordestino com miúdos e temperos especiais.</div>
-    </div>
-
-    <div class="categoria" onclick="toggleCategoria('petiscos')">🍢 Tira-Gosto/Petiscos</div>
-    <div id="petiscos" class="itens">
-      <div class="item"><span>Tábua de Frios</span> <span class="preco">R$ 35,00</span></div>
-      <div class="descricao">Queijos, embutidos e azeitonas.</div>
-    </div>
-
-    <div class="categoria" onclick="toggleCategoria('bebidas')">🥤 Bebidas</div>
-    <div id="bebidas" class="itens">
-      <div class="item"><span>Heineken 600ml</span> <span class="preco">R$ 14,00</span></div>
-      <div class="descricao">Cerveja premium puro malte.</div>
-    </div>
-
-    <div class="categoria" onclick="toggleCategoria('sobremesas')">🍮 Sobremesas</div>
-    <div id="sobremesas" class="itens">
-      <div class="item"><span>Pudim de Leite</span> <span class="preco">R$ 5,00</span></div>
-      <div class="descricao">Pudim cremoso com calda de caramelo.</div>
-    </div>
-
-    <div class="rodape">
+    <footer class="rodape">
       <p><strong>Formas de pagamento:</strong> Aceitamos Pix, cartão de crédito e débito.</p>
       <p><strong>Horário de funcionamento:</strong> Terça a domingo, das 10h às 22h.</p>
-    </div>
+    </footer>
   </div>
 </body>
 </html>
