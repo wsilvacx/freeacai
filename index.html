@@ -31,6 +31,19 @@
             z-index: 1000;
         }
 
+        .logo {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        .logo img {
+            width: 100px;
+            height: 100px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
         .container {
             max-width: 800px;
             margin: 60px auto 20px;
@@ -120,6 +133,9 @@
     <div class="cardapio-titulo">🍽️ Cardápio</div>
 
     <div class="container">
+        <div class="logo">
+            <img src="https://via.placeholder.com/100" alt="Logo Pesque e Pague União">
+        </div>
         <h1>Pesque e Pague União</h1>
 
         <div class="categoria" onclick="toggleCategoria('refeicoes')">🍽️ Refeições</div>
