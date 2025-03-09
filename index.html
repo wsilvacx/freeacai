@@ -6,13 +6,7 @@
   <title>Cardápio - Pesque e Pague União</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Roboto', sans-serif;
       background: url('IMG_6008.jpeg') no-repeat center center fixed;
@@ -20,139 +14,99 @@
       color: #fff;
       padding: 20px;
     }
-
     .container {
-      max-width: 960px;
-      margin: auto;
-      background-color: rgba(28, 28, 28, 0.85);
-      border-radius: 20px;
-      padding: 30px;
-      box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: rgba(0,0,0,0.8);
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.6);
     }
-
     header {
       text-align: center;
-      margin-bottom: 30px;
+      margin-bottom: 20px;
     }
-
-    .logo img {
-      width: 100px;
-      height: 100px;
+    header .logo img {
+      width: 80px;
+      height: 80px;
       border-radius: 50%;
       margin-bottom: 10px;
-      box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
     }
-
     header h1 {
-      font-size: 28px;
+      font-size: 24px;
       text-transform: uppercase;
       letter-spacing: 2px;
-      margin-bottom: 10px;
     }
-
-    .content {
+    nav {
       display: flex;
-      gap: 20px;
+      justify-content: center;
+      margin-bottom: 20px;
     }
-
-    /* Sidebar com as categorias */
-    .sidebar {
-      flex: 1;
+    nav ul {
+      list-style: none;
       display: flex;
-      flex-direction: column;
-      gap: 12px;
+      gap: 15px;
     }
-
-    .categoria {
-      background: linear-gradient(135deg, #4b4b4b, #2a2a2a);
-      color: #fff;
-      padding: 15px;
-      border-radius: 30px;
-      font-size: 18px;
-      font-weight: 700;
-      border: none;
+    nav ul li {
       cursor: pointer;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      padding: 10px 15px;
+      background: linear-gradient(45deg, #333, #555);
+      border-radius: 25px;
+      transition: background 0.3s, transform 0.2s;
     }
-
-    .categoria:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-      background: linear-gradient(135deg, #5e5e5e, #3c3c3c);
+    nav ul li:hover, nav ul li.active {
+      background: linear-gradient(45deg, #555, #777);
+      transform: scale(1.05);
     }
-
-    /* Área principal para os itens */
-    .main {
-      flex: 2;
-      background-color: rgba(0, 0, 0, 0.3);
-      border-radius: 20px;
-      padding: 20px;
-      overflow-y: auto;
-      max-height: 500px;
-    }
-
-    .itens {
+    .content {
       display: none;
     }
-
-    .itens.active {
+    .content.active {
       display: block;
     }
-
     .item {
-      background-color: #2a2a2a;
-      margin: 10px 0;
-      padding: 12px;
-      border-radius: 8px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
+      background-color: #222;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      padding: 10px 15px;
+      transition: background 0.3s;
     }
-
-    .item > div {
+    .item:hover {
+      background-color: #333;
+    }
+    .item-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-
     .preco {
       color: #f39c12;
       font-weight: bold;
     }
-
     .descricao {
       font-size: 14px;
-      color: #bbb;
-      text-align: left;
+      color: #ccc;
+      margin-top: 8px;
     }
-
-    footer.rodape {
-      margin-top: 30px;
-      font-size: 14px;
-      color: #ddd;
-      border-top: 1px solid #333;
-      padding-top: 20px;
+    footer {
       text-align: center;
-    }
-
-    footer.rodape p {
-      margin: 5px 0;
+      font-size: 14px;
+      margin-top: 20px;
+      border-top: 1px solid #444;
+      padding-top: 10px;
     }
   </style>
   <script>
-    function showCategory(catId) {
-      // Esconde todas as categorias
-      const categorias = document.querySelectorAll('.itens');
-      categorias.forEach(cat => {
-        cat.classList.remove('active');
-      });
-      // Mostra apenas a categoria selecionada
-      document.getElementById(catId).classList.add('active');
+    function showContent(category) {
+      // Remove a classe active de todos os itens do menu e seções de conteúdo
+      document.querySelectorAll('nav ul li').forEach(li => li.classList.remove('active'));
+      document.querySelectorAll('.content').forEach(section => section.classList.remove('active'));
+      // Adiciona active no item do menu e na seção de conteúdo selecionada
+      document.getElementById(category + '-nav').classList.add('active');
+      document.getElementById(category + '-content').classList.add('active');
     }
-
-    // Exibe a primeira categoria ("refeicoes") por padrão
     window.onload = function() {
-      showCategory('refeicoes');
+      showContent('refeicoes');
     }
   </script>
 </head>
@@ -160,72 +114,70 @@
   <div class="container">
     <header>
       <div class="logo">
-        <img src="https://via.placeholder.com/100" alt="Logo Pesque e Pague União">
+        <img src="https://via.placeholder.com/80" alt="Logo Pesque e Pague União">
       </div>
       <h1>Pesque e Pague União</h1>
     </header>
-    <div class="content">
-      <nav class="sidebar">
-        <button class="categoria" onclick="showCategory('refeicoes')">🍽️ Refeições</button>
-        <button class="categoria" onclick="showCategory('petiscos')">🍢 Tira-Gosto/Petiscos</button>
-        <button class="categoria" onclick="showCategory('bebidas')">🥤 Bebidas</button>
-        <button class="categoria" onclick="showCategory('sobremesas')">🍮 Sobremesas</button>
-      </nav>
-      <section class="main">
-        <div id="refeicoes" class="itens active">
-          <div class="item">
-            <div>
-              <span>Peixe Frito</span>
-              <span class="preco">R$ 65,00</span>
-            </div>
-            <div class="descricao">Peixe frito crocante servido com acompanhamentos.</div>
-          </div>
-          <div class="item">
-            <div>
-              <span>Carne de Sol</span>
-              <span class="preco">R$ 60,00</span>
-            </div>
-            <div class="descricao">Carne de sol macia com arroz, feijão e farofa.</div>
-          </div>
-          <div class="item">
-            <div>
-              <span>Panelada</span>
-              <span class="preco">R$ 45,00</span>
-            </div>
-            <div class="descricao">Prato típico nordestino com miúdos e temperos especiais.</div>
-          </div>
+    <nav>
+      <ul>
+        <li id="refeicoes-nav" onclick="showContent('refeicoes')">🍽️ Refeições</li>
+        <li id="petiscos-nav" onclick="showContent('petiscos')">🍢 Petiscos</li>
+        <li id="bebidas-nav" onclick="showContent('bebidas')">🥤 Bebidas</li>
+        <li id="sobremesas-nav" onclick="showContent('sobremesas')">🍮 Sobremesas</li>
+      </ul>
+    </nav>
+    <section id="refeicoes-content" class="content active">
+      <div class="item">
+        <div class="item-header">
+          <span>Peixe Frito</span>
+          <span class="preco">R$ 65,00</span>
         </div>
-        <div id="petiscos" class="itens">
-          <div class="item">
-            <div>
-              <span>Tábua de Frios</span>
-              <span class="preco">R$ 35,00</span>
-            </div>
-            <div class="descricao">Queijos, embutidos e azeitonas.</div>
-          </div>
+        <div class="descricao">Peixe frito crocante servido com acompanhamentos.</div>
+      </div>
+      <div class="item">
+        <div class="item-header">
+          <span>Carne de Sol</span>
+          <span class="preco">R$ 60,00</span>
         </div>
-        <div id="bebidas" class="itens">
-          <div class="item">
-            <div>
-              <span>Heineken 600ml</span>
-              <span class="preco">R$ 14,00</span>
-            </div>
-            <div class="descricao">Cerveja premium puro malte.</div>
-          </div>
+        <div class="descricao">Carne de sol macia com arroz, feijão e farofa.</div>
+      </div>
+      <div class="item">
+        <div class="item-header">
+          <span>Panelada</span>
+          <span class="preco">R$ 45,00</span>
         </div>
-        <div id="sobremesas" class="itens">
-          <div class="item">
-            <div>
-              <span>Pudim de Leite</span>
-              <span class="preco">R$ 5,00</span>
-            </div>
-            <div class="descricao">Pudim cremoso com calda de caramelo.</div>
-          </div>
+        <div class="descricao">Prato típico nordestino com miúdos e temperos especiais.</div>
+      </div>
+    </section>
+    <section id="petiscos-content" class="content">
+      <div class="item">
+        <div class="item-header">
+          <span>Tábua de Frios</span>
+          <span class="preco">R$ 35,00</span>
         </div>
-      </section>
-    </div>
-    <footer class="rodape">
-      <p><strong>Formas de pagamento:</strong> Aceitamos Pix, cartão de crédito e débito.</p>
+        <div class="descricao">Queijos, embutidos e azeitonas.</div>
+      </div>
+    </section>
+    <section id="bebidas-content" class="content">
+      <div class="item">
+        <div class="item-header">
+          <span>Heineken 600ml</span>
+          <span class="preco">R$ 14,00</span>
+        </div>
+        <div class="descricao">Cerveja premium puro malte.</div>
+      </div>
+    </section>
+    <section id="sobremesas-content" class="content">
+      <div class="item">
+        <div class="item-header">
+          <span>Pudim de Leite</span>
+          <span class="preco">R$ 5,00</span>
+        </div>
+        <div class="descricao">Pudim cremoso com calda de caramelo.</div>
+      </div>
+    </section>
+    <footer>
+      <p><strong>Formas de pagamento:</strong> Pix, cartão de crédito e débito.</p>
       <p><strong>Horário de funcionamento:</strong> Terça a domingo, das 10h às 22h.</p>
     </footer>
   </div>
