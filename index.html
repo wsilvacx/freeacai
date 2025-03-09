@@ -81,7 +81,7 @@
       font-size: 18px;
       font-weight: 500;
       transition: background-color 0.3s ease;
-      cursor: pointer;
+      cursor: default;
     }
 
     .item:hover {
@@ -93,11 +93,13 @@
       font-weight: bold;
     }
 
+    /* Agora as descrições ficam sempre visíveis */
     .descricao {
-      display: none;
+      display: block;
       font-size: 16px;
       color: #bbb;
       margin-top: 8px;
+      text-align: left;
     }
 
     .rodape {
@@ -114,7 +116,7 @@
   </style>
   <script>
     function toggleCategoria(id) {
-      // Fecha todas as categorias abertas
+      // Fecha todas as categorias abertas, exceto a selecionada
       var categorias = document.querySelectorAll('.itens');
       categorias.forEach(function(categoria) {
         if (categoria.id !== id) {
@@ -126,48 +128,43 @@
       var itens = document.getElementById(id);
       itens.style.display = itens.style.display === "block" ? "none" : "block";
     }
-
-    function toggleDescricao(id) {
-      var descricao = document.getElementById(id);
-      descricao.style.display = descricao.style.display === "block" ? "none" : "block";
-    }
   </script>
 </head>
 <body>
   <div class="container">
     <div class="logo">
-      <img src="IMG_5997.jpeg" alt="Logo Pesque e Pague União">
+      <img src="https://via.placeholder.com/120" alt="Logo Pesque e Pague União">
     </div>
     <h1>Pesque e Pague União</h1>
 
     <div class="categoria" onclick="toggleCategoria('refeicoes')">🍽️ Refeições</div>
     <div id="refeicoes" class="itens">
-      <div class="item" onclick="toggleDescricao('desc1')"><span>Peixe Frito</span> <span class="preco">R$ 65,00</span></div>
-      <div id="desc1" class="descricao">Peixe frito crocante servido com acompanhamentos.</div>
+      <div class="item"><span>Peixe Frito</span> <span class="preco">R$ 65,00</span></div>
+      <div class="descricao">Peixe frito crocante servido com acompanhamentos.</div>
 
-      <div class="item" onclick="toggleDescricao('desc2')"><span>Carne de Sol</span> <span class="preco">R$ 60,00</span></div>
-      <div id="desc2" class="descricao">Carne de sol macia com arroz, feijão e farofa.</div>
+      <div class="item"><span>Carne de Sol</span> <span class="preco">R$ 60,00</span></div>
+      <div class="descricao">Carne de sol macia com arroz, feijão e farofa.</div>
 
-      <div class="item" onclick="toggleDescricao('desc3')"><span>Panelada</span> <span class="preco">R$ 45,00</span></div>
-      <div id="desc3" class="descricao">Prato típico nordestino com miúdos e temperos especiais.</div>
+      <div class="item"><span>Panelada</span> <span class="preco">R$ 45,00</span></div>
+      <div class="descricao">Prato típico nordestino com miúdos e temperos especiais.</div>
     </div>
 
     <div class="categoria" onclick="toggleCategoria('petiscos')">🍢 Tira-Gosto/Petiscos</div>
     <div id="petiscos" class="itens">
-      <div class="item" onclick="toggleDescricao('desc4')"><span>Tábua de Frios</span> <span class="preco">R$ 35,00</span></div>
-      <div id="desc4" class="descricao">Queijos, embutidos e azeitonas.</div>
+      <div class="item"><span>Tábua de Frios</span> <span class="preco">R$ 35,00</span></div>
+      <div class="descricao">Queijos, embutidos e azeitonas.</div>
     </div>
 
     <div class="categoria" onclick="toggleCategoria('bebidas')">🥤 Bebidas</div>
     <div id="bebidas" class="itens">
-      <div class="item" onclick="toggleDescricao('desc5')"><span>Heineken 600ml</span> <span class="preco">R$ 14,00</span></div>
-      <div id="desc5" class="descricao">Cerveja premium puro malte.</div>
+      <div class="item"><span>Heineken 600ml</span> <span class="preco">R$ 14,00</span></div>
+      <div class="descricao">Cerveja premium puro malte.</div>
     </div>
 
     <div class="categoria" onclick="toggleCategoria('sobremesas')">🍮 Sobremesas</div>
     <div id="sobremesas" class="itens">
-      <div class="item" onclick="toggleDescricao('desc6')"><span>Pudim de Leite</span> <span class="preco">R$ 5,00</span></div>
-      <div id="desc6" class="descricao">Pudim cremoso com calda de caramelo.</div>
+      <div class="item"><span>Pudim de Leite</span> <span class="preco">R$ 5,00</span></div>
+      <div class="descricao">Pudim cremoso com calda de caramelo.</div>
     </div>
 
     <div class="rodape">
