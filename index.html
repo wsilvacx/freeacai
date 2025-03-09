@@ -33,7 +33,7 @@
     }
 
     h1 {
-      font-size: 40px;
+      font-size: 32px; /* Tamanho reduzido */
       color: #fff;
       margin-bottom: 20px;
       text-transform: uppercase;
@@ -48,23 +48,26 @@
       box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
     }
 
+    /* Novo formato para os botões */
     .categoria {
-      background-color: #333;
+      background: linear-gradient(45deg, #444, #222);
       color: #fff;
       padding: 15px;
       margin: 12px 0;
-      border-radius: 8px;
-      font-size: 22px;
+      border-radius: 30px;  /* Mais arredondado */
+      font-size: 20px;
       font-weight: bold;
       cursor: pointer;
-      transition: background-color 0.3s ease, transform 0.2s ease;
-      width: 100%; /* Botões mais largos */
+      transition: background 0.3s ease, transform 0.2s ease;
+      width: 100%;
       display: block;
+      border: 2px solid transparent;
     }
 
     .categoria:hover {
-      background-color: #444;
-      transform: translateY(-5px);
+      background: linear-gradient(45deg, #555, #333);
+      transform: translateY(-3px);
+      border: 2px solid #f39c12;
     }
 
     .itens {
@@ -124,7 +127,6 @@
           categoria.style.display = 'none';
         }
       });
-
       // Alterna a visibilidade da categoria selecionada
       var itens = document.getElementById(id);
       itens.style.display = itens.style.display === "block" ? "none" : "block";
