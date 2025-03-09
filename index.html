@@ -5,75 +5,74 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cardápio - Pesque e Pague União</title>
     <style>
-        body {
-            background: url() no-repeat center center fixed;
-            background-size: cover;
-            color: white;
-            font-family: 'Poppins', Arial, sans-serif;
-            text-align: center;
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        * {
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #000;
+            color: #fff;
+            text-align: center;
             padding: 20px;
         }
 
-        .cardapio-titulo {
-            position: fixed;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.8);
-            padding: 10px 20px;
-            border-radius: 30px;
-            font-size: 24px;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-            z-index: 1000;
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
         }
 
         .logo {
             display: flex;
             justify-content: center;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
         }
 
         .logo img {
-            width: 100px;
-            height: 100px;
+            width: 120px;
+            height: 120px;
             border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 10px rgba(255, 255, 255, 0.3);
         }
 
-        .container {
-            max-width: 800px;
-            margin: 60px auto 20px;
-            background: rgba(0, 0, 0, 0.85);
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        h1 {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
         }
 
         .categoria {
-            font-size: 22px;
-            background: linear-gradient(to right, #ffffff, #e0e0e0);
-            color: black;
+            font-size: 20px;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
             padding: 12px;
             margin: 10px 0;
             border-radius: 10px;
             cursor: pointer;
-            transition: 0.3s;
-            font-weight: bold;
-            box-shadow: 2px 4px 6px rgba(255, 255, 255, 0.2);
+            transition: 0.3s ease-in-out;
+            text-transform: uppercase;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .categoria:hover {
-            background: linear-gradient(to right, #f5f5f5, #d6d6d6);
+            background: rgba(255, 255, 255, 0.3);
             transform: scale(1.02);
-            box-shadow: 4px 6px 10px rgba(255, 255, 255, 0.3);
         }
 
         .itens {
-            display: none;
+            max-height: 0;
             overflow: hidden;
             transition: max-height 0.5s ease-in-out;
         }
@@ -83,66 +82,65 @@
             justify-content: space-between;
             align-items: center;
             font-size: 18px;
-            margin: 10px 0;
-            padding: 10px;
+            padding: 12px;
+            margin: 5px 0;
             border-radius: 5px;
             background: rgba(255, 255, 255, 0.1);
             cursor: pointer;
-            transition: background 0.3s, transform 0.2s;
+            transition: 0.3s;
         }
 
         .item:hover {
             background: rgba(255, 255, 255, 0.3);
-            transform: scale(1.02);
         }
 
         .preco {
             font-weight: bold;
-            color: #ffd700;
+            color: #00ffcc;
         }
 
         .descricao {
-            display: none;
+            max-height: 0;
+            overflow: hidden;
             font-size: 16px;
             color: #ddd;
             margin-top: 5px;
             padding: 10px;
-            border-left: 4px solid #ffffff;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 5px;
+            transition: max-height 0.3s ease-in-out;
         }
 
         .rodape {
             margin-top: 30px;
             font-size: 16px;
             color: #bdbdbd;
-            border-top: 1px solid #444;
             padding-top: 10px;
         }
     </style>
     <script>
         function toggleCategoria(id) {
             var itens = document.getElementById(id);
-            itens.style.display = itens.style.display === "block" ? "none" : "block";
+            itens.style.maxHeight = itens.style.maxHeight ? null : itens.scrollHeight + "px";
         }
 
         function toggleDescricao(id) {
             var descricao = document.getElementById(id);
-            descricao.style.display = descricao.style.display === "block" ? "none" : "block";
+            descricao.style.maxHeight = descricao.style.maxHeight ? null : descricao.scrollHeight + "px";
         }
     </script>
 </head>
 <body>
 
-    <div class="cardapio-titulo">🍽️ Cardápio</div>
-
     <div class="container">
         <div class="logo">
-            <img src="https://via.placeholder.com/100" alt="Logo Pesque e Pague União">
+            <img src="https://via.placeholder.com/120" alt="Logo Pesque e Pague União">
         </div>
         <h1>Pesque e Pague União</h1>
 
-        <div class="categoria" onclick="toggleCategoria('refeicoes')">🍽️ Refeições</div>
+        <div class="categoria" onclick="toggleCategoria('refeicoes')">
+            🍽️ Refeições <span>▼</span>
+        </div>
         <div id="refeicoes" class="itens">
             <div class="item" onclick="toggleDescricao('desc1')"><span>Peixe Frito</span> <span class="preco">R$ 65,00</span></div>
             <div id="desc1" class="descricao">Peixe frito crocante servido com acompanhamentos.</div>
@@ -151,19 +149,25 @@
             <div id="desc2" class="descricao">Carne de sol macia com arroz, feijão e farofa.</div>
         </div>
 
-        <div class="categoria" onclick="toggleCategoria('petiscos')">🍢 Tira-Gosto/Petiscos</div>
+        <div class="categoria" onclick="toggleCategoria('petiscos')">
+            🍢 Tira-Gosto/Petiscos <span>▼</span>
+        </div>
         <div id="petiscos" class="itens">
             <div class="item" onclick="toggleDescricao('desc3')"><span>Calabresa Acebolada</span> <span class="preco">R$ 30,00</span></div>
             <div id="desc3" class="descricao">Linguiça calabresa acebolada.</div>
         </div>
 
-        <div class="categoria" onclick="toggleCategoria('bebidas')">🥤 Bebidas</div>
+        <div class="categoria" onclick="toggleCategoria('bebidas')">
+            🥤 Bebidas <span>▼</span>
+        </div>
         <div id="bebidas" class="itens">
             <div class="item" onclick="toggleDescricao('desc5')"><span>Heineken 600ml</span> <span class="preco">R$ 14,00</span></div>
             <div id="desc5" class="descricao">Cerveja premium puro malte.</div>
         </div>
 
-        <div class="categoria" onclick="toggleCategoria('sobremesas')">🍮 Sobremesas</div>
+        <div class="categoria" onclick="toggleCategoria('sobremesas')">
+            🍮 Sobremesas <span>▼</span>
+        </div>
         <div id="sobremesas" class="itens">
             <div class="item" onclick="toggleDescricao('desc6')"><span>Pudim de Leite</span> <span class="preco">R$ 5,00</span></div>
             <div id="desc6" class="descricao">Pudim cremoso com calda de caramelo.</div>
