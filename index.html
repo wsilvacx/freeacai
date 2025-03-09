@@ -9,63 +9,92 @@
             background: url('https://source.unsplash.com/1600x900/?restaurant,food') no-repeat center center fixed;
             background-size: cover;
             color: white;
-            font-family: Arial, sans-serif;
+            font-family: 'Poppins', Arial, sans-serif;
             text-align: center;
             margin: 0;
             padding: 20px;
         }
-        h1 {
-            font-size: 36px;
-            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+
+        .cardapio-titulo {
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 24px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
         }
+
         .container {
             max-width: 800px;
-            margin: auto;
-            background: rgba(0, 0, 0, 0.8);
+            margin: 60px auto 20px;
+            background: rgba(0, 0, 0, 0.85);
             padding: 20px;
             border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
         }
+
         .categoria {
-            font-size: 24px;
-            background: white;
-            color: black;
-            padding: 10px;
+            font-size: 22px;
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
+            color: white;
+            padding: 12px;
             margin: 10px 0;
             border-radius: 5px;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: 0.3s;
+            font-weight: bold;
         }
+
         .categoria:hover {
-            background: #e0e0e0;
+            filter: brightness(1.2);
         }
+
         .itens {
             display: none;
-            margin-top: 10px;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
         }
+
         .item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 20px;
+            font-size: 18px;
             margin: 10px 0;
-            padding: 5px 0;
-            border-bottom: 1px solid #444;
-            transition: background 0.3s;
+            padding: 10px;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.1);
             cursor: pointer;
+            transition: background 0.3s;
         }
+
         .item:hover {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.3);
         }
+
         .preco {
             font-weight: bold;
-            color: white;
+            color: #ffd700;
         }
+
         .descricao {
             display: none;
             font-size: 16px;
             color: #ddd;
-            padding-top: 5px;
+            margin-top: 5px;
+            padding: 10px;
+            border-left: 4px solid #ff7e5f;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
         }
+
         .rodape {
             margin-top: 30px;
             font-size: 16px;
@@ -88,6 +117,8 @@
 </head>
 <body>
 
+    <div class="cardapio-titulo">🍽️ Cardápio</div>
+
     <div class="container">
         <h1>Pesque e Pague União</h1>
 
@@ -98,48 +129,24 @@
 
             <div class="item" onclick="toggleDescricao('desc2')"><span>Carne de Sol</span> <span class="preco">R$ 60,00</span></div>
             <div id="desc2" class="descricao">Carne de sol macia com arroz, feijão e farofa.</div>
-
-            <div class="item" onclick="toggleDescricao('desc3')"><span>Panelada</span> <span class="preco">R$ 45,00</span></div>
-            <div id="desc3" class="descricao">Prato típico nordestino com miúdos e temperos especiais.</div>
-
-            <div class="item" onclick="toggleDescricao('desc4')"><span>Galinha Caipira</span> <span class="preco">R$ 160,00</span></div>
-            <div id="desc4" class="descricao">Galinha caipira cozida lentamente com temperos caseiros.</div>
-
-            <div class="item" onclick="toggleDescricao('desc5')"><span>Peixada União</span> <span class="preco">R$ 120,00</span></div>
-            <div id="desc5" class="descricao">Peixada especial da casa com molho e acompanhamentos.</div>
         </div>
 
         <div class="categoria" onclick="toggleCategoria('petiscos')">🍢 Tira-Gosto/Petiscos</div>
         <div id="petiscos" class="itens">
-            <div class="item" onclick="toggleDescricao('desc6')"><span>Tábua de Frios</span> <span class="preco">R$ 35,00</span></div>
-            <div id="desc6" class="descricao">Queijos, embutidos e azeitonas.</div>
-
-            <div class="item" onclick="toggleDescricao('desc7')"><span>Calabresa</span> <span class="preco">R$ 30,00</span></div>
-            <div id="desc7" class="descricao">Linguiça calabresa acebolada.</div>
+            <div class="item" onclick="toggleDescricao('desc3')"><span>Tábua de Frios</span> <span class="preco">R$ 35,00</span></div>
+            <div id="desc3" class="descricao">Queijos, embutidos e azeitonas.</div>
         </div>
 
         <div class="categoria" onclick="toggleCategoria('sobremesas')">🍮 Sobremesas</div>
         <div id="sobremesas" class="itens">
-            <div class="item" onclick="toggleDescricao('desc8')"><span>Pudim de Leite</span> <span class="preco">R$ 5,00</span></div>
-            <div id="desc8" class="descricao">Pudim cremoso com calda de caramelo.</div>
-        </div>
-
-        <div class="categoria" onclick="toggleCategoria('adicionais')">🍚 Adicionais</div>
-        <div id="adicionais" class="itens">
-            <div class="item" onclick="toggleDescricao('desc9')"><span>Porção de Arroz</span> <span class="preco">R$ 10,00</span></div>
-            <div id="desc9" class="descricao">Arroz branco soltinho.</div>
+            <div class="item" onclick="toggleDescricao('desc4')"><span>Pudim de Leite</span> <span class="preco">R$ 5,00</span></div>
+            <div id="desc4" class="descricao">Pudim cremoso com calda de caramelo.</div>
         </div>
 
         <div class="categoria" onclick="toggleCategoria('bebidas')">🥤 Bebidas</div>
         <div id="bebidas" class="itens">
-            <div class="item" onclick="toggleDescricao('desc10')"><span>Heineken 600ml</span> <span class="preco">R$ 14,00</span></div>
-            <div id="desc10" class="descricao">Cerveja premium puro malte.</div>
-        </div>
-
-        <div class="categoria" onclick="toggleCategoria('aguas')">💧 Águas</div>
-        <div id="aguas" class="itens">
-            <div class="item" onclick="toggleDescricao('desc11')"><span>Água Mineral 510ml</span> <span class="preco">R$ 4,00</span></div>
-            <div id="desc11" class="descricao">Água pura e refrescante.</div>
+            <div class="item" onclick="toggleDescricao('desc5')"><span>Heineken 600ml</span> <span class="preco">R$ 14,00</span></div>
+            <div id="desc5" class="descricao">Cerveja premium puro malte.</div>
         </div>
 
         <div class="rodape">
