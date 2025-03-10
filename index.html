@@ -38,7 +38,6 @@
       text-transform: uppercase;
       letter-spacing: 2px;
     }
-    /* Nova barra de categorias */
     .category-bar {
       display: flex;
       gap: 15px;
@@ -50,9 +49,6 @@
       margin-bottom: 20px;
       scroll-snap-type: x mandatory;
       -webkit-overflow-scrolling: touch;
-    }
-    .category-bar::-webkit-scrollbar {
-      display: none;
     }
     .category-btn {
       flex: 0 0 auto;
@@ -73,7 +69,6 @@
       transform: scale(1.05);
       border: 1px solid rgba(255,255,255,0.5);
     }
-    /* Seção de conteúdo */
     .content-section {
       display: none;
       opacity: 0;
@@ -90,24 +85,14 @@
       border-radius: 10px;
       margin-bottom: 15px;
       padding: 20px;
-      display: flex;
-      gap: 20px;
-      align-items: flex-start;
       transition: background 0.3s, box-shadow 0.3s ease-in-out;
     }
     .item:hover {
       background-color: #333;
       box-shadow: 0px 5px 15px rgba(255, 255, 255, 0.2);
     }
-    .item img {
-      width: 70px;
-      height: 70px;
-      border-radius: 5px;
-      object-fit: cover;
-    }
     .item-details {
       flex: 1;
-      text-align: left;
     }
     .item-header {
       display: flex;
@@ -120,12 +105,10 @@
     .preco {
       color: #f39c12;
       font-weight: bold;
-      margin-left: 10px;
     }
     .descricao {
       font-size: 14px;
       color: #ccc;
-      line-height: 1.4;
     }
     footer {
       text-align: center;
@@ -133,21 +116,6 @@
       margin-top: 20px;
       border-top: 1px solid #444;
       padding-top: 10px;
-    }
-    @media (max-width: 600px) {
-      .item {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-      }
-      .item img {
-        width: 100px;
-        height: 100px;
-      }
-      .category-bar {
-        flex-wrap: wrap;
-        justify-content: center;
-      }
     }
   </style>
   <script>
@@ -175,36 +143,67 @@
       <div class="category-btn" id="petiscos-btn" onclick="showCategory('petiscos')">🍢 Petiscos</div>
       <div class="category-btn" id="bebidas-btn" onclick="showCategory('bebidas')">🥤 Bebidas</div>
       <div class="category-btn" id="sobremesas-btn" onclick="showCategory('sobremesas')">🍮 Sobremesas</div>
+      <div class="category-btn" id="adicionais-btn" onclick="showCategory('adicionais')">➕ Adicionais</div>
     </div>
     <div class="content">
       <div id="refeicoes-content" class="content-section active">
         <div class="item">
-          <img src="peixe_frito.jpg" alt="Peixe Frito">
-          <div class="item-details">
-            <div class="item-header">
-              <span>Peixe Frito</span>
-              <span class="preco">R$ 65,00</span>
-            </div>
-            <div class="descricao">Peixe frito crocante servido com acompanhamentos.</div>
+          <div class="item-header">
+            <span>Peixe Frito</span>
+            <span class="preco">R$ 65,00</span>
           </div>
+          <div class="descricao">Peixe frito crocante com arroz, vinagrete e farofa.</div>
+        </div>
+        <div class="item">
+          <div class="item-header">
+            <span>Galinha Caipira</span>
+            <span class="preco">R$ 50,00</span>
+          </div>
+          <div class="descricao">Galinha caipira com arroz, feijão e macarrão.</div>
         </div>
       </div>
       <div id="petiscos-content" class="content-section">
         <div class="item">
-          <img src="tabua_de_frios.jpg" alt="Tábua de Frios">
-          <div class="item-details">
-            <div class="item-header">
-              <span>Tábua de Frios</span>
-              <span class="preco">R$ 35,00</span>
-            </div>
-            <div class="descricao">Queijos, embutidos e azeitonas.</div>
+          <div class="item-header">
+            <span>Tábua de Frios</span>
+            <span class="preco">R$ 35,00</span>
+          </div>
+          <div class="descricao">Queijos, embutidos e azeitonas.</div>
+        </div>
+      </div>
+      <div id="bebidas-content" class="content-section">
+        <div class="item">
+          <div class="item-header">
+            <span>Refrigerante Lata</span>
+            <span class="preco">R$ 5,00</span>
+          </div>
+        </div>
+        <div class="item">
+          <div class="item-header">
+            <span>Cerveja Long Neck</span>
+            <span class="preco">R$ 10,00</span>
+          </div>
+        </div>
+      </div>
+      <div id="sobremesas-content" class="content-section">
+        <div class="item">
+          <div class="item-header">
+            <span>Pudim</span>
+            <span class="preco">R$ 7,00</span>
+          </div>
+        </div>
+      </div>
+      <div id="adicionais-content" class="content-section">
+        <div class="item">
+          <div class="item-header">
+            <span>Farofa Extra</span>
+            <span class="preco">R$ 5,00</span>
           </div>
         </div>
       </div>
     </div>
     <footer>
-      <p><strong>Formas de pagamento:</strong> Pix, cartão de crédito e débito.</p>
-      <p><strong>Horário de funcionamento:</strong> Terça a domingo, das 10h às 22h.</p>
+      <p><strong>Horário:</strong> Terça a domingo, das 10h às 22h.</p>
     </footer>
   </div>
 </body>
