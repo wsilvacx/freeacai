@@ -18,8 +18,8 @@
     }
     body {
       font-family: 'Roboto', sans-serif;
-      background-color: #f7f7f7; /* Fundo claro para simular layout mobile */
-      color: #333;
+      background-color: #121212; /* Fundo bem escuro */
+      color: #fff;
     }
     /* Barra Superior (header) */
     .header {
@@ -27,8 +27,8 @@
       align-items: center;
       justify-content: space-between;
       padding: 10px 15px;
-      background-color: #fff;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      background-color: #1E1E1E; /* Barra superior mais escura */
+      box-shadow: 0 2px 5px rgba(0,0,0,0.4);
       position: sticky;
       top: 0;
       z-index: 999;
@@ -39,11 +39,13 @@
       gap: 8px;
       font-weight: 700;
       font-size: 18px;
+      color: #fff;
     }
     .header .brand img {
-      width: 30px;
-      height: 30px;
+      width: 35px;
+      height: 35px;
       object-fit: cover;
+      border-radius: 50%;
     }
     .header .icons {
       display: flex;
@@ -52,6 +54,10 @@
     .header .icons i {
       font-size: 20px;
       cursor: pointer;
+      color: #ccc;
+    }
+    .header .icons i:hover {
+      color: #fff;
     }
 
     /* Seção de categorias */
@@ -60,10 +66,10 @@
       grid-template-columns: repeat(2, 1fr); /* 2 colunas */
       gap: 15px;
       padding: 15px;
-      background-color: #fff;
+      background-color: #1E1E1E;
       margin: 10px;
       border-radius: 8px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.5);
     }
     .category-card {
       display: flex;
@@ -71,26 +77,28 @@
       align-items: center;
       justify-content: center;
       gap: 5px;
-      background-color: #fafafa;
+      background-color: #2A2A2A;
       border-radius: 8px;
       padding: 10px;
       cursor: pointer;
       transition: 0.3s;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
     }
     .category-card:hover {
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
       transform: translateY(-2px);
     }
     .category-card img {
       width: 50px;
       height: 50px;
       object-fit: contain;
+      filter: brightness(0.9);
     }
     .category-card span {
       font-weight: 700;
       font-size: 14px;
       text-transform: uppercase;
+      color: #fff;
     }
 
     /* Título da seção (ex: Refeições) */
@@ -98,22 +106,23 @@
       font-weight: 700;
       font-size: 18px;
       margin: 15px 10px 5px;
+      color: #fff;
     }
 
     /* Lista de itens (ex: Refeições) */
     .item-list {
-      background-color: #fff;
+      background-color: #1E1E1E;
       margin: 10px;
       padding: 10px;
       border-radius: 8px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.5);
     }
     .item {
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 10px 0;
-      border-bottom: 1px solid #eee;
+      border-bottom: 1px solid #333;
     }
     .item:last-child {
       border-bottom: none; /* Remove a borda do último item */
@@ -127,6 +136,7 @@
     .item-info .item-name {
       font-weight: 700;
       font-size: 16px;
+      color: #fff;
     }
     .item-info .item-price {
       color: #ff5722;
@@ -134,7 +144,7 @@
     }
     .item-info .item-desc {
       font-size: 13px;
-      color: #666;
+      color: #ccc;
     }
     .item-right {
       display: flex;
@@ -148,7 +158,7 @@
       border-radius: 5px;
     }
     .item-right i {
-      color: #ccc;
+      color: #888;
       cursor: pointer;
       font-size: 18px;
     }
@@ -156,7 +166,7 @@
       color: #ff5722;
     }
     
-    /* Espaçamento final */
+    /* Espaço final */
     .spacer {
       height: 50px;
     }
@@ -167,8 +177,8 @@
   <!-- Barra Superior -->
   <div class="header">
     <div class="brand">
-      <!-- Ícone ou Logo -->
-      <img src="https://cdn-icons-png.flaticon.com/512/3075/3075936.png" alt="Logo Cardápio">
+      <!-- LOGO: Substitua 'logo.png' pela sua imagem -->
+      <img src="logo.png" alt="Logo">
       <span>Cardápio</span>
     </div>
     <div class="icons">
@@ -236,19 +246,6 @@
         <i class="far fa-heart"></i>
       </div>
     </div>
-    <div class="item">
-      <div class="item-info">
-        <span class="item-name">Bife Acebolado</span>
-        <span class="item-price">R$ 55,00</span>
-        <p class="item-desc">
-          Arroz, feijão e batata frita.
-        </p>
-      </div>
-      <div class="item-right">
-        <img src="https://cdn-icons-png.flaticon.com/512/3075/3075936.png" alt="Bife Acebolado">
-        <i class="far fa-heart"></i>
-      </div>
-    </div>
   </div>
 
   <!-- Lista de Itens: Petiscos -->
@@ -267,32 +264,6 @@
         <i class="far fa-heart"></i>
       </div>
     </div>
-    <div class="item">
-      <div class="item-info">
-        <span class="item-name">Batata Frita</span>
-        <span class="item-price">R$ 20,00</span>
-        <p class="item-desc">
-          Batatas crocantes e molho especial.
-        </p>
-      </div>
-      <div class="item-right">
-        <img src="https://cdn-icons-png.flaticon.com/512/3075/3075936.png" alt="Batata Frita">
-        <i class="far fa-heart"></i>
-      </div>
-    </div>
-    <div class="item">
-      <div class="item-info">
-        <span class="item-name">Pastel</span>
-        <span class="item-price">R$ 8,00</span>
-        <p class="item-desc">
-          De carne ou queijo.
-        </p>
-      </div>
-      <div class="item-right">
-        <img src="https://cdn-icons-png.flaticon.com/512/3075/3075936.png" alt="Pastel">
-        <i class="far fa-heart"></i>
-      </div>
-    </div>
   </div>
 
   <!-- Lista de Itens: Bebidas -->
@@ -305,26 +276,6 @@
       </div>
       <div class="item-right">
         <img src="https://cdn-icons-png.flaticon.com/512/3075/3075936.png" alt="Refrigerante">
-        <i class="far fa-heart"></i>
-      </div>
-    </div>
-    <div class="item">
-      <div class="item-info">
-        <span class="item-name">Suco Natural</span>
-        <span class="item-price">R$ 7,00</span>
-      </div>
-      <div class="item-right">
-        <img src="https://cdn-icons-png.flaticon.com/512/3075/3075936.png" alt="Suco Natural">
-        <i class="far fa-heart"></i>
-      </div>
-    </div>
-    <div class="item">
-      <div class="item-info">
-        <span class="item-name">Cerveja</span>
-        <span class="item-price">R$ 10,00</span>
-      </div>
-      <div class="item-right">
-        <img src="https://cdn-icons-png.flaticon.com/512/3075/3075936.png" alt="Cerveja">
         <i class="far fa-heart"></i>
       </div>
     </div>
@@ -343,26 +294,6 @@
         <i class="far fa-heart"></i>
       </div>
     </div>
-    <div class="item">
-      <div class="item-info">
-        <span class="item-name">Sorvete</span>
-        <span class="item-price">R$ 10,00</span>
-      </div>
-      <div class="item-right">
-        <img src="https://cdn-icons-png.flaticon.com/512/3075/3075936.png" alt="Sorvete">
-        <i class="far fa-heart"></i>
-      </div>
-    </div>
-    <div class="item">
-      <div class="item-info">
-        <span class="item-name">Bolo de Chocolate</span>
-        <span class="item-price">R$ 15,00</span>
-      </div>
-      <div class="item-right">
-        <img src="https://cdn-icons-png.flaticon.com/512/3075/3075936.png" alt="Bolo de Chocolate">
-        <i class="far fa-heart"></i>
-      </div>
-    </div>
   </div>
 
   <!-- Lista de Itens: Adicionais -->
@@ -378,16 +309,6 @@
         <i class="far fa-heart"></i>
       </div>
     </div>
-    <div class="item">
-      <div class="item-info">
-        <span class="item-name">Arroz Extra</span>
-        <span class="item-price">R$ 3,00</span>
-      </div>
-      <div class="item-right">
-        <img src="https://cdn-icons-png.flaticon.com/512/3075/3075936.png" alt="Arroz Extra">
-        <i class="far fa-heart"></i>
-      </div>
-    </div>
   </div>
 
   <!-- Espaço final -->
@@ -398,7 +319,6 @@
     function scrollToSection(sectionId) {
       const sectionTitle = document.getElementById(sectionId);
       if(sectionTitle) {
-        // Usamos scrollIntoView para rolar até o título da categoria
         sectionTitle.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     }
