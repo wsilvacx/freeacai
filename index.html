@@ -8,6 +8,7 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    
     body {
       font-family: 'Roboto', sans-serif;
       background: url('IMG_6008.jpeg') no-repeat center center fixed;
@@ -15,26 +16,33 @@
       color: #fff;
       padding: 20px;
     }
+
     .container {
-      max-width: 800px;
+      max-width: 850px;
       margin: 0 auto;
       background-color: rgba(0,0,0,0.85);
       border-radius: 15px;
-      padding: 20px;
+      padding: 25px;
       box-shadow: 0 4px 15px rgba(0,0,0,0.6);
       text-align: center;
     }
+
+    /* Logo e título */
     header .logo img {
-      width: 100px;
-      height: 100px;
+      width: 120px;
+      height: 120px;
       border-radius: 50%;
-      margin-bottom: 10px;
+      margin-bottom: 15px;
     }
+
     header h1 {
-      font-size: 26px;
+      font-size: 28px;
       text-transform: uppercase;
       letter-spacing: 2px;
+      font-weight: bold;
     }
+
+    /* Botões do menu inicial */
     .category-container {
       display: flex;
       flex-direction: column;
@@ -42,11 +50,10 @@
       margin-top: 20px;
     }
 
-    /* Botões elegantes */
     .category-btn {
       background: linear-gradient(135deg, #ffffff, #d1d1d1);
-      border-radius: 12px;
-      font-size: 20px;
+      border-radius: 15px;
+      font-size: 22px;
       font-weight: bold;
       color: #333;
       padding: 15px;
@@ -54,27 +61,27 @@
       transition: all 0.3s ease;
       border: none;
       width: 100%;
-      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
       text-transform: uppercase;
       letter-spacing: 1px;
+      box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
     }
 
     .category-btn:hover {
       background: linear-gradient(135deg, #f0f0f0, #c8c8c8);
-      transform: translateY(-2px);
-      box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3);
+      transform: scale(1.05);
+      box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.3);
     }
 
     .subcategory {
       display: none;
       margin-top: 10px;
-      padding: 10px;
+      padding: 15px;
       background: rgba(255,255,255,0.1);
-      border-radius: 10px;
+      border-radius: 15px;
     }
 
     /* Organização dos itens */
@@ -96,8 +103,8 @@
     }
 
     .item img {
-      width: 80px;
-      height: 80px;
+      width: 90px;
+      height: 90px;
       border-radius: 10px;
       object-fit: cover;
       border: 2px solid #fff;
@@ -162,21 +169,14 @@
             <div class="descricao">Acompanha arroz, vinagrete e farofa.</div>
           </div>
         </div>
-        <div class="item">
-          <img src="galinha-caipira.jpg" alt="Galinha Caipira">
-          <div class="item-info">
-            <div class="item-header"><span>Galinha Caipira</span> <span>R$ 50,00</span></div>
-            <div class="descricao">Acompanha arroz, feijão e macarrão.</div>
-          </div>
-        </div>
       </div>
 
       <button class="category-btn" onclick="toggleCategory('petiscos')">🍢 Petiscos</button>
       <div id="petiscos" class="subcategory">
         <div class="item">
-          <img src="tabua-frios.jpg" alt="Tábua de Frios">
+          <img src="batata-frita.jpg" alt="Batata Frita">
           <div class="item-info">
-            <div class="item-header"><span>Tábua de Frios</span> <span>R$ 35,00</span></div>
+            <div class="item-header"><span>Batata Frita</span> <span>R$ 20,00</span></div>
           </div>
         </div>
       </div>
@@ -187,6 +187,16 @@
           <img src="refrigerante.jpg" alt="Refrigerante">
           <div class="item-info">
             <div class="item-header"><span>Refrigerante</span> <span>R$ 5,00</span></div>
+          </div>
+        </div>
+      </div>
+
+      <button class="category-btn" onclick="toggleCategory('sobremesas')">🍮 Sobremesas</button>
+      <div id="sobremesas" class="subcategory">
+        <div class="item">
+          <img src="pudim.jpg" alt="Pudim">
+          <div class="item-info">
+            <div class="item-header"><span>Pudim</span> <span>R$ 7,00</span></div>
           </div>
         </div>
       </div>
