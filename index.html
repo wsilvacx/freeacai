@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Food King</title>
-  <!-- Fontes Google -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cardápio</title>
+  
+  <!-- Importando fontes e ícones -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-  <!-- Ícones do FontAwesome (para coração, carrinho, etc.) -->
   <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-
+  
   <style>
     * {
       margin: 0; 
@@ -43,6 +43,7 @@
     .header .brand img {
       width: 30px;
       height: 30px;
+      object-fit: cover;
     }
     .header .icons {
       display: flex;
@@ -56,12 +57,13 @@
     /* Seção de categorias */
     .categories {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(2, 1fr); /* 2 colunas */
       gap: 15px;
       padding: 15px;
       background-color: #fff;
       margin: 10px;
       border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
     .category-card {
       display: flex;
@@ -91,14 +93,14 @@
       text-transform: uppercase;
     }
 
-    /* Título da seção (ex: Lanches) */
+    /* Título da seção (ex: Refeições) */
     .section-title {
       font-weight: 700;
       font-size: 18px;
       margin: 15px 10px 5px;
     }
 
-    /* Lista de itens (ex: Lanches) */
+    /* Lista de itens (ex: Refeições) */
     .item-list {
       background-color: #fff;
       margin: 10px;
@@ -153,15 +155,21 @@
     .item-right i:hover {
       color: #ff5722;
     }
+    
+    /* Espaçamento final */
+    .spacer {
+      height: 50px;
+    }
   </style>
 </head>
 <body>
+
   <!-- Barra Superior -->
   <div class="header">
     <div class="brand">
       <!-- Ícone ou Logo -->
-      <img src="https://cdn-icons-png.flaticon.com/512/3075/3075936.png" alt="Logo Food King">
-      <span>FOOD KING</span>
+      <img src="https://cdn-icons-png.flaticon.com/512/3075/3075936.png" alt="Logo Cardápio">
+      <span>Cardápio</span>
     </div>
     <div class="icons">
       <i class="far fa-heart"></i> 
@@ -171,70 +179,229 @@
 
   <!-- Seção de Categorias -->
   <div class="categories">
-    <div class="category-card">
-      <img src="https://cdn-icons-png.flaticon.com/512/3075/3075936.png" alt="Lanches">
-      <span>Lanches</span>
+    <!-- 1: Refeições -->
+    <div class="category-card" onclick="scrollToSection('refeicoes')">
+      <img src="https://cdn-icons-png.flaticon.com/512/1046/1046857.png" alt="Refeições">
+      <span>Refeições</span>
     </div>
-    <div class="category-card">
-      <img src="https://cdn-icons-png.flaticon.com/512/1404/1404945.png" alt="Pizzas">
-      <span>Pizzas</span>
+    <!-- 2: Petiscos -->
+    <div class="category-card" onclick="scrollToSection('petiscos')">
+      <img src="https://cdn-icons-png.flaticon.com/512/1046/1046850.png" alt="Petiscos">
+      <span>Petiscos</span>
     </div>
-    <div class="category-card">
+    <!-- 3: Bebidas -->
+    <div class="category-card" onclick="scrollToSection('bebidas')">
+      <img src="https://cdn-icons-png.flaticon.com/512/1888/1888402.png" alt="Bebidas">
+      <span>Bebidas</span>
+    </div>
+    <!-- 4: Sobremesas -->
+    <div class="category-card" onclick="scrollToSection('sobremesas')">
       <img src="https://cdn-icons-png.flaticon.com/512/685/685327.png" alt="Sobremesas">
       <span>Sobremesas</span>
     </div>
-    <div class="category-card">
-      <img src="https://cdn-icons-png.flaticon.com/512/3041/3041132.png" alt="Bebidas">
-      <span>Bebidas</span>
+    <!-- 5: Adicionais -->
+    <div class="category-card" onclick="scrollToSection('adicionais')">
+      <img src="https://cdn-icons-png.flaticon.com/512/2992/2992052.png" alt="Adicionais">
+      <span>Adicionais</span>
     </div>
   </div>
 
-  <!-- Lista de Itens (Exemplo: Lanches) -->
-  <div class="section-title">Lanches</div>
+  <!-- Lista de Itens: Refeições -->
+  <div id="refeicoes" class="section-title">Refeições</div>
   <div class="item-list">
-    <!-- Item 1 -->
     <div class="item">
       <div class="item-info">
-        <span class="item-name">X Bacon</span>
-        <span class="item-price">R$ 17,00</span>
+        <span class="item-name">Peixe Frito</span>
+        <span class="item-price">R$ 65,00</span>
         <p class="item-desc">
-          Pão redondo, carne de hambúrguer, bacon, presunto, queijo e molhos especiais.
+          Arroz, vinagrete e farofa.
         </p>
       </div>
       <div class="item-right">
-        <img src="https://cdn-icons-png.flaticon.com/512/3075/3075936.png" alt="Hambúrguer">
+        <!-- Troque a imagem pela do prato -->
+        <img src="https://cdn-icons-png.flaticon.com/512/3075/3075936.png" alt="Peixe Frito">
         <i class="far fa-heart"></i>
       </div>
     </div>
-    <!-- Item 2 -->
     <div class="item">
       <div class="item-info">
-        <span class="item-name">X Cheddar</span>
-        <span class="item-price">R$ 19,00</span>
+        <span class="item-name">Galinha Caipira</span>
+        <span class="item-price">R$ 50,00</span>
         <p class="item-desc">
-          Pão redondo, carne de hambúrguer, cheddar, cebola caramelizada e molhos.
+          Arroz, feijão e macarrão.
         </p>
       </div>
       <div class="item-right">
-        <img src="https://cdn-icons-png.flaticon.com/512/3075/3075936.png" alt="Hambúrguer">
+        <img src="https://cdn-icons-png.flaticon.com/512/3075/3075936.png" alt="Galinha Caipira">
         <i class="far fa-heart"></i>
       </div>
     </div>
-    <!-- Item 3 -->
     <div class="item">
       <div class="item-info">
-        <span class="item-name">X Frango</span>
-        <span class="item-price">R$ 18,00</span>
+        <span class="item-name">Bife Acebolado</span>
+        <span class="item-price">R$ 55,00</span>
         <p class="item-desc">
-          Pão redondo, frango desfiado, presunto, queijo, alface, tomate e molhos.
+          Arroz, feijão e batata frita.
         </p>
       </div>
       <div class="item-right">
-        <img src="https://cdn-icons-png.flaticon.com/512/3075/3075936.png" alt="Hambúrguer">
+        <img src="https://cdn-icons-png.flaticon.com/512/3075/3075936.png" alt="Bife Acebolado">
         <i class="far fa-heart"></i>
       </div>
     </div>
   </div>
 
+  <!-- Lista de Itens: Petiscos -->
+  <div id="petiscos" class="section-title">Petiscos</div>
+  <div class="item-list">
+    <div class="item">
+      <div class="item-info">
+        <span class="item-name">Tábua de Frios</span>
+        <span class="item-price">R$ 35,00</span>
+        <p class="item-desc">
+          Queijos, embutidos e azeitonas.
+        </p>
+      </div>
+      <div class="item-right">
+        <img src="https://cdn-icons-png.flaticon.com/512/3075/3075936.png" alt="Tábua de Frios">
+        <i class="far fa-heart"></i>
+      </div>
+    </div>
+    <div class="item">
+      <div class="item-info">
+        <span class="item-name">Batata Frita</span>
+        <span class="item-price">R$ 20,00</span>
+        <p class="item-desc">
+          Batatas crocantes e molho especial.
+        </p>
+      </div>
+      <div class="item-right">
+        <img src="https://cdn-icons-png.flaticon.com/512/3075/3075936.png" alt="Batata Frita">
+        <i class="far fa-heart"></i>
+      </div>
+    </div>
+    <div class="item">
+      <div class="item-info">
+        <span class="item-name">Pastel</span>
+        <span class="item-price">R$ 8,00</span>
+        <p class="item-desc">
+          De carne ou queijo.
+        </p>
+      </div>
+      <div class="item-right">
+        <img src="https://cdn-icons-png.flaticon.com/512/3075/3075936.png" alt="Pastel">
+        <i class="far fa-heart"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lista de Itens: Bebidas -->
+  <div id="bebidas" class="section-title">Bebidas</div>
+  <div class="item-list">
+    <div class="item">
+      <div class="item-info">
+        <span class="item-name">Refrigerante</span>
+        <span class="item-price">R$ 5,00</span>
+      </div>
+      <div class="item-right">
+        <img src="https://cdn-icons-png.flaticon.com/512/3075/3075936.png" alt="Refrigerante">
+        <i class="far fa-heart"></i>
+      </div>
+    </div>
+    <div class="item">
+      <div class="item-info">
+        <span class="item-name">Suco Natural</span>
+        <span class="item-price">R$ 7,00</span>
+      </div>
+      <div class="item-right">
+        <img src="https://cdn-icons-png.flaticon.com/512/3075/3075936.png" alt="Suco Natural">
+        <i class="far fa-heart"></i>
+      </div>
+    </div>
+    <div class="item">
+      <div class="item-info">
+        <span class="item-name">Cerveja</span>
+        <span class="item-price">R$ 10,00</span>
+      </div>
+      <div class="item-right">
+        <img src="https://cdn-icons-png.flaticon.com/512/3075/3075936.png" alt="Cerveja">
+        <i class="far fa-heart"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lista de Itens: Sobremesas -->
+  <div id="sobremesas" class="section-title">Sobremesas</div>
+  <div class="item-list">
+    <div class="item">
+      <div class="item-info">
+        <span class="item-name">Pudim</span>
+        <span class="item-price">R$ 7,00</span>
+      </div>
+      <div class="item-right">
+        <img src="https://cdn-icons-png.flaticon.com/512/3075/3075936.png" alt="Pudim">
+        <i class="far fa-heart"></i>
+      </div>
+    </div>
+    <div class="item">
+      <div class="item-info">
+        <span class="item-name">Sorvete</span>
+        <span class="item-price">R$ 10,00</span>
+      </div>
+      <div class="item-right">
+        <img src="https://cdn-icons-png.flaticon.com/512/3075/3075936.png" alt="Sorvete">
+        <i class="far fa-heart"></i>
+      </div>
+    </div>
+    <div class="item">
+      <div class="item-info">
+        <span class="item-name">Bolo de Chocolate</span>
+        <span class="item-price">R$ 15,00</span>
+      </div>
+      <div class="item-right">
+        <img src="https://cdn-icons-png.flaticon.com/512/3075/3075936.png" alt="Bolo de Chocolate">
+        <i class="far fa-heart"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lista de Itens: Adicionais -->
+  <div id="adicionais" class="section-title">Adicionais</div>
+  <div class="item-list">
+    <div class="item">
+      <div class="item-info">
+        <span class="item-name">Farofa Extra</span>
+        <span class="item-price">R$ 5,00</span>
+      </div>
+      <div class="item-right">
+        <img src="https://cdn-icons-png.flaticon.com/512/3075/3075936.png" alt="Farofa Extra">
+        <i class="far fa-heart"></i>
+      </div>
+    </div>
+    <div class="item">
+      <div class="item-info">
+        <span class="item-name">Arroz Extra</span>
+        <span class="item-price">R$ 3,00</span>
+      </div>
+      <div class="item-right">
+        <img src="https://cdn-icons-png.flaticon.com/512/3075/3075936.png" alt="Arroz Extra">
+        <i class="far fa-heart"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Espaço final -->
+  <div class="spacer"></div>
+
+  <script>
+    // Função para rolar a tela até a seção correspondente
+    function scrollToSection(sectionId) {
+      const sectionTitle = document.getElementById(sectionId);
+      if(sectionTitle) {
+        // Usamos scrollIntoView para rolar até o título da categoria
+        sectionTitle.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  </script>
 </body>
 </html>
