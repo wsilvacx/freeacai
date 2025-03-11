@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cardápio - Pesque e Pague União</title>
+  <title>Cardápio</title>
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@400;700&display=swap');
     * { margin: 0; padding: 0; box-sizing: border-box; }
     
     body {
@@ -36,10 +36,12 @@
     }
 
     header h1 {
-      font-size: 28px;
+      font-family: 'Playfair Display', serif;
+      font-size: 36px;
       text-transform: uppercase;
       letter-spacing: 2px;
       font-weight: bold;
+      margin-bottom: 10px;
     }
 
     /* Botões do menu inicial */
@@ -128,6 +130,24 @@
       color: #ddd;
     }
 
+    /* Ícones sociais */
+    .social-icons {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .social-icons a {
+      color: #fff;
+      font-size: 24px;
+      transition: transform 0.3s;
+    }
+
+    .social-icons a:hover {
+      transform: scale(1.2);
+    }
+
     footer {
       text-align: center;
       font-size: 14px;
@@ -136,6 +156,7 @@
       padding-top: 10px;
     }
   </style>
+
   <script>
     function toggleCategory(categoryId) {
       let subcategory = document.getElementById(categoryId);
@@ -148,14 +169,18 @@
       subcategory.style.display = (subcategory.style.display === "block") ? "none" : "block";
     }
   </script>
+
+  <!-- Ícones do FontAwesome -->
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
 </head>
 <body>
   <div class="container">
     <header>
       <div class="logo">
-        <img src="IMG_5997.jpeg" alt="Logo Pesque e Pague União">
+        <img src="IMG_5997.jpeg" alt="Logo">
       </div>
-      <h1>Pesque e Pague União</h1>
+      <h1>Cardápio</h1>
     </header>
     
     <!-- Categorias -->
@@ -171,16 +196,6 @@
         </div>
       </div>
 
-      <button class="category-btn" onclick="toggleCategory('petiscos')">🍢 Petiscos</button>
-      <div id="petiscos" class="subcategory">
-        <div class="item">
-          <img src="batata-frita.jpg" alt="Batata Frita">
-          <div class="item-info">
-            <div class="item-header"><span>Batata Frita</span> <span>R$ 20,00</span></div>
-          </div>
-        </div>
-      </div>
-
       <button class="category-btn" onclick="toggleCategory('bebidas')">🥤 Bebidas</button>
       <div id="bebidas" class="subcategory">
         <div class="item">
@@ -190,16 +205,12 @@
           </div>
         </div>
       </div>
+    </div>
 
-      <button class="category-btn" onclick="toggleCategory('sobremesas')">🍮 Sobremesas</button>
-      <div id="sobremesas" class="subcategory">
-        <div class="item">
-          <img src="pudim.jpg" alt="Pudim">
-          <div class="item-info">
-            <div class="item-header"><span>Pudim</span> <span>R$ 7,00</span></div>
-          </div>
-        </div>
-      </div>
+    <!-- Ícones sociais -->
+    <div class="social-icons">
+      <a href="https://wa.me/SEUNUMERO" target="_blank"><i class="fab fa-whatsapp"></i></a>
+      <a href="https://www.instagram.com/SEUPERFIL" target="_blank"><i class="fab fa-instagram"></i></a>
     </div>
 
     <footer>
