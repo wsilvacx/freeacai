@@ -42,19 +42,19 @@
       margin-top: 20px;
     }
 
-    /* Botões da tela inicial - Melhorados */
+    /* Botões elegantes */
     .category-btn {
-      background: linear-gradient(135deg, #ff7e5f, #feb47b); /* Gradiente elegante */
+      background: linear-gradient(135deg, #ffffff, #d1d1d1);
       border-radius: 12px;
       font-size: 20px;
       font-weight: bold;
-      color: #fff;
+      color: #333;
       padding: 15px;
       cursor: pointer;
       transition: all 0.3s ease;
       border: none;
       width: 100%;
-      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Efeito de profundidade */
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -64,14 +64,9 @@
     }
 
     .category-btn:hover {
-      background: linear-gradient(135deg, #ff9966, #ff5e62);
+      background: linear-gradient(135deg, #f0f0f0, #c8c8c8);
       transform: translateY(-2px);
       box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3);
-    }
-
-    .category-btn:active {
-      transform: scale(0.98);
-      box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
     }
 
     .subcategory {
@@ -81,33 +76,51 @@
       background: rgba(255,255,255,0.1);
       border-radius: 10px;
     }
+
+    /* Organização dos itens */
     .item {
       display: flex;
       align-items: center;
       gap: 15px;
-      background-color: #222;
-      border-radius: 10px;
-      padding: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 15px;
       margin-bottom: 10px;
-      transition: background 0.3s ease-in-out;
+      transition: 0.3s ease-in-out;
     }
+
     .item:hover {
-      background-color: #333;
-      box-shadow: 0px 5px 15px rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.02);
+      box-shadow: 0px 5px 15px rgba(255, 255, 255, 0.3);
     }
+
     .item img {
-      width: 60px;
-      height: 60px;
+      width: 80px;
+      height: 80px;
       border-radius: 10px;
       object-fit: cover;
+      border: 2px solid #fff;
     }
+
+    .item-info {
+      flex: 1;
+      text-align: left;
+    }
+
     .item-header {
       display: flex;
       justify-content: space-between;
-      font-size: 16px;
+      font-size: 18px;
       font-weight: bold;
-      color: #f39c12;
+      color: #fff;
     }
+
+    .descricao {
+      font-size: 14px;
+      color: #ddd;
+    }
+
     footer {
       text-align: center;
       font-size: 14px;
@@ -144,9 +157,16 @@
       <div id="refeicoes" class="subcategory">
         <div class="item">
           <img src="peixe-frito.jpg" alt="Peixe Frito">
-          <div>
+          <div class="item-info">
             <div class="item-header"><span>Peixe Frito</span> <span>R$ 65,00</span></div>
             <div class="descricao">Acompanha arroz, vinagrete e farofa.</div>
+          </div>
+        </div>
+        <div class="item">
+          <img src="galinha-caipira.jpg" alt="Galinha Caipira">
+          <div class="item-info">
+            <div class="item-header"><span>Galinha Caipira</span> <span>R$ 50,00</span></div>
+            <div class="descricao">Acompanha arroz, feijão e macarrão.</div>
           </div>
         </div>
       </div>
@@ -155,7 +175,7 @@
       <div id="petiscos" class="subcategory">
         <div class="item">
           <img src="tabua-frios.jpg" alt="Tábua de Frios">
-          <div>
+          <div class="item-info">
             <div class="item-header"><span>Tábua de Frios</span> <span>R$ 35,00</span></div>
           </div>
         </div>
@@ -164,16 +184,10 @@
       <button class="category-btn" onclick="toggleCategory('bebidas')">🥤 Bebidas</button>
       <div id="bebidas" class="subcategory">
         <div class="item">
-          <img src="refrigerante.jpg" alt="Refrigerante Lata">
-          <div class="item-header"><span>Refrigerante Lata</span> <span>R$ 5,00</span></div>
-        </div>
-      </div>
-
-      <button class="category-btn" onclick="toggleCategory('sobremesas')">🍮 Sobremesas</button>
-      <div id="sobremesas" class="subcategory">
-        <div class="item">
-          <img src="pudim.jpg" alt="Pudim">
-          <div class="item-header"><span>Pudim</span> <span>R$ 7,00</span></div>
+          <img src="refrigerante.jpg" alt="Refrigerante">
+          <div class="item-info">
+            <div class="item-header"><span>Refrigerante</span> <span>R$ 5,00</span></div>
+          </div>
         </div>
       </div>
     </div>
