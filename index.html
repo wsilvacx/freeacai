@@ -18,139 +18,15 @@
             text-align: center;
         }
 
+        /* Cabeçalho com fundo preto sólido */
         header {
-            padding: 20px;
-        }
-
-        /* Logo */
-        .logo {
-            width: 150px;
-            height: auto;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: auto;
-            padding: 20px;
-        }
-
-        .category {
-            margin-bottom: 30px;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-        }
-
-        h2 {
-            border-bottom: 2px solid #fff;
-            display: inline-block;
-            padding-bottom: 5px;
-            font-weight: 700;
-        }
-
-        .item {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: background 0.3s;
-        }
-
-        .item:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .item h3 {
-            color: #fff;
-            margin: 0;
-            font-size: 18px;
-        }
-
-        .item p {
-            font-size: 14px;
-            opacity: 0.8;
-            margin: 5px 0 0 0;
-        }
-
-        .item span {
-            font-weight: bold;
-            font-size: 16px;
-            color: #000;
-            background: #fff;
-            padding: 5px 10px;
-            border-radius: 5px;
-        }
-
-        footer {
-            text-align: center;
-            padding: 15px;
-            margin-top: 30px;
-            background: #111;
-        }
-
-        /* Modo Branco */
-        @media (prefers-color-scheme: light) {
-            body {
-                background-color: #fff;
-                color: #000;
-            }
-            .category {
-                background: rgba(0, 0, 0, 0.05);
-            }
-            .item {
-                background: rgba(0, 0, 0, 0.1);
-            }
-            .item:hover {
-                background: rgba(0, 0, 0, 0.2);
-            }
-            .item h3 {
-                color: #000;
-            }
-            .item span {
-                background: #000;
-                color: #fff;
-            }
-            h2 {
-                border-bottom: 2px solid #000;
-            }
-            footer {
-                background: #ddd;
-            }
-        }
-    </style>
-</head>
-<body>
-    <header>
-        <img src="<!DOCTYPE html>
-<html lang="pt">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cardápio Exclusivo</title>
-    <style>
-        /* Fonte moderna */
-        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;700&display=swap');
-
-        /* Estilos gerais */
-        body {
-            font-family: 'Montserrat', sans-serif;
             background-color: #000;
-            color: #fff;
-            margin: 0;
-            padding: 0;
-            text-align: center;
+            padding: 30px 0;
         }
 
-        header {
-            padding: 20px;
-        }
-
-        /* Logo */
+        /* Logo centralizada */
         .logo {
-            width: 150px;
+            width: 180px;
             height: auto;
         }
 
@@ -222,6 +98,9 @@
             body {
                 background-color: #fff;
                 color: #000;
+            }
+            header {
+                background-color: #fff;
             }
             .category {
                 background: rgba(0, 0, 0, 0.05);
@@ -251,88 +130,6 @@
 <body>
     <header>
         <img src="IMG_5997.jpeg" alt="Logo do Estabelecimento" class="logo">
-    </header>
-
-    <div class="container">
-        <section class="category">
-            <h2>🥗 Entradas</h2>
-            <div class="item">
-                <div>
-                    <h3>Bruschetta Italiana</h3>
-                    <p>Pão crocante com tomate, manjericão e azeite.</p>
-                </div>
-                <span>R$ 25,00</span>
-            </div>
-            <div class="item">
-                <div>
-                    <h3>Carpaccio de Carne</h3>
-                    <p>Fatias finas de carne com molho de mostarda e alcaparras.</p>
-                </div>
-                <span>R$ 32,00</span>
-            </div>
-        </section>
-
-        <section class="category">
-            <h2>🍽️ Pratos Principais</h2>
-            <div class="item">
-                <div>
-                    <h3>Risoto de Camarão</h3>
-                    <p>Arroz cremoso com camarões frescos e toque de limão siciliano.</p>
-                </div>
-                <span>R$ 58,00</span>
-            </div>
-            <div class="item">
-                <div>
-                    <h3>Filé Mignon ao Molho Madeira</h3>
-                    <p>Acompanha purê de batata trufado e legumes grelhados.</p>
-                </div>
-                <span>R$ 72,00</span>
-            </div>
-        </section>
-
-        <section class="category">
-            <h2>🍰 Sobremesas</h2>
-            <div class="item">
-                <div>
-                    <h3>Pavlova de Frutas Vermelhas</h3>
-                    <p>Merengue crocante, chantilly e frutas frescas.</p>
-                </div>
-                <span>R$ 28,00</span>
-            </div>
-            <div class="item">
-                <div>
-                    <h3>Petit Gâteau</h3>
-                    <p>Bolo de chocolate com recheio cremoso e sorvete de baunilha.</p>
-                </div>
-                <span>R$ 30,00</span>
-            </div>
-        </section>
-
-        <section class="category">
-            <h2>🍷 Bebidas</h2>
-            <div class="item">
-                <div>
-                    <h3>Vinho Tinto Seleção</h3>
-                    <p>Garrafa de vinho tinto especial da casa.</p>
-                </div>
-                <span>R$ 90,00</span>
-            </div>
-            <div class="item">
-                <div>
-                    <h3>Coquetel de Frutas</h3>
-                    <p>Mix de frutas naturais sem álcool.</p>
-                </div>
-                <span>R$ 18,00</span>
-            </div>
-        </section>
-    </div>
-
-    <footer>
-        <p>📍 Rua Gourmet, 123 - Cidade Gastronômica</p>
-        <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://seu-cardapio-online.com" alt="QR Code">
-    </footer>
-</body>
-</html>" alt="Logo do Estabelecimento" class="logo">
     </header>
 
     <div class="container">
