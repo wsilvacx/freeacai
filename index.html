@@ -41,17 +41,30 @@
 
         .menu-categorias {
             display: flex;
-            justify-content: center;
             gap: 10px;
             margin-top: 15px;
+            overflow-x: auto;  /* Permite rolagem horizontal */
+            white-space: nowrap;
+            padding: 10px;
+        }
+
+        .menu-categorias::-webkit-scrollbar {
+            height: 5px;
+        }
+
+        .menu-categorias::-webkit-scrollbar-thumb {
+            background: #d60000;
+            border-radius: 5px;
         }
 
         .categoria {
             background-color: #ddd;
-            padding: 10px 15px;
-            border-radius: 5px;
+            padding: 15px 20px;
+            border-radius: 10px;
             cursor: pointer;
             font-weight: bold;
+            flex-shrink: 0; /* Evita que os botões diminuam */
+            font-size: 16px;
             transition: 0.3s;
         }
 
@@ -125,6 +138,7 @@
         <div class="categoria" onclick="mostrarPratos('prato_principal')">Prato Principal</div>
         <div class="categoria" onclick="mostrarPratos('lanches')">Lanches</div>
         <div class="categoria" onclick="mostrarPratos('bebidas')">Bebidas</div>
+        <div class="categoria" onclick="mostrarPratos('sobremesas')">Sobremesas</div>
     </div>
 
     <div class="menu-container" id="menu-lista">
@@ -152,6 +166,10 @@
             bebidas: [
                 { nome: "Refrigerante Lata", descricao: "Coca-Cola, Guaraná, Fanta", preco: "R$ 6,00", imagem: "https://via.placeholder.com/60" },
                 { nome: "Suco Natural", descricao: "Laranja, Acerola, Maracujá", preco: "R$ 8,00", imagem: "https://via.placeholder.com/60" }
+            ],
+            sobremesas: [
+                { nome: "Petit Gateau", descricao: "Bolo quente com sorvete", preco: "R$ 22,00", imagem: "https://via.placeholder.com/60" },
+                { nome: "Pudim", descricao: "Pudim de leite condensado", preco: "R$ 10,00", imagem: "https://via.placeholder.com/60" }
             ]
         };
 
@@ -159,7 +177,6 @@
             const menuLista = document.getElementById("menu-lista");
             menuLista.innerHTML = "";
 
-            // Remover classe ativa de todas as categorias
             document.querySelectorAll(".categoria").forEach(cat => cat.classList.remove("active"));
             document.querySelector(`.categoria[onclick="mostrarPratos('${categoria}')"]`).classList.add("active");
 
