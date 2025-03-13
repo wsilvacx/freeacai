@@ -13,12 +13,13 @@
         }
 
         body {
-            background-color: #f8f8f8;
+            background-color: #121212;
+            color: #ffffff;
         }
 
         .header {
-            background-color: #d60000;
-            color: white;
+            background-color: #000000;
+            color: #ffffff;
             padding: 15px;
             text-align: center;
             font-size: 20px;
@@ -37,13 +38,14 @@
         .banner {
             width: 100%;
             max-height: 200px;
+            border-radius: 10px;
         }
 
         .menu-categorias {
             display: flex;
             gap: 10px;
             margin-top: 15px;
-            overflow-x: auto;  /* Permite rolagem horizontal */
+            overflow-x: auto;
             white-space: nowrap;
             padding: 10px;
         }
@@ -58,18 +60,19 @@
         }
 
         .categoria {
-            background-color: #ddd;
+            background-color: #222;
+            color: white;
             padding: 15px 20px;
             border-radius: 10px;
             cursor: pointer;
             font-weight: bold;
-            flex-shrink: 0; /* Evita que os botões diminuam */
+            flex-shrink: 0;
             font-size: 16px;
             transition: 0.3s;
         }
 
         .categoria:hover {
-            background-color: #bbb;
+            background-color: #444;
         }
 
         .active {
@@ -80,9 +83,9 @@
         .menu-container {
             margin: 20px;
             padding: 15px;
-            background: white;
+            background: #181818;
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
         }
 
         .menu-item {
@@ -90,7 +93,7 @@
             align-items: center;
             margin-bottom: 15px;
             padding-bottom: 10px;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid #444;
         }
 
         .menu-item img {
@@ -111,7 +114,7 @@
 
         .whatsapp-btn {
             position: fixed;
-            bottom: 20px;
+            bottom: 80px;
             right: 20px;
             background-color: #25d366;
             color: white;
@@ -120,6 +123,35 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
             font-size: 24px;
             cursor: pointer;
+        }
+
+        .footer {
+            background: #000;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        .footer h3 {
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .footer p {
+            font-size: 14px;
+            margin: 5px 0;
+        }
+
+        .footer .pagamento {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .footer .pagamento img {
+            width: 40px;
         }
     </style>
 </head>
@@ -141,12 +173,27 @@
         <div class="categoria" onclick="mostrarPratos('sobremesas')">Sobremesas</div>
     </div>
 
-    <div class="menu-container" id="menu-lista">
-        <!-- Os pratos serão inseridos aqui dinamicamente -->
-    </div>
+    <div class="menu-container" id="menu-lista"></div>
 
     <div class="whatsapp-btn" onclick="window.location.href='https://wa.me/5599984557326'">
         ☎️
+    </div>
+
+    <div class="footer">
+        <h3>Endereço</h3>
+        <p>Rua Perimetral, Quadra A27, Casa 01, Vila Paraíso, Caxias - MA</p>
+
+        <h3>Horário de Funcionamento</h3>
+        <p>Segunda a Sábado: 10h - 22h</p>
+        <p>Domingo: 12h - 20h</p>
+
+        <h3>Formas de Pagamento</h3>
+        <div class="pagamento">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/0/0e/PIX_logo.png" alt="Pix">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/6/6a/Visa-e-logo.png" alt="Cartão Visa">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/MasterCard_Logo.svg" alt="MasterCard">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/Dinheiro-Icon.png" alt="Dinheiro">
+        </div>
     </div>
 
     <script>
@@ -156,20 +203,7 @@
                 { nome: "Porção de Batata Frita", descricao: "300g de batatas crocantes", preco: "R$ 18,00", imagem: "https://via.placeholder.com/60" }
             ],
             prato_principal: [
-                { nome: "Picanha Grelhada", descricao: "Acompanha arroz, farofa e vinagrete", preco: "R$ 45,00", imagem: "https://via.placeholder.com/60" },
-                { nome: "Frango à Parmegiana", descricao: "Acompanha arroz e purê", preco: "R$ 35,00", imagem: "https://via.placeholder.com/60" }
-            ],
-            lanches: [
-                { nome: "Cheeseburger", descricao: "Pão, carne, queijo, alface e tomate", preco: "R$ 20,00", imagem: "https://via.placeholder.com/60" },
-                { nome: "X-Bacon", descricao: "Hambúrguer, bacon e queijo cheddar", preco: "R$ 25,00", imagem: "https://via.placeholder.com/60" }
-            ],
-            bebidas: [
-                { nome: "Refrigerante Lata", descricao: "Coca-Cola, Guaraná, Fanta", preco: "R$ 6,00", imagem: "https://via.placeholder.com/60" },
-                { nome: "Suco Natural", descricao: "Laranja, Acerola, Maracujá", preco: "R$ 8,00", imagem: "https://via.placeholder.com/60" }
-            ],
-            sobremesas: [
-                { nome: "Petit Gateau", descricao: "Bolo quente com sorvete", preco: "R$ 22,00", imagem: "https://via.placeholder.com/60" },
-                { nome: "Pudim", descricao: "Pudim de leite condensado", preco: "R$ 10,00", imagem: "https://via.placeholder.com/60" }
+                { nome: "Picanha Grelhada", descricao: "Acompanha arroz, farofa e vinagrete", preco: "R$ 45,00", imagem: "https://via.placeholder.com/60" }
             ]
         };
 
@@ -183,19 +217,11 @@
             pratos[categoria].forEach(prato => {
                 const item = document.createElement("div");
                 item.classList.add("menu-item");
-                item.innerHTML = `
-                    <img src="${prato.imagem}" alt="${prato.nome}">
-                    <div>
-                        <p><strong>${prato.nome}</strong></p>
-                        <p>${prato.descricao}</p>
-                        <p class="preco">${prato.preco}</p>
-                    </div>
-                `;
+                item.innerHTML = `<img src="${prato.imagem}" alt="${prato.nome}"><div><p><strong>${prato.nome}</strong></p><p>${prato.descricao}</p><p class="preco">${prato.preco}</p></div>`;
                 menuLista.appendChild(item);
             });
         }
 
-        // Exibir a primeira categoria por padrão
         mostrarPratos("entradas");
     </script>
 
