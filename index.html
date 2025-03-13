@@ -3,28 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cardápio Elegante</title>
+    <title>Cardápio Exclusivo</title>
     <style>
-        /* Fonte elegante */
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap');
+        /* Fonte moderna */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;700&display=swap');
 
         /* Estilos gerais */
         body {
-            font-family: 'Playfair Display', serif;
-            background-color: #121212;
-            color: #f5f5f5;
+            font-family: 'Montserrat', sans-serif;
+            background-color: #000;
+            color: #fff;
             margin: 0;
             padding: 0;
-            transition: background 0.5s, color 0.5s;
+            text-align: center;
         }
 
         header {
-            background: linear-gradient(90deg, #d4af37, #b8860b);
             padding: 20px;
-            text-align: center;
-            color: #fff;
-            font-size: 24px;
-            font-weight: bold;
+        }
+
+        /* Logo */
+        .logo {
+            width: 150px;
+            height: auto;
         }
 
         .container {
@@ -36,54 +37,49 @@
         .category {
             margin-bottom: 30px;
             padding: 15px;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 10px;
-            transition: transform 0.3s;
-        }
-
-        .category:hover {
-            transform: scale(1.02);
         }
 
         h2 {
-            border-bottom: 3px solid #d4af37;
+            border-bottom: 2px solid #fff;
             display: inline-block;
             padding-bottom: 5px;
+            font-weight: 700;
         }
 
         .item {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
             padding: 15px;
             margin: 10px 0;
             border-radius: 8px;
-            transition: transform 0.3s, background 0.3s;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            transition: background 0.3s;
         }
 
         .item:hover {
-            transform: translateY(-5px);
-            background: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.2);
         }
 
         .item h3 {
-            color: #ffd700;
+            color: #fff;
             margin: 0;
             font-size: 18px;
         }
 
         .item p {
             font-size: 14px;
-            opacity: 0.9;
+            opacity: 0.8;
             margin: 5px 0 0 0;
         }
 
         .item span {
             font-weight: bold;
             font-size: 16px;
-            color: #fff;
-            background: #d4af37;
+            color: #000;
+            background: #fff;
             padding: 5px 10px;
             border-radius: 5px;
         }
@@ -91,62 +87,45 @@
         footer {
             text-align: center;
             padding: 15px;
-            background: linear-gradient(90deg, #b8860b, #d4af37);
-            color: #fff;
+            margin-top: 30px;
+            background: #111;
         }
 
-        /* Modo Claro */
-        .light-mode {
-            background-color: #f5f5f5;
-            color: #121212;
-        }
-
-        .light-mode header {
-            background: linear-gradient(90deg, #ffcc00, #ff9900);
-        }
-
-        .light-mode .category {
-            background: rgba(0, 0, 0, 0.05);
-        }
-
-        .light-mode .item {
-            background: rgba(0, 0, 0, 0.1);
-        }
-
-        .light-mode .item h3 {
-            color: #b8860b;
-        }
-
-        .light-mode footer {
-            background: linear-gradient(90deg, #ff9900, #ffcc00);
-        }
-
-        /* Botão de alternância */
-        #themeToggle {
-            display: block;
-            margin: 20px auto;
-            padding: 10px 20px;
-            border: none;
-            background: #ffd700;
-            color: #121212;
-            font-weight: bold;
-            cursor: pointer;
-            border-radius: 5px;
-            transition: background 0.3s;
-        }
-
-        #themeToggle:hover {
-            background: #b8860b;
-            color: white;
+        /* Modo Branco */
+        @media (prefers-color-scheme: light) {
+            body {
+                background-color: #fff;
+                color: #000;
+            }
+            .category {
+                background: rgba(0, 0, 0, 0.05);
+            }
+            .item {
+                background: rgba(0, 0, 0, 0.1);
+            }
+            .item:hover {
+                background: rgba(0, 0, 0, 0.2);
+            }
+            .item h3 {
+                color: #000;
+            }
+            .item span {
+                background: #000;
+                color: #fff;
+            }
+            h2 {
+                border-bottom: 2px solid #000;
+            }
+            footer {
+                background: #ddd;
+            }
         }
     </style>
 </head>
 <body>
     <header>
-        <h1>🍽️ Cardápio Exclusivo</h1>
+        <img src="logo.jpg" alt="Logo do Estabelecimento" class="logo">
     </header>
-
-    <button id="themeToggle">Modo Escuro</button>
 
     <div class="container">
         <section class="category">
@@ -226,14 +205,5 @@
         <p>📍 Rua Gourmet, 123 - Cidade Gastronômica</p>
         <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://seu-cardapio-online.com" alt="QR Code">
     </footer>
-
-    <script>
-        // Alternar entre modo claro e escuro
-        const themeToggle = document.getElementById("themeToggle");
-        themeToggle.addEventListener("click", () => {
-            document.body.classList.toggle("light-mode");
-            themeToggle.textContent = document.body.classList.contains("light-mode") ? "Modo Escuro" : "Modo Claro";
-        });
-    </script>
 </body>
 </html>
