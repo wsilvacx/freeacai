@@ -3,21 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pesque e Pague União - Cardápio</title>
+  <title>Cardápio - Pesque e Pague União</title>
   <link rel="icon" href="favicon.ico" type="image/x-icon">
-
-  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-  
-  <!-- FontAwesome para Ícones -->
-  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     
     body {
       font-family: 'Roboto', sans-serif;
-      background: url('IMG_6008.webp') no-repeat center center fixed;
+      background: url('IMG_6008.jpeg') no-repeat center center fixed;
       background-size: cover;
       color: #fff;
       padding: 20px;
@@ -32,12 +27,11 @@
       text-align: center;
     }
 
-    header .logo img {
-      width: 150px;
-      height: 150px;
-      border-radius: 50%;
+    header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 40px;
+      text-transform: uppercase;
       margin-bottom: 20px;
-      border: 3px solid #fff;
     }
 
     .category-container {
@@ -61,19 +55,8 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
       text-transform: uppercase;
-      letter-spacing: 1px;
       box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
-    }
-
-    .category-btn i {
-      font-size: 24px;
-    }
-
-    .category-btn:hover {
-      background: linear-gradient(135deg, #f0f0f0, #c8c8c8);
-      transform: scale(1.05);
     }
 
     .subcategory {
@@ -87,82 +70,85 @@
     .item {
       display: flex;
       align-items: center;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 8px;
+      margin-bottom: 8px;
+    }
+
+    .item-info {
+      flex: 1;
+      text-align: left;
+    }
+
+    .item-header {
+      display: flex;
       justify-content: space-between;
       font-size: 16px;
       font-weight: bold;
-      padding: 10px;
-      border-bottom: 1px solid rgba(255,255,255,0.3);
-    }
-
-    .descricao {
-      font-size: 12px;
-      color: #ddd;
-    }
-
-    footer {
-      text-align: center;
-      font-size: 14px;
-      margin-top: 20px;
-      border-top: 1px solid #444;
-      padding-top: 10px;
+      color: #fff;
     }
   </style>
 
   <script>
     function toggleCategory(categoryId) {
       let subcategory = document.getElementById(categoryId);
-      let isVisible = subcategory.style.display === "block";
-      
-      document.querySelectorAll('.subcategory').forEach(sub => {
-        sub.style.display = "none";
+      let allSubcategories = document.querySelectorAll('.subcategory');
+      allSubcategories.forEach(sub => {
+        if (sub !== subcategory) {
+          sub.style.display = 'none';
+        }
       });
-
-      subcategory.style.display = isVisible ? "none" : "block";
+      subcategory.style.display = (subcategory.style.display === "block") ? "none" : "block";
     }
   </script>
 </head>
 <body>
   <div class="container">
     <header>
-      <div class="logo">
-        <img src="IMG_5997.webp" alt="Logo">
-      </div>
       <h1>Pesque e Pague União</h1>
     </header>
-    
+
     <div class="category-container">
-      <button class="category-btn" onclick="toggleCategory('refeicoes')">
-        <i class="fas fa-utensils"></i> Refeições
-      </button>
+      <button class="category-btn" onclick="toggleCategory('refeicoes')">🍽️ Refeições</button>
       <div id="refeicoes" class="subcategory">
-        <div class="item">Peixe Frito (Arroz Baião, Farofa e Vinagrete) <span>R$ 65,00</span></div>
-        <div class="item">Carne de Sol (Arroz Baião, Farofa, Vinagrete, Queijo) <span>R$ 60,00</span></div>
-        <div class="item">Panelada (Arroz Branco, Farofa) <span>R$ 45,00</span></div>
-        <div class="item">Galinha Caipira (Arroz Branco, Farofa e Pirão) <span>R$ 160,00</span></div>
-        <div class="item">Peixada União (Arroz Branco, Leite de Coco, Ovo de Codorna, Verdura, Pirão e Tilápia) <span>R$ 120,00</span></div>
+        <div class="item"><div class="item-info"><div class="item-header"><span>Peixe Frito</span> <span>R$ 65,00</span></div><div>Arroz Baião, Farofa e Vinagrete</div></div></div>
+        <div class="item"><div class="item-info"><div class="item-header"><span>Carne de Sol</span> <span>R$ 60,00</span></div><div>Arroz Baião, Farofa, Vinagrete, Queijo</div></div></div>
+        <div class="item"><div class="item-info"><div class="item-header"><span>Panelada</span> <span>R$ 45,00</span></div><div>Arroz Branco, Farofa</div></div></div>
+        <div class="item"><div class="item-info"><div class="item-header"><span>Galinha Caipira</span> <span>R$ 160,00</span></div><div>Arroz Branco, Farofa e Pirão</div></div></div>
+        <div class="item"><div class="item-info"><div class="item-header"><span>Peixada União</span> <span>R$ 120,00</span></div><div>Arroz Branco, Leite de Coco, Ovo de Codorna, Verdura, Pirão e Tilápia</div></div></div>
       </div>
 
-      <button class="category-btn" onclick="toggleCategory('petiscos')">
-        <i class="fas fa-pizza-slice"></i> Tira-Gosto / Petiscos
-      </button>
-      <div id="petiscos" class="subcategory">
-        <div class="item">Tábua de Frios <span>R$ 35,00</span></div>
-        <div class="item">Calabresa <span>R$ 30,00</span></div>
-        <div class="item">Carne de Sol <span>R$ 45,00</span></div>
-        <div class="item">Panelada <span>R$ 35,00</span></div>
-        <div class="item">Peixe Frito <span>R$ 55,00</span></div>
-      </div>
-
-      <button class="category-btn" onclick="toggleCategory('bebidas')">
-        <i class="fas fa-wine-bottle"></i> Bebidas
-      </button>
+      <button class="category-btn" onclick="toggleCategory('bebidas')">🥤 Bebidas</button>
       <div id="bebidas" class="subcategory">
-        <div class="item">Heineken 600ml <span>R$ 14,00</span></div>
-        <div class="item">Brahma Duplo Malte 600ml <span>R$ 10,00</span></div>
-        <div class="item">Coca-Cola 1L <span>R$ 10,00</span></div>
+        <div class="item"><div class="item-info"><div class="item-header"><span>Heineken 600ml</span> <span>R$ 14,00</span></div></div></div>
+        <div class="item"><div class="item-info"><div class="item-header"><span>Brahma Duplo Malte 600ml</span> <span>R$ 10,00</span></div></div></div>
+        <div class="item"><div class="item-info"><div class="item-header"><span>Guaraná 1L</span> <span>R$ 10,00</span></div></div></div>
+      </div>
+
+      <button class="category-btn" onclick="toggleCategory('acompanhamentos')">🍛 Acompanhamentos</button>
+      <div id="acompanhamentos" class="subcategory">
+        <div class="item"><div class="item-info"><div class="item-header"><span>Torresmo Crocante</span> <span>R$ 20,00</span></div></div></div>
+        <div class="item"><div class="item-info"><div class="item-header"><span>Macaxeira Frita</span> <span>R$ 15,00</span></div></div></div>
+      </div>
+
+      <button class="category-btn" onclick="toggleCategory('aguas')">💧 Águas</button>
+      <div id="aguas" class="subcategory">
+        <div class="item"><div class="item-info"><div class="item-header"><span>Água Mineral 510ml</span> <span>R$ 4,00</span></div></div></div>
+      </div>
+
+      <button class="category-btn" onclick="toggleCategory('destilados')">🥃 Destilados</button>
+      <div id="destilados" class="subcategory">
+        <p>Em breve...</p>
+      </div>
+
+      <button class="category-btn" onclick="toggleCategory('sucos')">🍹 Sucos</button>
+      <div id="sucos" class="subcategory">
+        <p>Em breve...</p>
       </div>
     </div>
-
+    
     <footer>
       <p><strong>Formas de pagamento:</strong> Pix, cartão de crédito e débito.</p>
       <p><strong>Horário de funcionamento:</strong> Terça a domingo, das 10h às 22h.</p>
