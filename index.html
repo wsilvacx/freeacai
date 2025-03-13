@@ -3,227 +3,184 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cardápio Online</title>
+    <title>Cardápio Elegante</title>
     <style>
-        * {
+        /* Estilo geral */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #1a1a1a;
+            color: #fff;
+            text-align: center;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-            font-family: Arial, sans-serif;
         }
 
-        body {
-            background-color: #ffffff;
-            color: #ffffff;
-        }
-
-        .header {
-            background-color: #000000;
-            color: #ffffff;
-            padding: 15px;
-            text-align: center;
-            font-size: 20px;
-            font-weight: bold;
-        }
-
-        .logo {
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        .logo img {
-            width: 150px;
-        }
-
-        .banner {
-            width: 100%;
-            max-height: 200px;
-            border-radius: 10px;
-        }
-
-        .menu-categorias {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-            overflow-x: auto;
-            white-space: nowrap;
-            padding: 10px;
-        }
-
-        .menu-categorias::-webkit-scrollbar {
-            height: 5px;
-        }
-
-        .menu-categorias::-webkit-scrollbar-thumb {
-            background: #d60000;
-            border-radius: 5px;
-        }
-
-        .categoria {
+        header {
             background-color: #222;
-            color: white;
-            padding: 15px 20px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: bold;
-            flex-shrink: 0;
-            font-size: 16px;
-            transition: 0.3s;
-        }
-
-        .categoria:hover {
-            background-color: #444;
-        }
-
-        .active {
-            background-color: #d60000 !important;
-            color: white;
-        }
-
-        .menu-container {
-            margin: 20px;
-            padding: 15px;
-            background: #181818;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
-        }
-
-        .menu-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #444;
-        }
-
-        .menu-item img {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            margin-right: 15px;
-        }
-
-        .menu-item p {
-            margin: 0;
-        }
-
-        .menu-item .preco {
-            font-weight: bold;
-            color: #d60000;
-        }
-
-        .whatsapp-btn {
-            position: fixed;
-            bottom: 80px;
-            right: 20px;
-            background-color: #25d366;
-            color: white;
-            padding: 15px;
-            border-radius: 50%;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-            font-size: 24px;
-            cursor: pointer;
-        }
-
-        .footer {
-            background: #000;
-            color: white;
-            text-align: center;
             padding: 20px;
-            margin-top: 30px;
         }
 
-        .footer h3 {
-            margin-bottom: 10px;
-            font-size: 18px;
+        h1 {
+            color: #d4af37;
         }
 
-        .footer p {
+        button {
+            background: #d4af37;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        .category {
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            border-bottom: 2px solid #d4af37;
+            display: inline-block;
+            padding-bottom: 5px;
+        }
+
+        .item {
+            background: #333;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+        }
+
+        .item h3 {
+            margin: 0;
+            color: #d4af37;
+        }
+
+        .item p {
             font-size: 14px;
-            margin: 5px 0;
+            opacity: 0.8;
         }
 
-        .footer .pagamento {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
+        .item span {
+            font-weight: bold;
+            color: #fff;
+        }
+
+        footer {
+            background: #222;
+            padding: 10px;
+            margin-top: 20px;
+        }
+
+        footer img {
+            width: 100px;
             margin-top: 10px;
         }
 
-        .footer .pagamento img {
-            width: 40px;
+        /* Tema claro */
+        .light-mode {
+            background-color: #fff;
+            color: #000;
+        }
+
+        .light-mode header, .light-mode footer {
+            background-color: #f4f4f4;
+        }
+
+        .light-mode .item {
+            background: #ddd;
+        }
+
+        .light-mode h1, .light-mode h2, .light-mode h3 {
+            color: #444;
         }
     </style>
 </head>
 <body>
+    <header>
+        <h1>Menu Sofisticado</h1>
+        <button id="themeToggle">Modo Escuro</button>
+    </header>
 
-    <div class="header">Cardápio Online</div>
+    <div class="container">
+        <section class="category">
+            <h2>Entradas</h2>
+            <div class="item">
+                <h3>Bruschetta Italiana</h3>
+                <p>Pão crocante com tomate, manjericão e azeite.</p>
+                <span>R$ 25,00</span>
+            </div>
+            <div class="item">
+                <h3>Carpaccio de Carne</h3>
+                <p>Fatias finas de carne com molho de mostarda e alcaparras.</p>
+                <span>R$ 32,00</span>
+            </div>
+        </section>
 
-    <div class="logo">
-        <img src="https://via.placeholder.com/150" alt="Logo Restaurante">
+        <section class="category">
+            <h2>Pratos Principais</h2>
+            <div class="item">
+                <h3>Risoto de Camarão</h3>
+                <p>Arroz arbóreo cremoso com camarões frescos.</p>
+                <span>R$ 58,00</span>
+            </div>
+            <div class="item">
+                <h3>Filé Mignon ao Molho Madeira</h3>
+                <p>Acompanha purê de batatas e legumes grelhados.</p>
+                <span>R$ 72,00</span>
+            </div>
+        </section>
+
+        <section class="category">
+            <h2>Sobremesas</h2>
+            <div class="item">
+                <h3>Pavlova de Frutas Vermelhas</h3>
+                <p>Merengue crocante com chantilly e frutas frescas.</p>
+                <span>R$ 28,00</span>
+            </div>
+            <div class="item">
+                <h3>Petit Gâteau</h3>
+                <p>Bolo de chocolate com recheio cremoso e sorvete de baunilha.</p>
+                <span>R$ 30,00</span>
+            </div>
+        </section>
+
+        <section class="category">
+            <h2>Bebidas</h2>
+            <div class="item">
+                <h3>Vinho Tinto Seleção</h3>
+                <p>Garrafa de vinho tinto especial da casa.</p>
+                <span>R$ 90,00</span>
+            </div>
+            <div class="item">
+                <h3>Coquetel de Frutas</h3>
+                <p>Mix de frutas naturais sem álcool.</p>
+                <span>R$ 18,00</span>
+            </div>
+        </section>
     </div>
 
-    <img class="banner" src="https://via.placeholder.com/600x200" alt="Banner Grelhados">
-
-    <div class="menu-categorias">
-        <div class="categoria active" onclick="mostrarPratos('entradas')">Entradas e Porções</div>
-        <div class="categoria" onclick="mostrarPratos('prato_principal')">Prato Principal</div>
-        <div class="categoria" onclick="mostrarPratos('lanches')">Lanches</div>
-        <div class="categoria" onclick="mostrarPratos('bebidas')">Bebidas</div>
-        <div class="categoria" onclick="mostrarPratos('sobremesas')">Sobremesas</div>
-    </div>
-
-    <div class="menu-container" id="menu-lista"></div>
-
-    <div class="whatsapp-btn" onclick="window.location.href='https://wa.me/5599984557326'">
-        ☎️
-    </div>
-
-    <div class="footer">
-        <h3>Endereço</h3>
-        <p>Rua Perimetral, Quadra A27, Casa 01, Vila Paraíso, Caxias - MA</p>
-
-        <h3>Horário de Funcionamento</h3>
-        <p>Segunda a Sábado: 10h - 22h</p>
-        <p>Domingo: 12h - 20h</p>
-
-        <h3>Formas de Pagamento</h3>
-        <div class="pagamento">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/0/0e/PIX_logo.png" alt="Pix">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/6/6a/Visa-e-logo.png" alt="Cartão Visa">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/MasterCard_Logo.svg" alt="MasterCard">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/Dinheiro-Icon.png" alt="Dinheiro">
-        </div>
-    </div>
+    <footer>
+        <p>📍 Rua Gourmet, 123 - Cidade Gastronômica</p>
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://seu-cardapio-online.com" alt="QR Code para acessar o cardápio">
+    </footer>
 
     <script>
-        const pratos = {
-            entradas: [
-                { nome: "Iscas de Frango", descricao: "300g de filézinho empanado", preco: "R$ 15,00 / R$ 30,00", imagem: "https://via.placeholder.com/60" },
-                { nome: "Porção de Batata Frita", descricao: "300g de batatas crocantes", preco: "R$ 18,00", imagem: "https://via.placeholder.com/60" }
-            ],
-            prato_principal: [
-                { nome: "Picanha Grelhada", descricao: "Acompanha arroz, farofa e vinagrete", preco: "R$ 45,00", imagem: "https://via.placeholder.com/60" }
-            ]
-        };
+        // Alternar entre modo claro e escuro
+        const themeToggle = document.getElementById("themeToggle");
 
-        function mostrarPratos(categoria) {
-            const menuLista = document.getElementById("menu-lista");
-            menuLista.innerHTML = "";
-
-            document.querySelectorAll(".categoria").forEach(cat => cat.classList.remove("active"));
-            document.querySelector(`.categoria[onclick="mostrarPratos('${categoria}')"]`).classList.add("active");
-
-            pratos[categoria].forEach(prato => {
-                const item = document.createElement("div");
-                item.classList.add("menu-item");
-                item.innerHTML = `<img src="${prato.imagem}" alt="${prato.nome}"><div><p><strong>${prato.nome}</strong></p><p>${prato.descricao}</p><p class="preco">${prato.preco}</p></div>`;
-                menuLista.appendChild(item);
-            });
-        }
-
-        mostrarPratos("entradas");
+        themeToggle.addEventListener("click", () => {
+            document.body.classList.toggle("light-mode");
+            if (document.body.classList.contains("light-mode")) {
+                themeToggle.textContent = "Modo Escuro";
+            } else {
+                themeToggle.textContent = "Modo Claro";
+            }
+        });
     </script>
-
 </body>
 </html>
