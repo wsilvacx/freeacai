@@ -58,7 +58,10 @@
       width: 100%;
       text-transform: uppercase;
     }
-    .category-btn:hover { background: #c8c8c8; transform: scale(1.05); }
+    .category-btn:hover { 
+      background: #c8c8c8; 
+      transform: scale(1.05); 
+    }
     .subcategory {
       display: none;
       margin-top: 10px;
@@ -69,14 +72,42 @@
     .item {
       display: flex;
       align-items: center;
-      justify-content: space-between;
       background: rgba(255, 255, 255, 0.1);
       border-radius: 8px;
       padding: 8px;
       margin-bottom: 8px;
     }
-    .item span { font-size: 16px; font-weight: bold; color: #fff; }
-    footer { text-align: center; font-size: 14px; margin-top: 20px; }
+    .item img {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 5px;
+      margin-right: 10px;
+      border: 1px solid #fff;
+    }
+    .item-info {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      width: 100%;
+    }
+    .item-header {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      font-size: 16px;
+      font-weight: bold;
+    }
+    .descricao {
+      font-size: 12px;
+      color: #ddd;
+      margin-top: 3px;
+    }
+    footer {
+      text-align: center;
+      font-size: 14px;
+      margin-top: 20px;
+    }
   </style>
   <script>
     function toggleCategory(categoryId) {
@@ -92,50 +123,421 @@
 <body>
   <div class="container">
     <header>
-      <div class="logo"><img src="IMG_5997.jpeg" alt="Logo"></div>
+      <div class="logo">
+        <img src="IMG_5997.jpeg" alt="Logo">
+      </div>
       <h1>Cardápio</h1>
     </header>
 
     <div class="category-container">
-      <button class="category-btn" onclick="toggleCategory('refeicoes')">🍽️ Refeições</button>
+      <!-- REFEIÇÃO -->
+      <button class="category-btn" onclick="toggleCategory('refeicoes')">🍽️ Refeição</button>
       <div id="refeicoes" class="subcategory">
-        <div class="item"><span>Peixe Frito</span> <span>R$ 65,00</span></div>
-        <div class="item"><span>Carne de Sol</span> <span>R$ 60,00</span></div>
-        <div class="item"><span>Panelada</span> <span>R$ 45,00</span></div>
-        <div class="item"><span>Galinha Caipira</span> <span>R$ 160,00</span></div>
-        <div class="item"><span>Peixada União</span> <span>R$ 120,00</span></div>
+        <div class="item">
+          <img src="peixe-frito.jpg" alt="Peixe Frito">
+          <div class="item-info">
+            <div class="item-header">
+              <span>Peixe Frito</span>
+              <span>R$ 65,00</span>
+            </div>
+            <div class="descricao">Arroz Baião, Farofa e Vinagrete</div>
+          </div>
+        </div>
+        <div class="item">
+          <img src="carne-de-sol.jpg" alt="Carne de Sol">
+          <div class="item-info">
+            <div class="item-header">
+              <span>Carne de Sol</span>
+              <span>R$ 60,00</span>
+            </div>
+            <div class="descricao">Arroz Baião, Farofa, Vinagrete e Queijo</div>
+          </div>
+        </div>
+        <div class="item">
+          <img src="panelada.jpg" alt="Panelada">
+          <div class="item-info">
+            <div class="item-header">
+              <span>Panelada</span>
+              <span>R$ 45,00</span>
+            </div>
+            <div class="descricao">Arroz Branco e Farofa</div>
+          </div>
+        </div>
+        <div class="item">
+          <img src="galinha-caipira.jpg" alt="Galinha Caipira">
+          <div class="item-info">
+            <div class="item-header">
+              <span>Galinha Caipira</span>
+              <span>R$ 160,00</span>
+            </div>
+            <div class="descricao">Arroz Branco, Farofa e Pirão</div>
+          </div>
+        </div>
+        <div class="item">
+          <img src="peixada-uniao.jpg" alt="Peixada União">
+          <div class="item-info">
+            <div class="item-header">
+              <span>Peixada União</span>
+              <span>R$ 120,00</span>
+            </div>
+            <div class="descricao">Arroz Branco, Leite de Coco, Ovo de Codorna, Verdura, Pirão e Tilápia</div>
+          </div>
+        </div>
       </div>
 
+      <!-- TIRA-GOSTO / PETISCO -->
       <button class="category-btn" onclick="toggleCategory('petiscos')">🍢 Tira-gosto / Petiscos</button>
       <div id="petiscos" class="subcategory">
-        <div class="item"><span>Tábua de Frios</span> <span>R$ 35,00</span></div>
-        <div class="item"><span>Calabresa</span> <span>R$ 30,00</span></div>
-        <div class="item"><span>Carne de Sol</span> <span>R$ 45,00</span></div>
-        <div class="item"><span>Panelada</span> <span>R$ 35,00</span></div>
-        <div class="item"><span>Peixe Frito</span> <span>R$ 55,00</span></div>
-        <div class="item"><span>Batata Frita</span> <span>R$ 20,00</span></div>
-        <div class="item"><span>Camarão ao Alho e Óleo</span> <span>R$ 50,00</span></div>
+        <div class="item">
+          <img src="tabua-frios.jpg" alt="Tábua de Frios">
+          <div class="item-info">
+            <div class="item-header">
+              <span>Tábua de Frios</span>
+              <span>R$ 35,00</span>
+            </div>
+            <div class="descricao">Queijo, Presunto, Salame, Ovo de Codorna e Azeitona</div>
+          </div>
+        </div>
+        <div class="item">
+          <img src="calabresa.jpg" alt="Calabresa">
+          <div class="item-info">
+            <div class="item-header">
+              <span>Calabresa</span>
+              <span>R$ 30,00</span>
+            </div>
+            <div class="descricao">Farofa e Vinagrete</div>
+          </div>
+        </div>
+        <div class="item">
+          <img src="carne-de-sol-petisco.jpg" alt="Carne de Sol Petisco">
+          <div class="item-info">
+            <div class="item-header">
+              <span>Carne de Sol</span>
+              <span>R$ 45,00</span>
+            </div>
+            <div class="descricao">Farofa e Vinagrete</div>
+          </div>
+        </div>
+        <div class="item">
+          <img src="panelada-petisco.jpg" alt="Panelada Petisco">
+          <div class="item-info">
+            <div class="item-header">
+              <span>Panelada</span>
+              <span>R$ 35,00</span>
+            </div>
+            <div class="descricao">Farofa</div>
+          </div>
+        </div>
+        <div class="item">
+          <img src="peixe-frito-petisco.jpg" alt="Peixe Frito Petisco">
+          <div class="item-info">
+            <div class="item-header">
+              <span>Peixe Frito</span>
+              <span>R$ 55,00</span>
+            </div>
+            <div class="descricao">Farofa e Vinagrete</div>
+          </div>
+        </div>
+        <div class="item">
+          <img src="batata-frita.jpg" alt="Batata Frita">
+          <div class="item-info">
+            <div class="item-header">
+              <span>Batata Frita</span>
+              <span>R$ 20,00</span>
+            </div>
+            <div class="descricao">Molho Rose</div>
+          </div>
+        </div>
+        <div class="item">
+          <img src="camarao-alho-oleo.jpg" alt="Camarão ao Alho e Óleo">
+          <div class="item-info">
+            <div class="item-header">
+              <span>Camarão ao Alho e Óleo</span>
+              <span>R$ 50,00</span>
+            </div>
+            <div class="descricao">Molho Apimentado</div>
+          </div>
+        </div>
+        <div class="item">
+          <img src="file-com-fritas.jpg" alt="Filé com Fritas">
+          <div class="item-info">
+            <div class="item-header">
+              <span>Filé com Fritas</span>
+              <span>R$ 45,00</span>
+            </div>
+            <div class="descricao">Molho Rose</div>
+          </div>
+        </div>
+        <div class="item">
+          <img src="bisteca-suina.jpg" alt="Bisteca Suína">
+          <div class="item-info">
+            <div class="item-header">
+              <span>Bisteca Suína</span>
+              <span>R$ 35,00</span>
+            </div>
+            <div class="descricao">Farofa e Vinagrete</div>
+          </div>
+        </div>
+        <div class="item">
+          <img src="bisteca-bovina.jpg" alt="Bisteca Bovina">
+          <div class="item-info">
+            <div class="item-header">
+              <span>Bisteca Bovina</span>
+              <span>R$ 45,00</span>
+            </div>
+            <div class="descricao">Farofa e Vinagrete</div>
+          </div>
+        </div>
       </div>
 
+      <!-- ACOMPANHAMENTOS -->
       <button class="category-btn" onclick="toggleCategory('acompanhamentos')">🍛 Acompanhamentos</button>
       <div id="acompanhamentos" class="subcategory">
-        <div class="item"><span>Torresmo Crocante</span> <span>R$ 20,00</span></div>
-        <div class="item"><span>Macaxeira Frita</span> <span>R$ 15,00</span></div>
-        <div class="item"><span>Feijoada</span> <span>R$ 20,00</span></div>
-        <div class="item"><span>Pão de Alho</span> <span>R$ 13,00</span></div>
+        <div class="item">
+          <img src="torresmo-crocante.jpg" alt="Torresmo Crocante">
+          <div class="item-info">
+            <div class="item-header">
+              <span>Torresmo Crocante</span>
+              <span>R$ 20,00</span>
+            </div>
+          </div>
+        </div>
+        <div class="item">
+          <img src="macaxeira-frita.jpg" alt="Macaxeira Frita">
+          <div class="item-info">
+            <div class="item-header">
+              <span>Macaxeira Frita</span>
+              <span>R$ 15,00</span>
+            </div>
+          </div>
+        </div>
+        <div class="item">
+          <img src="feijoada.jpg" alt="Feijoada">
+          <div class="item-info">
+            <div class="item-header">
+              <span>Feijoada</span>
+              <span>R$ 20,00</span>
+            </div>
+          </div>
+        </div>
+        <div class="item">
+          <img src="pao-de-alho.jpg" alt="Pão de Alho">
+          <div class="item-info">
+            <div class="item-header">
+              <span>Pão de Alho</span>
+              <span>R$ 13,00</span>
+            </div>
+          </div>
+        </div>
       </div>
 
+      <!-- SOBREMESA -->
+      <button class="category-btn" onclick="toggleCategory('sobremesas')">🍮 Sobremesa</button>
+      <div id="sobremesas" class="subcategory">
+        <div class="item">
+          <img src="pudim-de-leite.jpg" alt="Pudim de Leite">
+          <div class="item-info">
+            <div class="item-header">
+              <span>Pudim de Leite</span>
+              <span>R$ 5,00</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADICIONAIS -->
+      <button class="category-btn" onclick="toggleCategory('adicionais')">➕ Adicionais</button>
+      <div id="adicionais" class="subcategory">
+        <div class="item">
+          <img src="porcao-de-arroz.jpg" alt="Porção de Arroz">
+          <div class="item-info">
+            <div class="item-header">
+              <span>Porção de Arroz</span>
+              <span>R$ 10,00</span>
+            </div>
+          </div>
+        </div>
+        <div class="item">
+          <img src="vinagrete.jpg" alt="Vinagrete">
+          <div class="item-info">
+            <div class="item-header">
+              <span>Vinagrete</span>
+              <span>R$ 4,00</span>
+            </div>
+          </div>
+        </div>
+        <div class="item">
+          <img src="farofa.jpg" alt="Farofa">
+          <div class="item-info">
+            <div class="item-header">
+              <span>Farofa</span>
+              <span>R$ 3,00</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BEBIDAS -->
       <button class="category-btn" onclick="toggleCategory('bebidas')">🥤 Bebidas</button>
       <div id="bebidas" class="subcategory">
-        <div class="item"><span>Heineken 600ml</span> <span>R$ 14,00</span></div>
-        <div class="item"><span>Brahma Duplo Malte 600ml</span> <span>R$ 10,00</span></div>
-        <div class="item"><span>Coca-Cola 1L</span> <span>R$ 10,00</span></div>
+        <div class="item">
+          <img src="heineken-600ml.jpg" alt="Heineken 600ml">
+          <div class="item-info">
+            <div class="item-header">
+              <span>Heineken 600ml</span>
+              <span>R$ 14,00</span>
+            </div>
+          </div>
+        </div>
+        <div class="item">
+          <img src="brahma-duplo-malte-600ml.jpg" alt="Brahma Duplo Malte 600ml">
+          <div class="item-info">
+            <div class="item-header">
+              <span>Brahma Duplo Malte 600ml</span>
+              <span>R$ 10,00</span>
+            </div>
+          </div>
+        </div>
+        <div class="item">
+          <img src="brahma-chopp-600ml.jpg" alt="Brahma Chopp 600ml">
+          <div class="item-info">
+            <div class="item-header">
+              <span>Brahma Chopp 600ml</span>
+              <span>R$ 10,00</span>
+            </div>
+          </div>
+        </div>
+        <div class="item">
+          <img src="skol-600ml.jpg" alt="Skol 600ml">
+          <div class="item-info">
+            <div class="item-header">
+              <span>Skol 600ml</span>
+              <span>R$ 10,00</span>
+            </div>
+          </div>
+        </div>
+        <div class="item">
+          <img src="imperio.jpg" alt="Império">
+          <div class="item-info">
+            <div class="item-header">
+              <span>Império</span>
+              <span>R$ 14,00</span>
+            </div>
+          </div>
+        </div>
+        <div class="item">
+          <img src="imperio-duplo-malte.jpg" alt="Império Duplo Malte">
+          <div class="item-info">
+            <div class="item-header">
+              <span>Império Duplo Malte</span>
+              <span>R$ 10,00</span>
+            </div>
+          </div>
+        </div>
+        <div class="item">
+          <img src="coca-cola-1l.jpg" alt="Coca-Cola 1L">
+          <div class="item-info">
+            <div class="item-header">
+              <span>Coca-Cola 1L</span>
+              <span>R$ 10,00</span>
+            </div>
+          </div>
+        </div>
+        <div class="item">
+          <img src="coca-cola-lata.jpg" alt="Coca-Cola Lata">
+          <div class="item-info">
+            <div class="item-header">
+              <span>Coca-Cola Lata</span>
+              <span>R$ 5,00</span>
+            </div>
+          </div>
+        </div>
+        <div class="item">
+          <img src="coca-zero-1l.jpg" alt="Coca Zero 1L">
+          <div class="item-info">
+            <div class="item-header">
+              <span>Coca Zero 1L</span>
+              <span>R$ 12,00</span>
+            </div>
+          </div>
+        </div>
+        <div class="item">
+          <img src="coca-zero-lata.jpg" alt="Coca Zero Lata">
+          <div class="item-info">
+            <div class="item-header">
+              <span>Coca Zero Lata</span>
+              <span>R$ 6,00</span>
+            </div>
+          </div>
+        </div>
+        <div class="item">
+          <img src="guarana-1l.jpg" alt="Guaraná 1L">
+          <div class="item-info">
+            <div class="item-header">
+              <span>Guaraná 1L</span>
+              <span>R$ 10,00</span>
+            </div>
+          </div>
+        </div>
+        <div class="item">
+          <img src="guarana-lata.jpg" alt="Guaraná Lata">
+          <div class="item-info">
+            <div class="item-header">
+              <span>Guaraná Lata</span>
+              <span>R$ 5,00</span>
+            </div>
+          </div>
+        </div>
+        <div class="item">
+          <img src="redbull.jpg" alt="Red Bull">
+          <div class="item-info">
+            <div class="item-header">
+              <span>Red Bull</span>
+              <span>R$ 12,00</span>
+            </div>
+          </div>
+        </div>
+        <div class="item">
+          <img src="ice.jpg" alt="Ice">
+          <div class="item-info">
+            <div class="item-header">
+              <span>Ice</span>
+              <span>R$ 8,00</span>
+            </div>
+          </div>
+        </div>
       </div>
 
+      <!-- ÁGUAS -->
       <button class="category-btn" onclick="toggleCategory('aguas')">💧 Águas</button>
       <div id="aguas" class="subcategory">
-        <div class="item"><span>Água Mineral 510ml (Sem Gás)</span> <span>R$ 4,00</span></div>
-        <div class="item"><span>Água Mineral 510ml (Com Gás)</span> <span>R$ 6,00</span></div>
+        <div class="item">
+          <img src="agua-mineral-510ml-sem-gas.jpg" alt="Água Mineral 510ml (Sem Gás)">
+          <div class="item-info">
+            <div class="item-header">
+              <span>Água Mineral 510ml (Sem Gás)</span>
+              <span>R$ 4,00</span>
+            </div>
+          </div>
+        </div>
+        <div class="item">
+          <img src="agua-mineral-510ml-com-gas.jpg" alt="Água Mineral 510ml (Com Gás)">
+          <div class="item-info">
+            <div class="item-header">
+              <span>Água Mineral 510ml (Com Gás)</span>
+              <span>R$ 6,00</span>
+            </div>
+          </div>
+        </div>
+        <div class="item">
+          <img src="agua-mineral-1-5l-sem-gas.jpg" alt="Água Mineral 1,5L (Sem Gás)">
+          <div class="item-info">
+            <div class="item-header">
+              <span>Água Mineral 1,5L (Sem Gás)</span>
+              <span>R$ 8,00</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
