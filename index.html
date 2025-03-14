@@ -44,9 +44,9 @@
       display: flex;
       overflow-x: auto;
       gap: 15px;
-      padding-bottom: 10px;
+      padding: 10px 0;
       margin-bottom: 20px;
-      border-bottom: 1px solid #ccc;
+      border-bottom: 2px solid rgba(255,255,255,0.3);
     }
     .menu-bar::-webkit-scrollbar {
       height: 8px;
@@ -57,6 +57,7 @@
     }
     .category-btn {
       background: linear-gradient(135deg, #ffffff, #d1d1d1);
+      border: none;
       border-radius: 15px;
       font-size: 16px;
       font-weight: bold;
@@ -64,16 +65,23 @@
       padding: 10px 15px;
       cursor: pointer;
       transition: all 0.3s ease;
-      border: none;
       text-transform: uppercase;
       white-space: nowrap;
       flex-shrink: 0;
     }
+    /* Efeito hover */
     .category-btn:hover { 
       background: #c8c8c8; 
       transform: scale(1.05); 
     }
-    /* Subcategorias: exibidas em bloco abaixo do menu */
+    /* Categoria ativa */
+    .category-btn.active {
+      background: #fff;
+      color: #333;
+      box-shadow: 0px 4px 8px rgba(255,255,255,0.3);
+      transform: scale(1.05);
+    }
+    /* Subcategorias: exibidas abaixo do menu */
     .subcategories {
       text-align: left;
       margin-bottom: 20px;
@@ -119,7 +127,7 @@
     }
     /* Divisor horizontal antes do rodapé */
     .divider {
-      border-top: 1px solid #ccc;
+      border-top: 1px solid rgba(255,255,255,0.3);
       margin: 20px 0;
     }
     footer {
@@ -130,14 +138,23 @@
   </style>
   <script>
     function toggleCategory(categoryId) {
-      let subcategory = document.getElementById(categoryId);
-      // Fecha os outros submenus
-      let allSubcategories = document.querySelectorAll('.subcategory');
-      allSubcategories.forEach(sub => {
-        if (sub !== subcategory) { sub.style.display = 'none'; }
-      });
-      // Alterna exibição do submenu clicado
-      subcategory.style.display = (subcategory.style.display === "block") ? "none" : "block";
+      const button = document.querySelector(`.menu-bar button[onclick="toggleCategory('${categoryId}')"]`);
+      const subcategory = document.getElementById(categoryId);
+      const allSubcategories = document.querySelectorAll('.subcategory');
+      const allButtons = document.querySelectorAll('.menu-bar button');
+
+      // Se o submenu já está aberto, fecha e remove destaque
+      if(subcategory.style.display === "block"){
+        subcategory.style.display = "none";
+        button.classList.remove("active");
+      } else {
+        // Fecha todos e remove destaque dos botões
+        allSubcategories.forEach(sub => sub.style.display = "none");
+        allButtons.forEach(btn => btn.classList.remove("active"));
+        // Abre o submenu clicado e destaca o botão
+        subcategory.style.display = "block";
+        button.classList.add("active");
+      }
     }
   </script>
 </head>
