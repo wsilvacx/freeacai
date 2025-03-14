@@ -54,11 +54,11 @@
       gap: 10px;
       padding: 10px 0;
       border-bottom: 2px solid rgba(255,255,255,0.3);
-      scrollbar-width: none; /* Esconde a barra de rolagem no Firefox */
+      scrollbar-width: none; /* Esconde a scrollbar no Firefox */
       position: relative;
     }
     .nav-arrows .tab-menu::-webkit-scrollbar {
-      display: none; /* Esconde a barra de rolagem no Chrome/Safari */
+      display: none; /* Esconde a scrollbar no Chrome/Safari */
     }
     /* Gradientes laterais para indicar rolagem */
     .nav-arrows .tab-menu::before,
@@ -200,12 +200,52 @@
     function scrollTabs(value) {
       document.querySelector(".tab-menu").scrollBy({ left: value, behavior: "smooth" });
     }
-    // Exibe a primeira aba por padrão após carregar a página
+    
+    // Função para trocar de categoria via swipe
+    let touchstartX = 0;
+    let touchendX = 0;
+    const swipeThreshold = 50; // Distância mínima para considerar um swipe
+
+    function handleGesture() {
+      if (touchstartX - touchendX > swipeThreshold) {
+        // Swipe para a esquerda: próxima categoria
+        changeTab('next');
+      } else if (touchendX - touchstartX > swipeThreshold) {
+        // Swipe para a direita: categoria anterior
+        changeTab('prev');
+      }
+    }
+
+    function changeTab(direction) {
+      const tabs = document.querySelectorAll('.tab-menu button');
+      let activeIndex = Array.from(tabs).findIndex(tab => tab.classList.contains('active'));
+      if (direction === 'next' && activeIndex < tabs.length - 1) {
+        tabs[activeIndex + 1].click();
+      } else if (direction === 'prev' && activeIndex > 0) {
+        tabs[activeIndex - 1].click();
+      }
+    }
+
+    // Adiciona eventos de touch nos conteúdos ativos para detectar swipe
+    function addSwipeListeners() {
+      const contents = document.querySelectorAll('.tab-content');
+      contents.forEach(content => {
+        content.addEventListener('touchstart', e => {
+          touchstartX = e.changedTouches[0].screenX;
+        });
+        content.addEventListener('touchend', e => {
+          touchendX = e.changedTouches[0].screenX;
+          handleGesture();
+        });
+      });
+    }
+
     window.onload = function() {
       var firstTab = document.querySelector(".tab-menu button");
       if(firstTab){
         firstTab.click();
       }
+      addSwipeListeners();
     }
   </script>
 </head>
