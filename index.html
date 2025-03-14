@@ -40,15 +40,45 @@
       font-weight: bold;
       margin-bottom: 20px;
     }
-    /* Barra de abas */
-    .tab-menu {
+    /* Container para a barra com setas */
+    .nav-arrows {
+      display: flex;
+      align-items: center;
+      position: relative;
+      margin-bottom: 20px;
+    }
+    .nav-arrows .tab-menu {
+      flex: 1;
       display: flex;
       overflow-x: auto;
       gap: 10px;
       padding: 10px 0;
-      margin-bottom: 20px;
       border-bottom: 2px solid rgba(255,255,255,0.3);
+      scrollbar-width: none; /* Esconde a barra de rolagem no Firefox */
+      position: relative;
     }
+    .nav-arrows .tab-menu::-webkit-scrollbar {
+      display: none; /* Esconde a barra de rolagem no Chrome/Safari */
+    }
+    /* Gradientes laterais para indicar rolagem */
+    .nav-arrows .tab-menu::before,
+    .nav-arrows .tab-menu::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 30px;
+      pointer-events: none;
+    }
+    .nav-arrows .tab-menu::before {
+      left: 0;
+      background: linear-gradient(to right, rgba(0, 0, 0, 0.85), transparent);
+    }
+    .nav-arrows .tab-menu::after {
+      right: 0;
+      background: linear-gradient(to left, rgba(0, 0, 0, 0.85), transparent);
+    }
+    /* Estilo dos botões da aba */
     .tab-menu button {
       background: linear-gradient(135deg, #ffffff, #d1d1d1);
       border: none;
@@ -72,6 +102,22 @@
       color: #333;
       box-shadow: 0px 4px 8px rgba(255,255,255,0.3);
       transform: scale(1.05);
+    }
+    /* Estilo dos botões de seta */
+    .nav-arrows button.nav-left,
+    .nav-arrows button.nav-right {
+      background: rgba(0, 0, 0, 0.5);
+      border: none;
+      color: #fff;
+      font-size: 24px;
+      padding: 10px;
+      cursor: pointer;
+      border-radius: 50%;
+      transition: background 0.3s ease;
+    }
+    .nav-arrows button.nav-left:hover,
+    .nav-arrows button.nav-right:hover {
+      background: rgba(0, 0, 0, 0.7);
     }
     /* Conteúdo das abas: oculto por padrão */
     .tab-content {
@@ -150,6 +196,10 @@
       // Adiciona destaque ao botão selecionado
       button.classList.add("active");
     }
+    // Função para rolar a barra de abas
+    function scrollTabs(value) {
+      document.querySelector(".tab-menu").scrollBy({ left: value, behavior: "smooth" });
+    }
     // Exibe a primeira aba por padrão após carregar a página
     window.onload = function() {
       var firstTab = document.querySelector(".tab-menu button");
@@ -168,15 +218,19 @@
       <h1>Cardápio</h1>
     </header>
 
-    <!-- Barra de abas -->
-    <div class="tab-menu">
-      <button onclick="openTab('refeicoes', this)">🍽️ Refeição</button>
-      <button onclick="openTab('petiscos', this)">🍢 Tira-gosto / Petiscos</button>
-      <button onclick="openTab('acompanhamentos', this)">🍛 Acompanhamentos</button>
-      <button onclick="openTab('sobremesas', this)">🍮 Sobremesa</button>
-      <button onclick="openTab('adicionais', this)">➕ Adicionais</button>
-      <button onclick="openTab('bebidas', this)">🥤 Bebidas</button>
-      <button onclick="openTab('aguas', this)">💧 Águas</button>
+    <!-- Barra de abas com setas de navegação -->
+    <div class="nav-arrows">
+      <button class="nav-left" onclick="scrollTabs(-100)">❮</button>
+      <div class="tab-menu">
+        <button onclick="openTab('refeicoes', this)">🍽️ Refeição</button>
+        <button onclick="openTab('petiscos', this)">🍢 Tira-gosto / Petiscos</button>
+        <button onclick="openTab('acompanhamentos', this)">🍛 Acompanhamentos</button>
+        <button onclick="openTab('sobremesas', this)">🍮 Sobremesa</button>
+        <button onclick="openTab('adicionais', this)">➕ Adicionais</button>
+        <button onclick="openTab('bebidas', this)">🥤 Bebidas</button>
+        <button onclick="openTab('aguas', this)">💧 Águas</button>
+      </div>
+      <button class="nav-right" onclick="scrollTabs(100)">❯</button>
     </div>
 
     <!-- Conteúdo das abas organizadas em grade -->
