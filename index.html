@@ -39,28 +39,44 @@
       font-weight: bold;
       margin-bottom: 20px;
     }
-    .category-container {
+    /* Barra de menu horizontal */
+    .menu-bar {
       display: flex;
-      flex-direction: column;
+      overflow-x: auto;
       gap: 15px;
-      margin-top: 20px;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #ccc;
+    }
+    .menu-bar::-webkit-scrollbar {
+      height: 8px;
+    }
+    .menu-bar::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 4px;
     }
     .category-btn {
       background: linear-gradient(135deg, #ffffff, #d1d1d1);
       border-radius: 15px;
-      font-size: 22px;
+      font-size: 16px;
       font-weight: bold;
       color: #333;
-      padding: 15px;
+      padding: 10px 15px;
       cursor: pointer;
       transition: all 0.3s ease;
       border: none;
-      width: 100%;
       text-transform: uppercase;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
     .category-btn:hover { 
       background: #c8c8c8; 
       transform: scale(1.05); 
+    }
+    /* Subcategorias: exibidas em bloco abaixo do menu */
+    .subcategories {
+      text-align: left;
+      margin-bottom: 20px;
     }
     .subcategory {
       display: none;
@@ -88,13 +104,11 @@
     .item-info {
       display: flex;
       flex-direction: column;
-      align-items: flex-start;
       width: 100%;
     }
     .item-header {
       display: flex;
       justify-content: space-between;
-      width: 100%;
       font-size: 16px;
       font-weight: bold;
     }
@@ -103,19 +117,26 @@
       color: #ddd;
       margin-top: 3px;
     }
+    /* Divisor horizontal antes do rodapé */
+    .divider {
+      border-top: 1px solid #ccc;
+      margin: 20px 0;
+    }
     footer {
       text-align: center;
       font-size: 14px;
-      margin-top: 20px;
+      margin-top: 10px;
     }
   </style>
   <script>
     function toggleCategory(categoryId) {
       let subcategory = document.getElementById(categoryId);
+      // Fecha os outros submenus
       let allSubcategories = document.querySelectorAll('.subcategory');
       allSubcategories.forEach(sub => {
         if (sub !== subcategory) { sub.style.display = 'none'; }
       });
+      // Alterna exibição do submenu clicado
       subcategory.style.display = (subcategory.style.display === "block") ? "none" : "block";
     }
   </script>
@@ -129,9 +150,20 @@
       <h1>Cardápio</h1>
     </header>
 
-    <div class="category-container">
-      <!-- REFEIÇÃO -->
+    <!-- Barra de menu horizontal -->
+    <div class="menu-bar">
       <button class="category-btn" onclick="toggleCategory('refeicoes')">🍽️ Refeição</button>
+      <button class="category-btn" onclick="toggleCategory('petiscos')">🍢 Tira-gosto / Petiscos</button>
+      <button class="category-btn" onclick="toggleCategory('acompanhamentos')">🍛 Acompanhamentos</button>
+      <button class="category-btn" onclick="toggleCategory('sobremesas')">🍮 Sobremesa</button>
+      <button class="category-btn" onclick="toggleCategory('adicionais')">➕ Adicionais</button>
+      <button class="category-btn" onclick="toggleCategory('bebidas')">🥤 Bebidas</button>
+      <button class="category-btn" onclick="toggleCategory('aguas')">💧 Águas</button>
+    </div>
+
+    <!-- Subcategorias -->
+    <div class="subcategories">
+      <!-- REFEIÇÃO -->
       <div id="refeicoes" class="subcategory">
         <div class="item">
           <img src="peixe-frito.jpg" alt="Peixe Frito">
@@ -186,7 +218,6 @@
       </div>
 
       <!-- TIRA-GOSTO / PETISCO -->
-      <button class="category-btn" onclick="toggleCategory('petiscos')">🍢 Tira-gosto / Petiscos</button>
       <div id="petiscos" class="subcategory">
         <div class="item">
           <img src="tabua-frios.jpg" alt="Tábua de Frios">
@@ -291,7 +322,6 @@
       </div>
 
       <!-- ACOMPANHAMENTOS -->
-      <button class="category-btn" onclick="toggleCategory('acompanhamentos')">🍛 Acompanhamentos</button>
       <div id="acompanhamentos" class="subcategory">
         <div class="item">
           <img src="torresmo-crocante.jpg" alt="Torresmo Crocante">
@@ -332,7 +362,6 @@
       </div>
 
       <!-- SOBREMESA -->
-      <button class="category-btn" onclick="toggleCategory('sobremesas')">🍮 Sobremesa</button>
       <div id="sobremesas" class="subcategory">
         <div class="item">
           <img src="pudim-de-leite.jpg" alt="Pudim de Leite">
@@ -346,7 +375,6 @@
       </div>
 
       <!-- ADICIONAIS -->
-      <button class="category-btn" onclick="toggleCategory('adicionais')">➕ Adicionais</button>
       <div id="adicionais" class="subcategory">
         <div class="item">
           <img src="porcao-de-arroz.jpg" alt="Porção de Arroz">
@@ -378,7 +406,6 @@
       </div>
 
       <!-- BEBIDAS -->
-      <button class="category-btn" onclick="toggleCategory('bebidas')">🥤 Bebidas</button>
       <div id="bebidas" class="subcategory">
         <div class="item">
           <img src="heineken-600ml.jpg" alt="Heineken 600ml">
@@ -509,7 +536,6 @@
       </div>
 
       <!-- ÁGUAS -->
-      <button class="category-btn" onclick="toggleCategory('aguas')">💧 Águas</button>
       <div id="aguas" class="subcategory">
         <div class="item">
           <img src="agua-mineral-510ml-sem-gas.jpg" alt="Água Mineral 510ml (Sem Gás)">
@@ -540,6 +566,9 @@
         </div>
       </div>
     </div>
+
+    <!-- Divisor horizontal antes do rodapé -->
+    <div class="divider"></div>
 
     <footer>
       <p><strong>Formas de pagamento:</strong> Pix, cartão de crédito e débito.</p>
