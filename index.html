@@ -1,147 +1,588 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cardápio</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-        }
-        .tab-menu {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-        .tab-menu button {
-            padding: 10px 20px;
-            margin: 5px;
-            border: none;
-            background: #ddd;
-            cursor: pointer;
-        }
-        .tab-menu button.active {
-            background: #007bff;
-            color: white;
-        }
-        .tab-content {
-            display: none;
-            padding: 20px;
-            border: 1px solid #ddd;
-            transition: transform 0.3s ease;
-        }
-        .tab-content.active {
-            display: block;
-        }
-        .swiping {
-            transform: translateX(100%);
-            transition: transform 0.3s ease;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cardápio - Abas em Grade</title>
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <style>
+    /* Reset e base */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: url('IMG_6008.jpeg') no-repeat center center fixed;
+      background-size: cover;
+      color: #fff;
+      padding: 20px;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background-color: rgba(0,0,0,0.85);
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+      text-align: center;
+    }
+    header .logo img {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      margin-bottom: 20px;
+      border: 3px solid #fff;
+    }
+    header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 40px;
+      text-transform: uppercase;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+    /* Barra de abas */
+    .tab-menu {
+      display: flex;
+      overflow-x: auto;
+      gap: 10px;
+      padding: 10px 0;
+      margin-bottom: 20px;
+      border-bottom: 2px solid rgba(255,255,255,0.3);
+    }
+    .tab-menu button {
+      background: linear-gradient(135deg, #ffffff, #d1d1d1);
+      border: none;
+      border-radius: 15px;
+      font-size: 16px;
+      font-weight: bold;
+      color: #333;
+      padding: 10px 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .tab-menu button:hover {
+      background: #c8c8c8;
+      transform: scale(1.05);
+    }
+    .tab-menu button.active {
+      background: #fff;
+      color: #333;
+      box-shadow: 0px 4px 8px rgba(255,255,255,0.3);
+      transform: scale(1.05);
+    }
+    /* Conteúdo das abas: oculto por padrão */
+    .tab-content {
+      display: none;
+      text-align: left;
+      margin-bottom: 20px;
+      padding: 10px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 15px;
+    }
+    /* Quando ativo, usa grid para organizar os itens */
+    .tab-content.active {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 15px;
+    }
+    /* Cada item mantém seu layout com flex, mas agora é um item da grade */
+    .item {
+      display: flex;
+      align-items: center;
+      background: rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 8px;
+      margin-bottom: 8px;
+    }
+    .item img {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 5px;
+      margin-right: 10px;
+      border: 1px solid #fff;
+    }
+    .item-info {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+    .item-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 16px;
+      font-weight: bold;
+    }
+    .descricao {
+      font-size: 12px;
+      color: #ddd;
+      margin-top: 3px;
+    }
+    /* Divisor horizontal antes do rodapé */
+    .divider {
+      border-top: 1px solid rgba(255,255,255,0.3);
+      margin: 20px 0;
+    }
+    footer {
+      text-align: center;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+  </style>
+  <script>
+    // Função para alternar abas
+    function openTab(tabName, button) {
+      // Oculta todos os conteúdos
+      var contents = document.getElementsByClassName("tab-content");
+      for (var i = 0; i < contents.length; i++) {
+        contents[i].classList.remove("active");
+      }
+      // Remove a classe active de todos os botões
+      var tabs = document.querySelectorAll(".tab-menu button");
+      tabs.forEach(function(tab) {
+        tab.classList.remove("active");
+      });
+      // Exibe o conteúdo da aba selecionada
+      document.getElementById(tabName).classList.add("active");
+      // Adiciona destaque ao botão selecionado
+      button.classList.add("active");
+    }
+    // Exibe a primeira aba por padrão após carregar a página
+    window.onload = function() {
+      var firstTab = document.querySelector(".tab-menu button");
+      if(firstTab){
+        firstTab.click();
+      }
+    }
+  </script>
 </head>
 <body>
+  <div class="container">
+    <header>
+      <div class="logo">
+        <img src="IMG_5997.jpeg" alt="Logo">
+      </div>
+      <h1>Cardápio</h1>
+    </header>
 
-    <h1>Cardápio</h1>
-    
+    <!-- Barra de abas -->
     <div class="tab-menu">
-        <button class="tab-link active" onclick="openTab(event, 'entradas')">Entradas</button>
-        <button class="tab-link" onclick="openTab(event, 'pratos')">Pratos Principais</button>
-        <button class="tab-link" onclick="openTab(event, 'sobremesas')">Sobremesas</button>
-        <button class="tab-link" onclick="openTab(event, 'bebidas')">Bebidas</button>
+      <button onclick="openTab('refeicoes', this)">🍽️ Refeição</button>
+      <button onclick="openTab('petiscos', this)">🍢 Tira-gosto / Petiscos</button>
+      <button onclick="openTab('acompanhamentos', this)">🍛 Acompanhamentos</button>
+      <button onclick="openTab('sobremesas', this)">🍮 Sobremesa</button>
+      <button onclick="openTab('adicionais', this)">➕ Adicionais</button>
+      <button onclick="openTab('bebidas', this)">🥤 Bebidas</button>
+      <button onclick="openTab('aguas', this)">💧 Águas</button>
     </div>
 
-    <div id="entradas" class="tab-content active">
-        <h2>Entradas</h2>
-        <p>Saladas, pães e antepastos deliciosos.</p>
+    <!-- Conteúdo das abas organizadas em grade -->
+    <div id="refeicoes" class="tab-content">
+      <div class="item">
+        <img src="peixe-frito.jpg" alt="Peixe Frito">
+        <div class="item-info">
+          <div class="item-header">
+            <span>Peixe Frito</span>
+            <span>R$ 65,00</span>
+          </div>
+          <div class="descricao">Arroz Baião, Farofa e Vinagrete</div>
+        </div>
+      </div>
+      <div class="item">
+        <img src="carne-de-sol.jpg" alt="Carne de Sol">
+        <div class="item-info">
+          <div class="item-header">
+            <span>Carne de Sol</span>
+            <span>R$ 60,00</span>
+          </div>
+          <div class="descricao">Arroz Baião, Farofa, Vinagrete e Queijo</div>
+        </div>
+      </div>
+      <div class="item">
+        <img src="panelada.jpg" alt="Panelada">
+        <div class="item-info">
+          <div class="item-header">
+            <span>Panelada</span>
+            <span>R$ 45,00</span>
+          </div>
+          <div class="descricao">Arroz Branco e Farofa</div>
+        </div>
+      </div>
+      <div class="item">
+        <img src="galinha-caipira.jpg" alt="Galinha Caipira">
+        <div class="item-info">
+          <div class="item-header">
+            <span>Galinha Caipira</span>
+            <span>R$ 160,00</span>
+          </div>
+          <div class="descricao">Arroz Branco, Farofa e Pirão</div>
+        </div>
+      </div>
+      <div class="item">
+        <img src="peixada-uniao.jpg" alt="Peixada União">
+        <div class="item-info">
+          <div class="item-header">
+            <span>Peixada União</span>
+            <span>R$ 120,00</span>
+          </div>
+          <div class="descricao">Arroz Branco, Leite de Coco, Ovo de Codorna, Verdura, Pirão e Tilápia</div>
+        </div>
+      </div>
     </div>
 
-    <div id="pratos" class="tab-content">
-        <h2>Pratos Principais</h2>
-        <ul>
-            <li><strong>Feijoada Completa</strong> - Feijão preto com carne de porco, arroz, couve e laranja.</li>
-            <li><strong>Lasagna de Carne</strong> - Camadas de massa, carne moída e molho bechamel.</li>
-            <li><strong>Risoto de Cogumelos</strong> - Risoto cremoso com cogumelos frescos e parmesão.</li>
-            <li><strong>Frango à Parmegiana</strong> - Peito de frango empanado com molho de tomate e queijo derretido.</li>
-            <li><strong>Strogonoff de Carne</strong> - Carne em pedaços com molho cremoso de mostarda e cogumelos.</li>
-        </ul>
+    <div id="petiscos" class="tab-content">
+      <div class="item">
+        <img src="tabua-frios.jpg" alt="Tábua de Frios">
+        <div class="item-info">
+          <div class="item-header">
+            <span>Tábua de Frios</span>
+            <span>R$ 35,00</span>
+          </div>
+          <div class="descricao">Queijo, Presunto, Salame, Ovo de Codorna e Azeitona</div>
+        </div>
+      </div>
+      <div class="item">
+        <img src="calabresa.jpg" alt="Calabresa">
+        <div class="item-info">
+          <div class="item-header">
+            <span>Calabresa</span>
+            <span>R$ 30,00</span>
+          </div>
+          <div class="descricao">Farofa e Vinagrete</div>
+        </div>
+      </div>
+      <div class="item">
+        <img src="carne-de-sol-petisco.jpg" alt="Carne de Sol Petisco">
+        <div class="item-info">
+          <div class="item-header">
+            <span>Carne de Sol</span>
+            <span>R$ 45,00</span>
+          </div>
+          <div class="descricao">Farofa e Vinagrete</div>
+        </div>
+      </div>
+      <div class="item">
+        <img src="panelada-petisco.jpg" alt="Panelada Petisco">
+        <div class="item-info">
+          <div class="item-header">
+            <span>Panelada</span>
+            <span>R$ 35,00</span>
+          </div>
+          <div class="descricao">Farofa</div>
+        </div>
+      </div>
+      <div class="item">
+        <img src="peixe-frito-petisco.jpg" alt="Peixe Frito Petisco">
+        <div class="item-info">
+          <div class="item-header">
+            <span>Peixe Frito</span>
+            <span>R$ 55,00</span>
+          </div>
+          <div class="descricao">Farofa e Vinagrete</div>
+        </div>
+      </div>
+      <div class="item">
+        <img src="batata-frita.jpg" alt="Batata Frita">
+        <div class="item-info">
+          <div class="item-header">
+            <span>Batata Frita</span>
+            <span>R$ 20,00</span>
+          </div>
+          <div class="descricao">Molho Rose</div>
+        </div>
+      </div>
+      <div class="item">
+        <img src="camarao-alho-oleo.jpg" alt="Camarão ao Alho e Óleo">
+        <div class="item-info">
+          <div class="item-header">
+            <span>Camarão ao Alho e Óleo</span>
+            <span>R$ 50,00</span>
+          </div>
+          <div class="descricao">Molho Apimentado</div>
+        </div>
+      </div>
+      <div class="item">
+        <img src="file-com-fritas.jpg" alt="Filé com Fritas">
+        <div class="item-info">
+          <div class="item-header">
+            <span>Filé com Fritas</span>
+            <span>R$ 45,00</span>
+          </div>
+          <div class="descricao">Molho Rose</div>
+        </div>
+      </div>
+      <div class="item">
+        <img src="bisteca-suina.jpg" alt="Bisteca Suína">
+        <div class="item-info">
+          <div class="item-header">
+            <span>Bisteca Suína</span>
+            <span>R$ 35,00</span>
+          </div>
+          <div class="descricao">Farofa e Vinagrete</div>
+        </div>
+      </div>
+      <div class="item">
+        <img src="bisteca-bovina.jpg" alt="Bisteca Bovina">
+        <div class="item-info">
+          <div class="item-header">
+            <span>Bisteca Bovina</span>
+            <span>R$ 45,00</span>
+          </div>
+          <div class="descricao">Farofa e Vinagrete</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="acompanhamentos" class="tab-content">
+      <div class="item">
+        <img src="torresmo-crocante.jpg" alt="Torresmo Crocante">
+        <div class="item-info">
+          <div class="item-header">
+            <span>Torresmo Crocante</span>
+            <span>R$ 20,00</span>
+          </div>
+        </div>
+      </div>
+      <div class="item">
+        <img src="macaxeira-frita.jpg" alt="Macaxeira Frita">
+        <div class="item-info">
+          <div class="item-header">
+            <span>Macaxeira Frita</span>
+            <span>R$ 15,00</span>
+          </div>
+        </div>
+      </div>
+      <div class="item">
+        <img src="feijoada.jpg" alt="Feijoada">
+        <div class="item-info">
+          <div class="item-header">
+            <span>Feijoada</span>
+            <span>R$ 20,00</span>
+          </div>
+        </div>
+      </div>
+      <div class="item">
+        <img src="pao-de-alho.jpg" alt="Pão de Alho">
+        <div class="item-info">
+          <div class="item-header">
+            <span>Pão de Alho</span>
+            <span>R$ 13,00</span>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div id="sobremesas" class="tab-content">
-        <h2>Sobremesas</h2>
-        <p>Doces irresistíveis para fechar com chave de ouro.</p>
+      <div class="item">
+        <img src="pudim-de-leite.jpg" alt="Pudim de Leite">
+        <div class="item-info">
+          <div class="item-header">
+            <span>Pudim de Leite</span>
+            <span>R$ 5,00</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="adicionais" class="tab-content">
+      <div class="item">
+        <img src="porcao-de-arroz.jpg" alt="Porção de Arroz">
+        <div class="item-info">
+          <div class="item-header">
+            <span>Porção de Arroz</span>
+            <span>R$ 10,00</span>
+          </div>
+        </div>
+      </div>
+      <div class="item">
+        <img src="vinagrete.jpg" alt="Vinagrete">
+        <div class="item-info">
+          <div class="item-header">
+            <span>Vinagrete</span>
+            <span>R$ 4,00</span>
+          </div>
+        </div>
+      </div>
+      <div class="item">
+        <img src="farofa.jpg" alt="Farofa">
+        <div class="item-info">
+          <div class="item-header">
+            <span>Farofa</span>
+            <span>R$ 3,00</span>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div id="bebidas" class="tab-content">
-        <h2>Bebidas</h2>
-        <p>Sucos, refrigerantes e drinks especiais.</p>
+      <div class="item">
+        <img src="heineken-600ml.jpg" alt="Heineken 600ml">
+        <div class="item-info">
+          <div class="item-header">
+            <span>Heineken 600ml</span>
+            <span>R$ 14,00</span>
+          </div>
+        </div>
+      </div>
+      <div class="item">
+        <img src="brahma-duplo-malte-600ml.jpg" alt="Brahma Duplo Malte 600ml">
+        <div class="item-info">
+          <div class="item-header">
+            <span>Brahma Duplo Malte 600ml</span>
+            <span>R$ 10,00</span>
+          </div>
+        </div>
+      </div>
+      <div class="item">
+        <img src="brahma-chopp-600ml.jpg" alt="Brahma Chopp 600ml">
+        <div class="item-info">
+          <div class="item-header">
+            <span>Brahma Chopp 600ml</span>
+            <span>R$ 10,00</span>
+          </div>
+        </div>
+      </div>
+      <div class="item">
+        <img src="skol-600ml.jpg" alt="Skol 600ml">
+        <div class="item-info">
+          <div class="item-header">
+            <span>Skol 600ml</span>
+            <span>R$ 10,00</span>
+          </div>
+        </div>
+      </div>
+      <div class="item">
+        <img src="imperio.jpg" alt="Império">
+        <div class="item-info">
+          <div class="item-header">
+            <span>Império</span>
+            <span>R$ 14,00</span>
+          </div>
+        </div>
+      </div>
+      <div class="item">
+        <img src="imperio-duplo-malte.jpg" alt="Império Duplo Malte">
+        <div class="item-info">
+          <div class="item-header">
+            <span>Império Duplo Malte</span>
+            <span>R$ 10,00</span>
+          </div>
+        </div>
+      </div>
+      <div class="item">
+        <img src="coca-cola-1l.jpg" alt="Coca-Cola 1L">
+        <div class="item-info">
+          <div class="item-header">
+            <span>Coca-Cola 1L</span>
+            <span>R$ 10,00</span>
+          </div>
+        </div>
+      </div>
+      <div class="item">
+        <img src="coca-cola-lata.jpg" alt="Coca-Cola Lata">
+        <div class="item-info">
+          <div class="item-header">
+            <span>Coca-Cola Lata</span>
+            <span>R$ 5,00</span>
+          </div>
+        </div>
+      </div>
+      <div class="item">
+        <img src="coca-zero-1l.jpg" alt="Coca Zero 1L">
+        <div class="item-info">
+          <div class="item-header">
+            <span>Coca Zero 1L</span>
+            <span>R$ 12,00</span>
+          </div>
+        </div>
+      </div>
+      <div class="item">
+        <img src="coca-zero-lata.jpg" alt="Coca Zero Lata">
+        <div class="item-info">
+          <div class="item-header">
+            <span>Coca Zero Lata</span>
+            <span>R$ 6,00</span>
+          </div>
+        </div>
+      </div>
+      <div class="item">
+        <img src="guarana-1l.jpg" alt="Guaraná 1L">
+        <div class="item-info">
+          <div class="item-header">
+            <span>Guaraná 1L</span>
+            <span>R$ 10,00</span>
+          </div>
+        </div>
+      </div>
+      <div class="item">
+        <img src="guarana-lata.jpg" alt="Guaraná Lata">
+        <div class="item-info">
+          <div class="item-header">
+            <span>Guaraná Lata</span>
+            <span>R$ 5,00</span>
+          </div>
+        </div>
+      </div>
+      <div class="item">
+        <img src="redbull.jpg" alt="Red Bull">
+        <div class="item-info">
+          <div class="item-header">
+            <span>Red Bull</span>
+            <span>R$ 12,00</span>
+          </div>
+        </div>
+      </div>
+      <div class="item">
+        <img src="ice.jpg" alt="Ice">
+        <div class="item-info">
+          <div class="item-header">
+            <span>Ice</span>
+            <span>R$ 8,00</span>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <script>
-        let isSwiping = false;
-        let swipeDirection = '';
+    <div id="aguas" class="tab-content">
+      <div class="item">
+        <img src="agua-mineral-510ml-sem-gas.jpg" alt="Água Mineral 510ml (Sem Gás)">
+        <div class="item-info">
+          <div class="item-header">
+            <span>Água Mineral 510ml (Sem Gás)</span>
+            <span>R$ 4,00</span>
+          </div>
+        </div>
+      </div>
+      <div class="item">
+        <img src="agua-mineral-510ml-com-gas.jpg" alt="Água Mineral 510ml (Com Gás)">
+        <div class="item-info">
+          <div class="item-header">
+            <span>Água Mineral 510ml (Com Gás)</span>
+            <span>R$ 6,00</span>
+          </div>
+        </div>
+      </div>
+      <div class="item">
+        <img src="agua-mineral-1-5l-sem-gas.jpg" alt="Água Mineral 1,5L (Sem Gás)">
+        <div class="item-info">
+          <div class="item-header">
+            <span>Água Mineral 1,5L (Sem Gás)</span>
+            <span>R$ 8,00</span>
+          </div>
+        </div>
+      </div>
+    </div>
 
-        function openTab(evt, tabName) {
-            let i, tabcontent, tablinks;
+    <!-- Divisor horizontal antes do rodapé -->
+    <div class="divider"></div>
 
-            // Esconder todas as abas
-            tabcontent = document.querySelectorAll(".tab-content");
-            tabcontent.forEach((content) => content.classList.remove("active"));
-
-            // Remover a classe ativa dos botões
-            tablinks = document.querySelectorAll(".tab-menu button");
-            tablinks.forEach((button) => button.classList.remove("active"));
-
-            // Mostrar a aba clicada
-            document.getElementById(tabName).classList.add("active");
-            evt.currentTarget.classList.add("active");
-        }
-
-        // Lógica de deslizar (swipe)
-        let startX = 0;
-        let endX = 0;
-
-        document.addEventListener("touchstart", (event) => {
-            startX = event.touches[0].clientX;
-        });
-
-        document.addEventListener("touchend", (event) => {
-            endX = event.changedTouches[0].clientX;
-            handleSwipe();
-        });
-
-        function handleSwipe() {
-            let tabs = document.querySelectorAll(".tab-menu button");
-            let activeTab = document.querySelector(".tab-menu button.active");
-
-            if (!activeTab || isSwiping) return;
-
-            let activeIndex = Array.from(tabs).indexOf(activeTab);
-            const distance = endX - startX;
-
-            // Detectar a direção do deslize
-            if (distance < -50 && activeIndex < tabs.length - 1) {
-                swipeDirection = 'left';  // Deslizar para a esquerda
-            } else if (distance > 50 && activeIndex > 0) {
-                swipeDirection = 'right'; // Deslizar para a direita
-            }
-
-            // Iniciar o processo de deslizar
-            if (swipeDirection) {
-                isSwiping = true;
-                const currentTab = document.getElementById(tabs[activeIndex].innerText.toLowerCase());
-                const nextTab = document.getElementById(tabs[swipeDirection === 'left' ? activeIndex + 1 : activeIndex - 1].innerText.toLowerCase());
-
-                currentTab.classList.add("swiping");
-                setTimeout(() => {
-                    nextTab.classList.add("active");
-                    currentTab.classList.remove("swiping");
-                    isSwiping = false;
-                    openTab({ currentTarget: tabs[swipeDirection === 'left' ? activeIndex + 1 : activeIndex - 1] }, nextTab.id);
-                }, 300);
-            }
-        }
-    </script>
-
+    <footer>
+      <p><strong>Formas de pagamento:</strong> Pix, cartão de crédito e débito.</p>
+      <p><strong>Horário de funcionamento:</strong> Terça a domingo, das 10h às 22h.</p>
+    </footer>
+  </div>
 </body>
 </html>
