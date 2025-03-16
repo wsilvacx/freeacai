@@ -5,46 +5,64 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Contato</title>
   <link rel="icon" href="favicon.ico" type="image/x-icon">
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: 'Roboto', sans-serif;
-      background: #222;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to right, #111, #222);
       color: #fff;
       text-align: center;
-      padding: 20px;
+      padding: 40px 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
     }
     .container {
       max-width: 800px;
-      margin: 0 auto;
-      background-color: rgba(0,0,0,0.85);
+      width: 100%;
+      background: rgba(0, 0, 0, 0.85);
       border-radius: 15px;
       padding: 30px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(10px);
     }
     .logo {
-      width: 150px;
+      width: 120px;
       margin-bottom: 20px;
     }
     h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: 36px;
+      font-size: 32px;
+      font-weight: 600;
       margin-bottom: 20px;
     }
     .btn {
-      display: block;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       background: #25D366;
       color: #fff;
       text-decoration: none;
-      font-size: 20px;
-      padding: 15px;
-      border-radius: 10px;
-      margin: 10px 0;
+      font-size: 18px;
+      font-weight: 500;
+      padding: 12px;
+      border-radius: 8px;
+      margin: 12px auto;
+      width: 80%;
+      max-width: 350px;
       transition: 0.3s;
     }
     .btn:hover {
+      transform: scale(1.05);
       background: #1ebc5a;
+    }
+    .btn i {
+      margin-right: 10px;
+      font-size: 22px;
+    }
+    .btn.cardapio {
+      background: #ff9800;
     }
     iframe {
       width: 100%;
@@ -54,6 +72,7 @@
       margin-top: 15px;
     }
   </style>
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
 <body>
   <div class="container">
@@ -68,10 +87,14 @@
     </iframe>
 
     <h2>📞 WhatsApp</h2>
-    <a href="https://wa.me/5599984557326" class="btn">Fale Conosco no WhatsApp</a>
+    <a href="https://wa.me/5599984557326" class="btn">
+      <i class="fab fa-whatsapp"></i> Fale Conosco no WhatsApp
+    </a>
 
     <h2>📄 Cardápio</h2>
-    <a href="cardapio.html" class="btn" style="background: #ff9800;">Ver Cardápio</a>
+    <a href="cardapio.html" class="btn cardapio">
+      <i class="fas fa-utensils"></i> Ver Cardápio
+    </a>
   </div>
 </body>
 </html>
