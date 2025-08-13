@@ -62,9 +62,9 @@
     </select>
 
     <p><strong>Escolha uma fruta:</strong></p>
-    <label><input type="radio" name="fruta" value="uva" checked> Uva</label><br>
-    <label><input type="radio" name="fruta" value="banana"> Banana</label><br>
-    <label><input type="radio" name="fruta" value="morango"> Morango</label>
+    <label><input type="radio" name="fruta" value="Uva" checked> Uva</label><br>
+    <label><input type="radio" name="fruta" value="Banana"> Banana</label><br>
+    <label><input type="radio" name="fruta" value="Morango"> Morango</label>
 
     <p><strong>Escolha seus adicionais:</strong></p>
     <div>
@@ -96,13 +96,14 @@ function finalizarPedido() {
         adicionais.push(item.parentNode.innerText.trim());
     });
 
-    let mensagem = "🍧 Pedido realizado!\n";
-    mensagem += "Tamanho: " + tamanhoText + "\n";
-    mensagem += "Fruta: " + fruta + "\n";
-    mensagem += "Adicionais: " + (adicionais.length > 0 ? adicionais.join(", ") : "Nenhum") + "\n";
-    mensagem += document.getElementById("total").innerText;
+    let mensagem = "🍧 *Novo Pedido de Açaí* 🍧\n";
+    mensagem += "*Tamanho:* " + tamanhoText + "\n";
+    mensagem += "*Fruta:* " + fruta + "\n";
+    mensagem += "*Adicionais:* " + (adicionais.length > 0 ? adicionais.join(", ") : "Nenhum") + "\n";
+    mensagem += "*" + document.getElementById("total").innerText + "*";
 
-    alert(mensagem);
+    let url = "https://wa.me/5599984557326?text=" + encodeURIComponent(mensagem);
+    window.open(url, "_blank");
 }
 </script>
 
