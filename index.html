@@ -85,20 +85,13 @@
 
   /* tamanhos - cards */
   .sizes {
-  display: flex;
-  justify-content: center; /* Centraliza no eixo horizontal */
-  gap: 12px;
-  flex-wrap: nowrap; /* Mantém sempre na horizontal */
-}
-
-.size-card {
-  width: 120px; /* Diminuído de 140px */
-}
-.size-card img {
-  height: 100px; /* Diminuído proporcionalmente */
-}
+    display:flex;
+    justify-content:center; /* Centraliza horizontalmente */
+    gap:12px;
+    flex-wrap:nowrap; /* Sempre na horizontal */
+  }
   .size-card {
-    
+    width:120px; /* Reduzido */
     border-radius:14px;
     overflow:hidden;
     background:var(--card-bg);
@@ -110,7 +103,7 @@
   }
   .size-card img{
     width:100%;
-    height:116px;
+    height:100px; /* Proporcional ao novo tamanho */
     object-fit:cover;
     display:block;
   }
@@ -192,6 +185,7 @@
     .app{ grid-template-columns: 1fr; padding:16px }
     .right{ order: 2 }
     .left{ order:1 }
+    .sizes { flex-wrap:wrap; } /* Permite quebrar em telas muito pequenas */
   }
 </style>
 </head>
@@ -271,38 +265,31 @@
 </div>
 
 <script>
-  // estado inicial
   let precoAtual = 10;
   let textoTamanho = "300 ml - R$ 10,00";
 
   function selecionarTamanho(card){
-    // marca ativo
     document.querySelectorAll('.size-card').forEach(c => c.classList.remove('active'));
     card.classList.add('active');
 
     precoAtual = parseFloat(card.getAttribute('data-price'));
     textoTamanho = card.getAttribute('data-text');
 
-    // atualizar resumo
     document.getElementById('res-tamanho').innerText = textoTamanho;
     atualizarResumo();
   }
 
   function atualizarResumo(){
-    // fruta
     const fruta = document.querySelector('input[name="fruta"]:checked').value;
     document.getElementById('res-fruta').innerText = fruta;
 
-    // adicionais
     const adicionais = Array.from(document.querySelectorAll('.check-list input[type="checkbox"]:checked'))
       .map(i => i.value);
     document.getElementById('res-adicionais').innerText = adicionais.length ? adicionais.join(', ') : 'Nenhum';
 
-    // preço (não muda com adicionais)
     document.getElementById('res-preco').innerText = 'R$ ' + precoAtual.toFixed(2);
   }
 
-  // inicializa
   document.addEventListener('DOMContentLoaded', function(){
     const first = document.querySelector('.size-card.active');
     if(first){
@@ -324,7 +311,7 @@
       "*Adicionais:* " + (adicionais.length ? adicionais.join(', ') : 'Nenhum') + "\n" +
       "*Total:* R$ " + precoAtual.toFixed(2);
 
-    const numero = "5599984557326"; // número: +55 99 98455-7326
+    const numero = "5599984557326";
     const url = "https://wa.me/" + numero + "?text=" + encodeURIComponent(mensagem);
     window.open(url, "_blank");
   }
