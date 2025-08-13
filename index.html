@@ -6,90 +6,151 @@
 <title>Monte seu Açaí</title>
 <style>
     body {
-        font-family: Arial, sans-serif;
-        background: #f7f1f8;
+        font-family: 'Segoe UI', sans-serif;
+        background: linear-gradient(135deg, #8e2de2, #4a00e0);
         padding: 20px;
+        color: #fff;
     }
     h1 {
         text-align: center;
-        color: #6b0f77;
+        margin-bottom: 25px;
+        font-size: 2rem;
+        color: #fff;
     }
     .container {
-        max-width: 400px;
+        max-width: 500px;
         margin: auto;
-        background: white;
+        background: rgba(255, 255, 255, 0.95);
         padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        color: #333;
     }
-    label {
+    .section {
+        margin-bottom: 20px;
+    }
+    .section-title {
+        font-size: 1.2rem;
         font-weight: bold;
+        margin-bottom: 10px;
     }
-    select, input[type="checkbox"], input[type="radio"] {
-        margin: 10px 0;
+    /* Botões de tamanho */
+    .size-buttons {
+        display: flex;
+        gap: 10px;
     }
-    .total {
-        margin-top: 20px;
-        font-size: 20px;
-        font-weight: bold;
-        color: #6b0f77;
-    }
-    button {
-        margin-top: 15px;
-        width: 100%;
-        padding: 10px;
+    .size-btn {
+        flex: 1;
+        padding: 12px;
+        border: none;
+        border-radius: 8px;
         background: #6b0f77;
         color: white;
-        border: none;
-        border-radius: 5px;
+        font-weight: bold;
         cursor: pointer;
-        font-size: 16px;
+        font-size: 1rem;
+        transition: transform 0.2s, background 0.2s;
     }
-    button:hover {
+    .size-btn:hover {
         background: #52095b;
+        transform: scale(1.05);
+    }
+    .size-btn.active {
+        background: #ff9800;
+    }
+    /* Inputs */
+    label {
+        display: block;
+        margin-bottom: 5px;
+        cursor: pointer;
+    }
+    input[type="checkbox"], input[type="radio"] {
+        margin-right: 8px;
+    }
+    /* Total fixo */
+    .total {
+        background: #6b0f77;
+        color: #fff;
+        padding: 12px;
+        border-radius: 8px;
+        font-size: 1.2rem;
+        text-align: center;
+        margin-top: 15px;
+    }
+    /* Botão finalizar */
+    .btn-finalizar {
+        margin-top: 15px;
+        width: 100%;
+        padding: 14px;
+        background: #ff9800;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1.2rem;
+        font-weight: bold;
+        transition: background 0.2s, transform 0.2s;
+    }
+    .btn-finalizar:hover {
+        background: #e68900;
+        transform: scale(1.03);
     }
 </style>
 </head>
 <body>
 
-<h1>Monte seu Açaí</h1>
+<h1>🍧 Monte seu Açaí 🍧</h1>
+
 <div class="container">
-    <label for="tamanho">Escolha o tamanho:</label><br>
-    <select id="tamanho" onchange="calcularTotal()">
-        <option value="10">300 ml - R$ 10,00</option>
-        <option value="12">400 ml - R$ 12,00</option>
-        <option value="14">500 ml - R$ 14,00</option>
-    </select>
+    <!-- Escolha do tamanho -->
+    <div class="section">
+        <div class="section-title">1️⃣ Escolha o tamanho:</div>
+        <div class="size-buttons">
+            <button class="size-btn active" onclick="selecionarTamanho(10, this)">300 ml<br>R$ 10,00</button>
+            <button class="size-btn" onclick="selecionarTamanho(12, this)">400 ml<br>R$ 12,00</button>
+            <button class="size-btn" onclick="selecionarTamanho(14, this)">500 ml<br>R$ 14,00</button>
+        </div>
+    </div>
 
-    <p><strong>Escolha uma fruta:</strong></p>
-    <label><input type="radio" name="fruta" value="Uva" checked> Uva</label><br>
-    <label><input type="radio" name="fruta" value="Banana"> Banana</label><br>
-    <label><input type="radio" name="fruta" value="Morango"> Morango</label>
+    <!-- Escolha da fruta -->
+    <div class="section">
+        <div class="section-title">2️⃣ Escolha a fruta:</div>
+        <label><input type="radio" name="fruta" value="Uva" checked> Uva</label>
+        <label><input type="radio" name="fruta" value="Banana"> Banana</label>
+        <label><input type="radio" name="fruta" value="Morango"> Morango</label>
+    </div>
 
-    <p><strong>Escolha seus adicionais:</strong></p>
-    <div>
-        <label><input type="checkbox"> Leite em pó</label><br>
-        <label><input type="checkbox"> Castanhas</label><br>
-        <label><input type="checkbox"> Leite condensado</label><br>
-        <label><input type="checkbox"> Paçoca</label><br>
-        <label><input type="checkbox"> Granola</label><br>
-        <label><input type="checkbox"> Flocos de arroz</label><br>
+    <!-- Adicionais -->
+    <div class="section">
+        <div class="section-title">3️⃣ Escolha seus adicionais:</div>
+        <label><input type="checkbox"> Leite em pó</label>
+        <label><input type="checkbox"> Castanhas</label>
+        <label><input type="checkbox"> Leite condensado</label>
+        <label><input type="checkbox"> Paçoca</label>
+        <label><input type="checkbox"> Granola</label>
+        <label><input type="checkbox"> Flocos de arroz</label>
         <label><input type="checkbox"> M&M colorido</label>
     </div>
 
+    <!-- Total -->
     <div class="total" id="total">Total: R$ 10,00</div>
 
-    <button onclick="finalizarPedido()">Finalizar Pedido</button>
+    <!-- Botão finalizar -->
+    <button class="btn-finalizar" onclick="finalizarPedido()">✅ Finalizar Pedido</button>
 </div>
 
 <script>
-function calcularTotal() {
-    let tamanho = parseFloat(document.getElementById("tamanho").value);
-    document.getElementById("total").innerText = "Total: R$ " + tamanho.toFixed(2);
+let precoAtual = 10; // padrão
+
+function selecionarTamanho(valor, botao) {
+    precoAtual = valor;
+    document.getElementById("total").innerText = "Total: R$ " + valor.toFixed(2);
+    document.querySelectorAll(".size-btn").forEach(b => b.classList.remove("active"));
+    botao.classList.add("active");
 }
 
 function finalizarPedido() {
-    let tamanhoText = document.getElementById("tamanho").options[document.getElementById("tamanho").selectedIndex].text;
+    let tamanhoSelecionado = document.querySelector(".size-btn.active").innerText.replace("\n", " ");
     let fruta = document.querySelector('input[name="fruta"]:checked').value;
     let adicionais = [];
     document.querySelectorAll('input[type="checkbox"]:checked').forEach(function(item) {
@@ -97,12 +158,12 @@ function finalizarPedido() {
     });
 
     let mensagem = "🍧 *Novo Pedido de Açaí* 🍧\n";
-    mensagem += "*Tamanho:* " + tamanhoText + "\n";
+    mensagem += "*Tamanho:* " + tamanhoSelecionado + "\n";
     mensagem += "*Fruta:* " + fruta + "\n";
     mensagem += "*Adicionais:* " + (adicionais.length > 0 ? adicionais.join(", ") : "Nenhum") + "\n";
-    mensagem += "*" + document.getElementById("total").innerText + "*";
+    mensagem += "*Total:* R$ " + precoAtual.toFixed(2);
 
-    let url = "https://wa.me/5599981392792?text=" + encodeURIComponent(mensagem);
+    let url = "https://wa.me/5599984557326?text=" + encodeURIComponent(mensagem);
     window.open(url, "_blank");
 }
 </script>
