@@ -87,7 +87,10 @@
   .sizes {
   display:flex;
   gap:12px;
-  flex-wrap:wrap;
+  flex-wrap:nowrap; /* impede quebrar linha */
+  justify-content:center; /* centraliza */
+  overflow-x:auto; /* rolagem se faltar espaço */
+  padding-bottom:6px; /* espaço para rolagem */
 }
   .size-card {
     width:140px;
