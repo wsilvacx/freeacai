@@ -25,7 +25,7 @@
     label {
         font-weight: bold;
     }
-    select, input[type="checkbox"] {
+    select, input[type="checkbox"], input[type="radio"] {
         margin: 10px 0;
     }
     .total {
@@ -61,31 +61,48 @@
         <option value="14">500 ml - R$ 14,00</option>
     </select>
 
+    <p><strong>Escolha uma fruta:</strong></p>
+    <label><input type="radio" name="fruta" value="uva" checked> Uva</label><br>
+    <label><input type="radio" name="fruta" value="banana"> Banana</label><br>
+    <label><input type="radio" name="fruta" value="morango"> Morango</label>
+
     <p><strong>Escolha seus adicionais:</strong></p>
     <div>
-        <label><input type="checkbox" value="2" onchange="calcularTotal()"> Leite em pó (+R$ 2,00)</label><br>
-        <label><input type="checkbox" value="3" onchange="calcularTotal()"> Castanhas (+R$ 3,00)</label><br>
-        <label><input type="checkbox" value="2" onchange="calcularTotal()"> Leite condensado (+R$ 2,00)</label><br>
-        <label><input type="checkbox" value="1.5" onchange="calcularTotal()"> Paçoca (+R$ 1,50)</label><br>
-        <label><input type="checkbox" value="1" onchange="calcularTotal()"> Granola (+R$ 1,00)</label><br>
-        <label><input type="checkbox" value="1" onchange="calcularTotal()"> Flocos de arroz (+R$ 1,00)</label><br>
-        <label><input type="checkbox" value="2" onchange="calcularTotal()"> M&M colorido (+R$ 2,00)</label>
+        <label><input type="checkbox"> Leite em pó</label><br>
+        <label><input type="checkbox"> Castanhas</label><br>
+        <label><input type="checkbox"> Leite condensado</label><br>
+        <label><input type="checkbox"> Paçoca</label><br>
+        <label><input type="checkbox"> Granola</label><br>
+        <label><input type="checkbox"> Flocos de arroz</label><br>
+        <label><input type="checkbox"> M&M colorido</label>
     </div>
 
     <div class="total" id="total">Total: R$ 10,00</div>
 
-    <button onclick="alert('Pedido realizado com sucesso!')">Finalizar Pedido</button>
+    <button onclick="finalizarPedido()">Finalizar Pedido</button>
 </div>
 
 <script>
 function calcularTotal() {
     let tamanho = parseFloat(document.getElementById("tamanho").value);
-    let adicionais = document.querySelectorAll('input[type="checkbox"]:checked');
-    let total = tamanho;
-    adicionais.forEach(function(item) {
-        total += parseFloat(item.value);
+    document.getElementById("total").innerText = "Total: R$ " + tamanho.toFixed(2);
+}
+
+function finalizarPedido() {
+    let tamanhoText = document.getElementById("tamanho").options[document.getElementById("tamanho").selectedIndex].text;
+    let fruta = document.querySelector('input[name="fruta"]:checked').value;
+    let adicionais = [];
+    document.querySelectorAll('input[type="checkbox"]:checked').forEach(function(item) {
+        adicionais.push(item.parentNode.innerText.trim());
     });
-    document.getElementById("total").innerText = "Total: R$ " + total.toFixed(2);
+
+    let mensagem = "🍧 Pedido realizado!\n";
+    mensagem += "Tamanho: " + tamanhoText + "\n";
+    mensagem += "Fruta: " + fruta + "\n";
+    mensagem += "Adicionais: " + (adicionais.length > 0 ? adicionais.join(", ") : "Nenhum") + "\n";
+    mensagem += document.getElementById("total").innerText;
+
+    alert(mensagem);
 }
 </script>
 
