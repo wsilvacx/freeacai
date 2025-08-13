@@ -85,13 +85,20 @@
 
   /* tamanhos - cards */
   .sizes {
-    display:flex;
-    justify-content:
-    gap:12px;
-    flex-wrap:wrap;
-  }
+  display: flex;
+  justify-content: center; /* Centraliza no eixo horizontal */
+  gap: 12px;
+  flex-wrap: nowrap; /* Mantém sempre na horizontal */
+}
+
+.size-card {
+  width: 120px; /* Diminuído de 140px */
+}
+.size-card img {
+  height: 100px; /* Diminuído proporcionalmente */
+}
   .size-card {
-    width:140px;
+    
     border-radius:14px;
     overflow:hidden;
     background:var(--card-bg);
