@@ -7,26 +7,33 @@
 <style>
     body {
         font-family: 'Segoe UI', sans-serif;
-        background: linear-gradient(135deg, #8e2de2, #4a00e0);
-        padding: 20px;
+        background: linear-gradient(135deg, #7b1fa2, #512da8);
+        margin: 0;
+        padding: 0;
         color: #fff;
     }
     h1 {
         text-align: center;
-        margin-bottom: 25px;
+        padding: 20px 10px;
+        margin: 0;
+        font-size: 2rem;
+        font-weight: bold;
+        background: rgba(0,0,0,0.15);
     }
     .container {
         max-width: 500px;
         margin: auto;
-        background: rgba(255, 255, 255, 0.95);
+        background: rgba(255, 255, 255, 0.97);
         padding: 20px;
-        border-radius: 15px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        border-radius: 20px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.25);
         color: #333;
+        margin-top: 20px;
     }
     .section {
         margin-bottom: 20px;
         display: none;
+        animation: fadeIn 0.4s ease;
     }
     .section.active {
         display: block;
@@ -34,24 +41,26 @@
     .section-title {
         font-size: 1.2rem;
         font-weight: bold;
-        margin-bottom: 10px;
+        margin-bottom: 15px;
+        color: #6a1b9a;
     }
     /* Cards de tamanho */
     .size-cards {
         display: flex;
-        gap: 10px;
+        gap: 15px;
         justify-content: center;
         flex-wrap: wrap;
     }
     .size-card {
         background: #fff;
-        border-radius: 10px;
+        border-radius: 15px;
         overflow: hidden;
         width: 140px;
         cursor: pointer;
         border: 2px solid transparent;
-        transition: transform 0.2s, border 0.2s;
+        transition: transform 0.25s ease, border 0.25s ease, box-shadow 0.25s ease;
         text-align: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
     .size-card img {
         width: 100%;
@@ -59,48 +68,58 @@
         object-fit: cover;
     }
     .size-card:hover {
-        transform: scale(1.05);
+        transform: translateY(-5px);
         border: 2px solid #ff9800;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.25);
     }
     .size-card.active {
         border: 2px solid #ff9800;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.35);
     }
     /* Inputs */
     label {
         display: block;
-        margin-bottom: 5px;
+        margin-bottom: 8px;
         cursor: pointer;
+        font-size: 1rem;
     }
     input[type="checkbox"], input[type="radio"] {
         margin-right: 8px;
+        transform: scale(1.2);
     }
     /* Total */
     .total {
         background: #6b0f77;
         color: #fff;
-        padding: 12px;
-        border-radius: 8px;
+        padding: 15px;
+        border-radius: 10px;
         font-size: 1.2rem;
         text-align: center;
         margin-top: 15px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
     /* Botão finalizar */
     .btn-finalizar {
         margin-top: 15px;
         width: 100%;
-        padding: 14px;
-        background: #ff9800;
+        padding: 15px;
+        background: linear-gradient(135deg, #ff9800, #f57c00);
         color: white;
         border: none;
-        border-radius: 8px;
+        border-radius: 50px;
         cursor: pointer;
         font-size: 1.2rem;
         font-weight: bold;
-        transition: background 0.2s, transform 0.2s;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        transition: background 0.25s ease, transform 0.25s ease;
     }
     .btn-finalizar:hover {
-        background: #e68900;
+        background: linear-gradient(135deg, #f57c00, #ef6c00);
         transform: scale(1.03);
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 </style>
 </head>
@@ -115,15 +134,15 @@
         <div class="size-cards">
             <div class="size-card" onclick="selecionarTamanho(10, '300 ml - R$ 10,00', this)">
                 <img src="https://images.unsplash.com/photo-1625860253100-38b08f6f52ff?w=500&h=500&fit=crop" alt="300 ml">
-                <p>300 ml<br><strong>R$ 10,00</strong></p>
+                <p><strong>300 ml</strong><br>R$ 10,00</p>
             </div>
             <div class="size-card" onclick="selecionarTamanho(12, '400 ml - R$ 12,00', this)">
                 <img src="https://images.unsplash.com/photo-1626082927389-8126e0582741?w=500&h=500&fit=crop" alt="400 ml">
-                <p>400 ml<br><strong>R$ 12,00</strong></p>
+                <p><strong>400 ml</strong><br>R$ 12,00</p>
             </div>
             <div class="size-card" onclick="selecionarTamanho(14, '500 ml - R$ 14,00', this)">
                 <img src="https://images.unsplash.com/photo-1625717921360-78a8d6b9d9d2?w=500&h=500&fit=crop" alt="500 ml">
-                <p>500 ml<br><strong>R$ 14,00</strong></p>
+                <p><strong>500 ml</strong><br>R$ 14,00</p>
             </div>
         </div>
     </div>
