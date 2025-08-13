@@ -1,326 +1,190 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Monte seu Açaí</title>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
-
-  :root{
-    --bg1: #7b1fa2;
-    --bg2: #512da8;
-    --accent1: #ff9800;
-    --card-bg: #fff;
-    --muted: #6b6b6b;
-    --radius: 16px;
-  }
-
-  *{box-sizing:border-box}
-  body{
-    margin:0;
-    font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-    background: linear-gradient(135deg,var(--bg1),var(--bg2));
-    -webkit-font-smoothing:antialiased;
-    color:#222;
-    padding:28px 16px;
-    display:flex;
-    justify-content:center;
-  }
-
-  .app {
-    width:100%;
-    max-width:940px;
-    background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,255,255,0.96));
-    border-radius:20px;
-    box-shadow: 0 12px 40px rgba(0,0,0,0.28);
-    padding:22px;
-    display:grid;
-    grid-template-columns: 1fr 360px;
-    gap:20px;
-    align-items:start;
-  }
-
-  header{
-    grid-column: 1 / -1;
-    display:flex;
-    align-items:center;
-    gap:16px;
-  }
-  .logo {
-    width:68px;
-    height:68px;
-    border-radius:14px;
-    overflow:hidden;
-    flex:0 0 68px;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
-  }
-  .logo img{width:100%;height:100%;object-fit:cover}
-  h1{
-    margin:0;
-    font-size:1.4rem;
-    color:#3b115b;
-  }
-  p.lead{
-    margin:2px 0 0 0;
-    font-size:0.92rem;
-    color:var(--muted);
-  }
-
-  /* Left column: escolhas */
-  .left {
-    padding-top:6px;
-  }
-  .section {
-    background:transparent;
-    margin-bottom:18px;
-  }
-  .section .title {
-    font-weight:600;
-    color:#4b0073;
-    margin-bottom:10px;
-    font-size:0.98rem;
-  }
-
-  /* tamanhos - cards */
-  .sizes {
-    display:flex;
-    gap:12px;
-    flex-wrap:wrap;
-  }
-  .size-card {
-    width:140px;
-    border-radius:14px;
-    overflow:hidden;
-    background:var(--card-bg);
-    box-shadow: 0 6px 18px rgba(67,0,85,0.06);
-    cursor:pointer;
-    border:2px solid transparent;
-    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
-    text-align:center;
-  }
-  .size-card img{
-    width:100%;
-    height:116px;
-    object-fit:cover;
-    display:block;
-  }
-  .size-card p{ margin:10px 8px 14px; font-weight:600; color:#2b0b3b}
-  .size-card:hover{ transform:translateY(-6px); box-shadow: 0 10px 28px rgba(67,0,85,0.12)}
-  .size-card.active{ border-color:var(--accent1); box-shadow:0 10px 28px rgba(255,152,0,0.12)}
-
-  /* fruta & adicionais */
-  .choices {
-    display:flex;
-    gap:12px;
-    flex-wrap:wrap;
-  }
-  .choice {
-    flex:1 1 150px;
-  }
-  .radio-list, .check-list{
-    background: #fff;
-    padding:12px;
-    border-radius:12px;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
-  }
-  .radio-list label, .check-list label{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    margin-bottom:8px;
-    cursor:pointer;
-    user-select:none;
-    color:#2b2b2b;
-    font-weight:500;
-  }
-  .radio-list input[type="radio"], .check-list input[type="checkbox"]{
-    width:18px; height:18px;
-    accent-color: var(--accent1);
-  }
-
-  /* right column: resumo */
-  .right {
-    position:relative;
-  }
-  .summary {
-    background: linear-gradient(180deg, #fff, #fff);
-    border-radius:14px;
-    padding:18px;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-    position:sticky;
-    top:24px;
-  }
-  .summary h3{ margin:0 0 6px 0; color:#3b115b }
-  .summary .line{ display:flex; justify-content:space-between; align-items:center; margin:10px 0; color:#444 }
-  .price {
-    font-size:1.5rem;
-    font-weight:700;
-    color:#2b0b3b;
-  }
-  .small{ font-size:0.88rem; color:var(--muted) }
-
-  .btn-order {
-    margin-top:14px;
-    width:100%;
-    padding:12px;
-    border-radius:12px;
-    background: linear-gradient(90deg,var(--accent1),#f57c00);
-    color:#fff;
-    font-weight:700;
-    border:none;
-    cursor:pointer;
-    box-shadow: 0 10px 30px rgba(255,152,0,0.12);
-    transition: transform .14s ease;
-  }
-  .btn-order:active{ transform:translateY(2px) }
-
-  /* footer small */
-  .note { margin-top:12px; font-size:0.85rem; color:var(--muted) }
-
-  /* responsive */
-  @media (max-width:880px){
-    .app{ grid-template-columns: 1fr; padding:16px }
-    .right{ order: 2 }
-    .left{ order:1 }
-  }
+    body {
+        font-family: 'Segoe UI', sans-serif;
+        background: linear-gradient(135deg, #7b1fa2, #512da8);
+        margin: 0;
+        padding: 0;
+        color: #fff;
+    }
+    h1 {
+        text-align: center;
+        padding: 20px 10px;
+        margin: 0;
+        font-size: 2rem;
+        font-weight: bold;
+        background: rgba(0,0,0,0.15);
+    }
+    .container {
+        max-width: 500px;
+        margin: auto;
+        background: rgba(255, 255, 255, 0.97);
+        padding: 20px;
+        border-radius: 20px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+        color: #333;
+        margin-top: 20px;
+    }
+    .section-title {
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin: 15px 0;
+        color: #6a1b9a;
+    }
+    /* Cards de tamanho */
+    .size-cards {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    .size-card {
+        background: #fff;
+        border-radius: 14px;
+        overflow: hidden;
+        width: 120px; /* menor */
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: transform 0.25s ease, border 0.25s ease, box-shadow 0.25s ease;
+        text-align: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .size-card img {
+        width: 100%;
+        height: 100px; /* menor */
+        object-fit: cover;
+    }
+    .size-card:hover {
+        transform: translateY(-5px);
+        border: 2px solid #ff9800;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+    }
+    .size-card.active {
+        border: 2px solid #ff9800;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+    }
+    /* Inputs */
+    label {
+        display: block;
+        margin-bottom: 8px;
+        cursor: pointer;
+        font-size: 1rem;
+    }
+    input[type="checkbox"], input[type="radio"] {
+        margin-right: 8px;
+        transform: scale(1.2);
+    }
+    /* Total */
+    .total {
+        background: #6b0f77;
+        color: #fff;
+        padding: 15px;
+        border-radius: 10px;
+        font-size: 1.2rem;
+        text-align: center;
+        margin-top: 15px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    /* Botão finalizar */
+    .btn-finalizar {
+        margin-top: 15px;
+        width: 100%;
+        padding: 15px;
+        background: linear-gradient(135deg, #ff9800, #f57c00);
+        color: white;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        font-size: 1.2rem;
+        font-weight: bold;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        transition: background 0.25s ease, transform 0.25s ease;
+    }
+    .btn-finalizar:hover {
+        background: linear-gradient(135deg, #f57c00, #ef6c00);
+        transform: scale(1.03);
+    }
 </style>
 </head>
 <body>
 
-<div class="app" role="application" aria-label="Montar açaí">
-  <header>
-    <div class="logo" aria-hidden="true">
-      <img src="https://http2.mlstatic.com/D_NQ_NP_760004-MLB89242035898_082025-O.jpg" alt="Açaí">
-    </div>
-    <div>
-      <h1>Monte seu Açaí</h1>
-      <p class="lead">Escolha o tamanho, a fruta e os adicionais — finalize pelo WhatsApp.</p>
-    </div>
-  </header>
+<h1>🍧 Monte seu Açaí 🍧</h1>
 
-  <div class="left">
-    <!-- Tamanhos -->
-    <section class="section">
-      <div class="title">Tamanho</div>
-      <div class="sizes" id="sizes">
-        <div class="size-card active" data-price="10" data-text="300 ml - R$ 10,00" onclick="selecionarTamanho(this)">
-          <img src="https://http2.mlstatic.com/D_NQ_NP_760004-MLB89242035898_082025-O.jpg" alt="Copo 300ml">
-          <p>300 ml<br><small style="color:#6b6b6b;font-weight:600">R$ 10,00</small></p>
+<div class="container">
+    <div class="section-title">Escolha o tamanho:</div>
+    <div class="size-cards">
+        <div class="size-card" onclick="selecionarTamanho(10, '300 ml - R$ 10,00', this)">
+            <img src="copo.png" alt="300 ml">
+            <p><strong>300 ml</strong><br>R$ 10,00</p>
         </div>
-        <div class="size-card" data-price="12" data-text="400 ml - R$ 12,00" onclick="selecionarTamanho(this)">
-          <img src="https://http2.mlstatic.com/D_NQ_NP_760004-MLB89242035898_082025-O.jpg" alt="Copo 400ml">
-          <p>400 ml<br><small style="color:#6b6b6b;font-weight:600">R$ 12,00</small></p>
+        <div class="size-card" onclick="selecionarTamanho(12, '400 ml - R$ 12,00', this)">
+            <img src="copo.png" alt="400 ml">
+            <p><strong>400 ml</strong><br>R$ 12,00</p>
         </div>
-        <div class="size-card" data-price="14" data-text="500 ml - R$ 14,00" onclick="selecionarTamanho(this)">
-          <img src="https://http2.mlstatic.com/D_NQ_NP_760004-MLB89242035898_082025-O.jpg" alt="Copo 500ml">
-          <p>500 ml<br><small style="color:#6b6b6b;font-weight:600">R$ 14,00</small></p>
+        <div class="size-card" onclick="selecionarTamanho(14, '500 ml - R$ 14,00', this)">
+            <img src="copo.png" alt="500 ml">
+            <p><strong>500 ml</strong><br>R$ 14,00</p>
         </div>
-      </div>
-    </section>
-
-    <!-- Frutas -->
-    <section class="section">
-      <div class="title">Fruta</div>
-      <div class="radio-list">
-        <label><input type="radio" name="fruta" value="Uva" checked onchange="atualizarResumo()"> Uva</label>
-        <label><input type="radio" name="fruta" value="Banana" onchange="atualizarResumo()"> Banana</label>
-        <label><input type="radio" name="fruta" value="Morango" onchange="atualizarResumo()"> Morango</label>
-      </div>
-    </section>
-
-    <!-- Adicionais -->
-    <section class="section">
-      <div class="title">Adicionais</div>
-      <div class="check-list">
-        <label><input type="checkbox" value="Leite em pó" onchange="atualizarResumo()"> Leite em pó</label>
-        <label><input type="checkbox" value="Castanhas" onchange="atualizarResumo()"> Castanhas</label>
-        <label><input type="checkbox" value="Leite condensado" onchange="atualizarResumo()"> Leite condensado</label>
-        <label><input type="checkbox" value="Paçoca" onchange="atualizarResumo()"> Paçoca</label>
-        <label><input type="checkbox" value="Granola" onchange="atualizarResumo()"> Granola</label>
-        <label><input type="checkbox" value="Flocos de arroz" onchange="atualizarResumo()"> Flocos de arroz</label>
-        <label><input type="checkbox" value="M&M colorido" onchange="atualizarResumo()"> M&M colorido</label>
-      </div>
-    </section>
-  </div>
-
-  <aside class="right">
-    <div class="summary" aria-live="polite">
-      <h3>Resumo do pedido</h3>
-
-      <div class="line"><span class="small">Tamanho</span><span id="res-tamanho">300 ml - R$ 10,00</span></div>
-      <div class="line"><span class="small">Fruta</span><span id="res-fruta">Uva</span></div>
-      <div class="line"><span class="small">Adicionais</span><span id="res-adicionais">Nenhum</span></div>
-
-      <div class="line" style="margin-top:14px;"><span class="small">Total</span><span class="price" id="res-preco">R$ 10,00</span></div>
-
-      <button class="btn-order" id="btnOrder" onclick="finalizarPedido()">Enviar pedido pelo WhatsApp</button>
-
-      <p class="note">Ao enviar, o WhatsApp abrirá com a mensagem pronta para confirmar o pedido.</p>
     </div>
-  </aside>
+
+    <div class="section-title">Escolha a fruta:</div>
+    <label><input type="radio" name="fruta" value="Uva" checked> Uva</label>
+    <label><input type="radio" name="fruta" value="Banana"> Banana</label>
+    <label><input type="radio" name="fruta" value="Morango"> Morango</label>
+
+    <div class="section-title">Escolha seus adicionais:</div>
+    <label><input type="checkbox"> Leite em pó</label>
+    <label><input type="checkbox"> Castanhas</label>
+    <label><input type="checkbox"> Leite condensado</label>
+    <label><input type="checkbox"> Paçoca</label>
+    <label><input type="checkbox"> Granola</label>
+    <label><input type="checkbox"> Flocos de arroz</label>
+    <label><input type="checkbox"> M&M colorido</label>
+
+    <div class="total" id="total">Total: R$ 0,00</div>
+    <button class="btn-finalizar" onclick="finalizarPedido()">✅ Finalizar Pedido</button>
 </div>
 
 <script>
-  // estado inicial
-  let precoAtual = 10;
-  let textoTamanho = "300 ml - R$ 10,00";
+let precoAtual = 0;
+let tamanhoTexto = "";
 
-  function selecionarTamanho(card){
-    // marca ativo
-    document.querySelectorAll('.size-card').forEach(c => c.classList.remove('active'));
-    card.classList.add('active');
+function selecionarTamanho(valor, texto, card) {
+    precoAtual = valor;
+    tamanhoTexto = texto;
 
-    precoAtual = parseFloat(card.getAttribute('data-price'));
-    textoTamanho = card.getAttribute('data-text');
+    document.querySelectorAll(".size-card").forEach(c => c.classList.remove("active"));
+    card.classList.add("active");
 
-    // atualizar resumo
-    document.getElementById('res-tamanho').innerText = textoTamanho;
-    atualizarResumo();
-  }
+    document.getElementById("total").innerText = "Total: R$ " + precoAtual.toFixed(2);
+}
 
-  function atualizarResumo(){
-    // fruta
-    const fruta = document.querySelector('input[name="fruta"]:checked').value;
-    document.getElementById('res-fruta').innerText = fruta;
-
-    // adicionais
-    const adicionais = Array.from(document.querySelectorAll('.check-list input[type="checkbox"]:checked'))
-      .map(i => i.value);
-    document.getElementById('res-adicionais').innerText = adicionais.length ? adicionais.join(', ') : 'Nenhum';
-
-    // preço (não muda com adicionais)
-    document.getElementById('res-preco').innerText = 'R$ ' + precoAtual.toFixed(2);
-  }
-
-  // inicializa
-  document.addEventListener('DOMContentLoaded', function(){
-    // default: primeiro card ativo
-    const first = document.querySelector('.size-card.active');
-    if(first){
-      precoAtual = parseFloat(first.dataset.price || 10);
-      textoTamanho = first.dataset.text || '300 ml - R$ 10,00';
+function finalizarPedido() {
+    if (!tamanhoTexto) {
+        alert("Por favor, selecione o tamanho do açaí.");
+        return;
     }
-    atualizarResumo();
-  });
 
-  function finalizarPedido(){
-    const fruta = document.querySelector('input[name="fruta"]:checked').value;
-    const adicionais = Array.from(document.querySelectorAll('.check-list input[type="checkbox"]:checked'))
-      .map(i => i.value);
+    let fruta = document.querySelector('input[name="fruta"]:checked').value;
+    let adicionais = [];
+    document.querySelectorAll('input[type="checkbox"]:checked').forEach(function(item) {
+        adicionais.push(item.parentNode.innerText.trim());
+    });
 
-    const mensagem = 
-      "🍧 *Novo Pedido de Açaí* 🍧\n" +
-      "*Tamanho:* " + textoTamanho + "\n" +
-      "*Fruta:* " + fruta + "\n" +
-      "*Adicionais:* " + (adicionais.length ? adicionais.join(', ') : 'Nenhum') + "\n" +
-      "*Total:* R$ " + precoAtual.toFixed(2);
+    let mensagem = "🍧 *Novo Pedido de Açaí* 🍧\n";
+    mensagem += "*Tamanho:* " + tamanhoTexto + "\n";
+    mensagem += "*Fruta:* " + fruta + "\n";
+    mensagem += "*Adicionais:* " + (adicionais.length > 0 ? adicionais.join(", ") : "Nenhum") + "\n";
+    mensagem += "*Total:* R$ " + precoAtual.toFixed(2);
 
-    const numero = "5599984557326"; // número: +55 99 98455-7326
-    const url = "https://wa.me/" + numero + "?text=" + encodeURIComponent(mensagem);
+    let url = "https://wa.me/5599984557326?text=" + encodeURIComponent(mensagem);
     window.open(url, "_blank");
-  }
+}
 </script>
 
 </body>
