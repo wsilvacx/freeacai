@@ -14,8 +14,6 @@
     h1 {
         text-align: center;
         margin-bottom: 25px;
-        font-size: 2rem;
-        color: #fff;
     }
     .container {
         max-width: 500px;
@@ -28,35 +26,44 @@
     }
     .section {
         margin-bottom: 20px;
+        display: none;
+    }
+    .section.active {
+        display: block;
     }
     .section-title {
         font-size: 1.2rem;
         font-weight: bold;
         margin-bottom: 10px;
     }
-    /* Botões de tamanho */
-    .size-buttons {
+    /* Cards de tamanho */
+    .size-cards {
         display: flex;
         gap: 10px;
+        justify-content: center;
+        flex-wrap: wrap;
     }
-    .size-btn {
-        flex: 1;
-        padding: 12px;
-        border: none;
-        border-radius: 8px;
-        background: #6b0f77;
-        color: white;
-        font-weight: bold;
+    .size-card {
+        background: #fff;
+        border-radius: 10px;
+        overflow: hidden;
+        width: 140px;
         cursor: pointer;
-        font-size: 1rem;
-        transition: transform 0.2s, background 0.2s;
+        border: 2px solid transparent;
+        transition: transform 0.2s, border 0.2s;
+        text-align: center;
     }
-    .size-btn:hover {
-        background: #52095b;
+    .size-card img {
+        width: 100%;
+        height: 120px;
+        object-fit: cover;
+    }
+    .size-card:hover {
         transform: scale(1.05);
+        border: 2px solid #ff9800;
     }
-    .size-btn.active {
-        background: #ff9800;
+    .size-card.active {
+        border: 2px solid #ff9800;
     }
     /* Inputs */
     label {
@@ -67,7 +74,7 @@
     input[type="checkbox"], input[type="radio"] {
         margin-right: 8px;
     }
-    /* Total fixo */
+    /* Total */
     .total {
         background: #6b0f77;
         color: #fff;
@@ -102,26 +109,36 @@
 <h1>🍧 Monte seu Açaí 🍧</h1>
 
 <div class="container">
-    <!-- Escolha do tamanho -->
-    <div class="section">
+    <!-- Passo 1 -->
+    <div class="section active" id="passo1">
         <div class="section-title">1️⃣ Escolha o tamanho:</div>
-        <div class="size-buttons">
-            <button class="size-btn active" onclick="selecionarTamanho(10, this)">300 ml<br>R$ 10,00</button>
-            <button class="size-btn" onclick="selecionarTamanho(12, this)">400 ml<br>R$ 12,00</button>
-            <button class="size-btn" onclick="selecionarTamanho(14, this)">500 ml<br>R$ 14,00</button>
+        <div class="size-cards">
+            <div class="size-card" onclick="selecionarTamanho(10, '300 ml - R$ 10,00', this)">
+                <img src="https://images.unsplash.com/photo-1625860253100-38b08f6f52ff?w=500&h=500&fit=crop" alt="300 ml">
+                <p>300 ml<br><strong>R$ 10,00</strong></p>
+            </div>
+            <div class="size-card" onclick="selecionarTamanho(12, '400 ml - R$ 12,00', this)">
+                <img src="https://images.unsplash.com/photo-1626082927389-8126e0582741?w=500&h=500&fit=crop" alt="400 ml">
+                <p>400 ml<br><strong>R$ 12,00</strong></p>
+            </div>
+            <div class="size-card" onclick="selecionarTamanho(14, '500 ml - R$ 14,00', this)">
+                <img src="https://images.unsplash.com/photo-1625717921360-78a8d6b9d9d2?w=500&h=500&fit=crop" alt="500 ml">
+                <p>500 ml<br><strong>R$ 14,00</strong></p>
+            </div>
         </div>
     </div>
 
-    <!-- Escolha da fruta -->
-    <div class="section">
+    <!-- Passo 2 -->
+    <div class="section" id="passo2">
         <div class="section-title">2️⃣ Escolha a fruta:</div>
         <label><input type="radio" name="fruta" value="Uva" checked> Uva</label>
         <label><input type="radio" name="fruta" value="Banana"> Banana</label>
         <label><input type="radio" name="fruta" value="Morango"> Morango</label>
+        <button class="btn-finalizar" onclick="mostrarPasso3()">Continuar ➡️</button>
     </div>
 
-    <!-- Adicionais -->
-    <div class="section">
+    <!-- Passo 3 -->
+    <div class="section" id="passo3">
         <div class="section-title">3️⃣ Escolha seus adicionais:</div>
         <label><input type="checkbox"> Leite em pó</label>
         <label><input type="checkbox"> Castanhas</label>
@@ -130,27 +147,34 @@
         <label><input type="checkbox"> Granola</label>
         <label><input type="checkbox"> Flocos de arroz</label>
         <label><input type="checkbox"> M&M colorido</label>
+
+        <div class="total" id="total">Total: R$ 0,00</div>
+        <button class="btn-finalizar" onclick="finalizarPedido()">✅ Finalizar Pedido</button>
     </div>
-
-    <!-- Total -->
-    <div class="total" id="total">Total: R$ 10,00</div>
-
-    <!-- Botão finalizar -->
-    <button class="btn-finalizar" onclick="finalizarPedido()">✅ Finalizar Pedido</button>
 </div>
 
 <script>
-let precoAtual = 10; // padrão
+let precoAtual = 0;
+let tamanhoTexto = "";
 
-function selecionarTamanho(valor, botao) {
+function selecionarTamanho(valor, texto, card) {
     precoAtual = valor;
-    document.getElementById("total").innerText = "Total: R$ " + valor.toFixed(2);
-    document.querySelectorAll(".size-btn").forEach(b => b.classList.remove("active"));
-    botao.classList.add("active");
+    tamanhoTexto = texto;
+
+    document.querySelectorAll(".size-card").forEach(c => c.classList.remove("active"));
+    card.classList.add("active");
+
+    document.getElementById("passo1").classList.remove("active");
+    document.getElementById("passo2").classList.add("active");
+}
+
+function mostrarPasso3() {
+    document.getElementById("passo2").classList.remove("active");
+    document.getElementById("passo3").classList.add("active");
+    document.getElementById("total").innerText = "Total: R$ " + precoAtual.toFixed(2);
 }
 
 function finalizarPedido() {
-    let tamanhoSelecionado = document.querySelector(".size-btn.active").innerText.replace("\n", " ");
     let fruta = document.querySelector('input[name="fruta"]:checked').value;
     let adicionais = [];
     document.querySelectorAll('input[type="checkbox"]:checked').forEach(function(item) {
@@ -158,7 +182,7 @@ function finalizarPedido() {
     });
 
     let mensagem = "🍧 *Novo Pedido de Açaí* 🍧\n";
-    mensagem += "*Tamanho:* " + tamanhoSelecionado + "\n";
+    mensagem += "*Tamanho:* " + tamanhoTexto + "\n";
     mensagem += "*Fruta:* " + fruta + "\n";
     mensagem += "*Adicionais:* " + (adicionais.length > 0 ? adicionais.join(", ") : "Nenhum") + "\n";
     mensagem += "*Total:* R$ " + precoAtual.toFixed(2);
