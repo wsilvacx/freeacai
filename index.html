@@ -83,14 +83,11 @@
     font-size:0.98rem;
   }
 
-  /* tamanhos - cards (alterado para ficar na horizontal) */
+  /* tamanhos - cards */
   .sizes {
     display:flex;
     gap:12px;
-    flex-wrap:nowrap; /* impede quebra de linha */
-    justify-content:center; /* centraliza */
-    overflow-x:auto; /* rolagem no celular */
-    padding-bottom:6px; /* espaço para rolagem */
+    flex-wrap:wrap;
   }
   .size-card {
     width:140px;
@@ -102,7 +99,6 @@
     border:2px solid transparent;
     transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
     text-align:center;
-    flex:0 0 auto; /* evita encolher */
   }
   .size-card img{
     width:100%;
@@ -267,31 +263,38 @@
 </div>
 
 <script>
+  // estado inicial
   let precoAtual = 10;
   let textoTamanho = "300 ml - R$ 10,00";
 
   function selecionarTamanho(card){
+    // marca ativo
     document.querySelectorAll('.size-card').forEach(c => c.classList.remove('active'));
     card.classList.add('active');
 
     precoAtual = parseFloat(card.getAttribute('data-price'));
     textoTamanho = card.getAttribute('data-text');
 
+    // atualizar resumo
     document.getElementById('res-tamanho').innerText = textoTamanho;
     atualizarResumo();
   }
 
   function atualizarResumo(){
+    // fruta
     const fruta = document.querySelector('input[name="fruta"]:checked').value;
     document.getElementById('res-fruta').innerText = fruta;
 
+    // adicionais
     const adicionais = Array.from(document.querySelectorAll('.check-list input[type="checkbox"]:checked'))
       .map(i => i.value);
     document.getElementById('res-adicionais').innerText = adicionais.length ? adicionais.join(', ') : 'Nenhum';
 
+    // preço (não muda com adicionais)
     document.getElementById('res-preco').innerText = 'R$ ' + precoAtual.toFixed(2);
   }
 
+  // inicializa
   document.addEventListener('DOMContentLoaded', function(){
     const first = document.querySelector('.size-card.active');
     if(first){
@@ -313,7 +316,7 @@
       "*Adicionais:* " + (adicionais.length ? adicionais.join(', ') : 'Nenhum') + "\n" +
       "*Total:* R$ " + precoAtual.toFixed(2);
 
-    const numero = "5599984557326"; 
+    const numero = "5599984557326"; // número: +55 99 98455-7326
     const url = "https://wa.me/" + numero + "?text=" + encodeURIComponent(mensagem);
     window.open(url, "_blank");
   }
