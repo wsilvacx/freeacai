@@ -4,229 +4,55 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Monte seu Açaí - AçaíFrre</title>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
-
-  :root{
-    --bg1: #7b1fa2;
-    --bg2: #512da8;
-    --accent1: #ff9800;
-    --card-bg: #fff;
-    --muted: #6b6b6b;
-    --radius: 16px;
-  }
-
-  *{box-sizing:border-box}
-  body{
-    margin:0;
-    font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-    background: linear-gradient(135deg,var(--bg1),var(--bg2));
-    -webkit-font-smoothing:antialiased;
-    color:#222;
-    padding:28px 16px;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-  }
-
-  /* Área fora do bloco branco */
-  .top-info {
-    text-align:center;
-    color:white;
-    margin-bottom:20px;
-  }
-  .top-info h1 {
-    font-size:2rem;
-    margin:0;
-    font-weight:700;
-  }
-  .top-info .slogan {
-    font-size:1.1rem;
-    font-style:italic;
-    margin:4px 0 10px;
-  }
-  .top-info p {
-    margin:2px 0;
-    font-size:0.95rem;
-  }
-
-  /* Bloco branco */
-  .app {
-    width:100%;
-    max-width:940px;
-    background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,255,255,0.96));
-    border-radius:20px;
-    box-shadow: 0 12px 40px rgba(0,0,0,0.28);
-    padding:22px;
-    display:grid;
-    grid-template-columns: 1fr 360px;
-    gap:20px;
-    align-items:start;
-  }
-
-  header{
-    grid-column: 1 / -1;
-    margin-bottom:8px;
-  }
-  header h2 {
-    margin:0;
-    font-size:1.3rem;
-    font-weight:600;
-    color:#3b115b;
-  }
-
-  /* Left column: escolhas */
-  .left {
-    padding-top:6px;
-  }
-  .section {
-    background:transparent;
-    margin-bottom:18px;
-  }
-  .section .title {
-    font-weight:600;
-    color:#4b0073;
-    margin-bottom:10px;
-    font-size:0.98rem;
-  }
-
-  /* tamanhos - cards */
-  .sizes {
-    display:flex;
-    justify-content:center;
-    gap:12px;
-    flex-wrap:nowrap;
-  }
-  .size-card {
-    width:120px;
-    border-radius:14px;
-    overflow:hidden;
-    background:var(--card-bg);
-    box-shadow: 0 6px 18px rgba(67,0,85,0.06);
-    cursor:pointer;
-    border:2px solid transparent;
-    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
-    text-align:center;
-  }
-  .size-card img{
-    width:100%;
-    height:100px;
-    object-fit:cover;
-    display:block;
-  }
-  .size-card p{ margin:10px 8px 14px; font-weight:600; color:#2b0b3b}
-  .size-card:hover{ transform:translateY(-6px); box-shadow: 0 10px 28px rgba(67,0,85,0.12)}
-  .size-card.active{ border-color:var(--accent1); box-shadow:0 10px 28px rgba(255,152,0,0.12)}
-
-  /* fruta & adicionais */
-  .radio-list, .check-list{
-    background: #fff;
-    padding:12px;
-    border-radius:12px;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
-  }
-  .radio-list label, .check-list label{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    margin-bottom:8px;
-    cursor:pointer;
-    user-select:none;
-    color:#2b2b2b;
-    font-weight:500;
-  }
-  .radio-list input[type="radio"], .check-list input[type="checkbox"]{
-    width:18px; height:18px;
-    accent-color: var(--accent1);
-  }
-
-  /* right column: resumo */
-  .right {
-    position:relative;
-  }
-  .summary {
-    background: linear-gradient(180deg, #fff, #fff);
-    border-radius:14px;
-    padding:18px;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-    position:sticky;
-    top:24px;
-  }
-  .summary h3{ margin:0 0 6px 0; color:#3b115b }
-  .summary .line{ display:flex; justify-content:space-between; align-items:center; margin:10px 0; color:#444 }
-  .price {
-    font-size:1.5rem;
-    font-weight:700;
-    color:#2b0b3b;
-  }
-  .small{ font-size:0.88rem; color:var(--muted) }
-
-  .btn-order {
-    margin-top:14px;
-    width:100%;
-    padding:12px;
-    border-radius:12px;
-    background: linear-gradient(90deg,var(--accent1),#f57c00);
-    color:#fff;
-    font-weight:700;
-    border:none;
-    cursor:pointer;
-    box-shadow: 0 10px 30px rgba(255,152,0,0.12);
-    transition: transform .14s ease;
-  }
-  .btn-order:active{ transform:translateY(2px) }
-
-  /* footer small */
-  .note { margin-top:12px; font-size:0.85rem; color:var(--muted) }
-
-  /* responsive */
-  @media (max-width:880px){
-    .app{ grid-template-columns: 1fr; padding:16px }
-    .right{ order: 2 }
-    .left{ order:1 }
-    .sizes { flex-wrap:wrap; }
-  }
+/* Seu CSS original pode ser mantido aqui, apenas acrescentei a lista do carrinho */
+.carrinho-lista {
+  margin-top: 10px;
+  background: #fff;
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+.carrinho-lista div {
+  border-bottom: 1px solid #ddd;
+  padding: 6px 0;
+}
+.carrinho-lista div:last-child {
+  border-bottom: none;
+}
 </style>
 </head>
 <body>
 
-<!-- Área fora do bloco branco -->
-<div class="top-info">
-  <h1>AçaíFrre</h1>
-  <div class="slogan">Açaí que te surpreende</div>
-  <p>📍 Rua Perimetral, Quadra A27, Casa 01, Vila Paraíso – Caxias-MA</p>
-  <p>🕒 Funcionamento: Seg a Sáb — 14h às 22h</p>
-  <p style="color:lightgreen;font-weight:600;">🚚 Entrega grátis no bairro Vila Paraíso!</p>
-</div>
-
-<div class="app" role="application" aria-label="Montar açaí">
+<div class="app">
   <header>
-    <h2>Escolha suas opções favoritas</h2>
+    <div class="logo"><img src="Logo.jpg" alt="Logo AçaíFrre"></div>
+    <div>
+      <h1>AçaíFrre</h1>
+      <p class="lead">Monte seu açaí do seu jeito!</p>
+      <p>📍 Rua Perimetral, Quadra A27, Casa 01, Vila Paraíso – Caxias-MA</p>
+      <p>🕒 Funcionamento: Seg a Sáb — 14h às 22h</p>
+      <p style="color:green;font-weight:600;">🚚 Entrega grátis no bairro Vila Paraíso!</p>
+    </div>
   </header>
 
   <div class="left">
-    <!-- Quantidade -->
-    <section class="section">
-      <div class="title">Quantidade</div>
-      <input type="number" id="quantidade" value="1" min="1" onchange="atualizarResumo()" style="width:80px;padding:6px;border-radius:8px;border:1px solid #ccc;">
-    </section>
-
     <!-- Tamanhos -->
     <section class="section">
       <div class="title">Tamanho</div>
       <div class="sizes" id="sizes">
         <div class="size-card active" data-price="10" data-text="300 ml - R$ 10,00" onclick="selecionarTamanho(this)">
           <img src="Copo.jpg" alt="Copo 300ml">
-          <p>300 ml<br><small style="color:#6b6b6b;font-weight:600">R$ 10,00</small></p>
+          <p>300 ml<br><small>R$ 10,00</small></p>
         </div>
         <div class="size-card" data-price="12" data-text="400 ml - R$ 12,00" onclick="selecionarTamanho(this)">
           <img src="Copo.jpg" alt="Copo 400ml">
-          <p>400 ml<br><small style="color:#6b6b6b;font-weight:600">R$ 12,00</small></p>
+          <p>400 ml<br><small>R$ 12,00</small></p>
         </div>
         <div class="size-card" data-price="14" data-text="500 ml - R$ 14,00" onclick="selecionarTamanho(this)">
           <img src="Copo.jpg" alt="Copo 500ml">
-          <p>500 ml<br><small style="color:#6b6b6b;font-weight:600">R$ 14,00</small></p>
+          <p>500 ml<br><small>R$ 14,00</small></p>
         </div>
       </div>
     </section>
@@ -257,82 +83,97 @@
   </div>
 
   <aside class="right">
-    <div class="summary" aria-live="polite">
-      <h3>Resumo do pedido</h3>
-
-      <div class="line"><span class="small">Quantidade</span><span id="res-quantidade">1</span></div>
+    <div class="summary">
+      <h3>Resumo do pedido atual</h3>
       <div class="line"><span class="small">Tamanho</span><span id="res-tamanho">300 ml - R$ 10,00</span></div>
       <div class="line"><span class="small">Fruta</span><span id="res-fruta">Uva</span></div>
       <div class="line"><span class="small">Adicionais</span><span id="res-adicionais">Nenhum</span></div>
+      <div class="line" style="margin-top:14px;"><span class="small">Preço</span><span class="price" id="res-preco">R$ 10,00</span></div>
 
-      <div class="line" style="margin-top:14px;"><span class="small">Total</span><span class="price" id="res-preco">R$ 10,00</span></div>
+      <button class="btn-order" onclick="adicionarAoCarrinho()">Adicionar ao pedido</button>
 
-      <button class="btn-order" id="btnOrder" onclick="finalizarPedido()">Enviar pedido pelo WhatsApp</button>
+      <h3 style="margin-top:20px;">Carrinho</h3>
+      <div class="carrinho-lista" id="carrinhoLista">Nenhum item adicionado</div>
 
-      <p class="note">Ao enviar, o WhatsApp abrirá com a mensagem pronta para confirmar o pedido.</p>
+      <div class="line" style="margin-top:14px;">
+        <span class="small">Total</span>
+        <span class="price" id="totalPedido">R$ 0,00</span>
+      </div>
+
+      <button class="btn-order" style="margin-top:10px;background:#4CAF50" onclick="finalizarPedido()">Enviar pedido pelo WhatsApp</button>
     </div>
   </aside>
 </div>
 
 <script>
-  let precoAtual = 10;
-  let textoTamanho = "300 ml - R$ 10,00";
+let precoAtual = 10;
+let textoTamanho = "300 ml - R$ 10,00";
+let carrinho = [];
 
-  function selecionarTamanho(card){
-    document.querySelectorAll('.size-card').forEach(c => c.classList.remove('active'));
-    card.classList.add('active');
+function selecionarTamanho(card){
+  document.querySelectorAll('.size-card').forEach(c => c.classList.remove('active'));
+  card.classList.add('active');
+  precoAtual = parseFloat(card.getAttribute('data-price'));
+  textoTamanho = card.getAttribute('data-text');
+  document.getElementById('res-tamanho').innerText = textoTamanho;
+  atualizarResumo();
+}
 
-    precoAtual = parseFloat(card.getAttribute('data-price'));
-    textoTamanho = card.getAttribute('data-text');
+function atualizarResumo(){
+  const fruta = document.querySelector('input[name="fruta"]:checked').value;
+  document.getElementById('res-fruta').innerText = fruta;
+  const adicionais = Array.from(document.querySelectorAll('.check-list input[type="checkbox"]:checked'))
+    .map(i => i.value);
+  document.getElementById('res-adicionais').innerText = adicionais.length ? adicionais.join(', ') : 'Nenhum';
+  document.getElementById('res-preco').innerText = 'R$ ' + precoAtual.toFixed(2);
+}
 
-    document.getElementById('res-tamanho').innerText = textoTamanho;
-    atualizarResumo();
-  }
-
-  function atualizarResumo(){
-    const quantidade = parseInt(document.getElementById('quantidade').value) || 1;
-    document.getElementById('res-quantidade').innerText = quantidade;
-
-    const fruta = document.querySelector('input[name="fruta"]:checked').value;
-    document.getElementById('res-fruta').innerText = fruta;
-
-    const adicionais = Array.from(document.querySelectorAll('.check-list input[type="checkbox"]:checked'))
-      .map(i => i.value);
-    document.getElementById('res-adicionais').innerText = adicionais.length ? adicionais.join(', ') : 'Nenhum';
-
-    const total = precoAtual * quantidade;
-    document.getElementById('res-preco').innerText = 'R$ ' + total.toFixed(2).replace('.', ',');
-  }
-
-  document.addEventListener('DOMContentLoaded', function(){
-    const first = document.querySelector('.size-card.active');
-    if(first){
-      precoAtual = parseFloat(first.dataset.price || 10);
-      textoTamanho = first.dataset.text || '300 ml - R$ 10,00';
-    }
-    atualizarResumo();
+function adicionarAoCarrinho(){
+  const fruta = document.querySelector('input[name="fruta"]:checked').value;
+  const adicionais = Array.from(document.querySelectorAll('.check-list input[type="checkbox"]:checked')).map(i => i.value);
+  
+  carrinho.push({
+    tamanho: textoTamanho,
+    fruta: fruta,
+    adicionais: adicionais.length ? adicionais.join(', ') : 'Nenhum',
+    preco: precoAtual
   });
 
-  function finalizarPedido(){
-    const quantidade = parseInt(document.getElementById('quantidade').value) || 1;
-    const fruta = document.querySelector('input[name="fruta"]:checked').value;
-    const adicionais = Array.from(document.querySelectorAll('.check-list input[type="checkbox"]:checked'))
-      .map(i => i.value);
+  atualizarCarrinho();
+}
 
-    const total = precoAtual * quantidade;
-
-    const mensagem = 
-      "🍧 *Novo Pedido de Açaí* 🍧\n" +
-      "*Quantidade:* " + quantidade + "\n" +
-      "*Tamanho:* " + textoTamanho + "\n" +
-      "*Fruta:* " + fruta + "\n" +
-      "*Adicionais:* " + (adicionais.length ? adicionais.join(', ') : 'Nenhum') + "\n" +
-      "*Total:* R$ " + total.toFixed(2).replace('.', ',');
-
-    const numero = "5599984557326";
-    const url = "https://wa.me/" + numero + "?text=" + encodeURIComponent(mensagem);
-    window.open(url, "_blank");
+function atualizarCarrinho(){
+  const lista = document.getElementById('carrinhoLista');
+  lista.innerHTML = '';
+  let total = 0;
+  carrinho.forEach((item, i) => {
+    total += item.preco;
+    lista.innerHTML += `<div><b>${i+1}.</b> ${item.tamanho} - ${item.fruta} - ${item.adicionais} <br><small>R$ ${item.preco.toFixed(2)}</small></div>`;
+  });
+  if(carrinho.length === 0){
+    lista.innerHTML = 'Nenhum item adicionado';
   }
+  document.getElementById('totalPedido').innerText = 'R$ ' + total.toFixed(2);
+}
+
+function finalizarPedido(){
+  if(carrinho.length === 0){
+    alert('Adicione pelo menos um açaí ao pedido!');
+    return;
+  }
+  let mensagem = "🍧 *Novo Pedido de Açaí* 🍧\n";
+  carrinho.forEach((item, i) => {
+    mensagem += `\n*${i+1}º Açaí*\nTamanho: ${item.tamanho}\nFruta: ${item.fruta}\nAdicionais: ${item.adicionais}\nPreço: R$ ${item.preco.toFixed(2)}\n`;
+  });
+  let total = carrinho.reduce((s, i) => s + i.preco, 0);
+  mensagem += `\n*Total:* R$ ${total.toFixed(2)}`;
+
+  const numero = "5599984557326";
+  const url = "https://wa.me/" + numero + "?text=" + encodeURIComponent(mensagem);
+  window.open(url, "_blank");
+}
+
+document.addEventListener('DOMContentLoaded', atualizarResumo);
 </script>
 
 </body>
