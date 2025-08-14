@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Monte seu Açaí - Freeaçaí</title>
+<title>Monte seu Açaí - AçaíFrre</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
@@ -26,9 +26,32 @@
     color:#222;
     padding:28px 16px;
     display:flex;
-    justify-content:center;
+    flex-direction:column;
+    align-items:center;
   }
 
+  /* Área fora do bloco branco */
+  .top-info {
+    text-align:center;
+    color:white;
+    margin-bottom:20px;
+  }
+  .top-info h1 {
+    font-size:2rem;
+    margin:0;
+    font-weight:700;
+  }
+  .top-info .slogan {
+    font-size:1.1rem;
+    font-style:italic;
+    margin:4px 0 10px;
+  }
+  .top-info p {
+    margin:2px 0;
+    font-size:0.95rem;
+  }
+
+  /* Bloco branco */
   .app {
     width:100%;
     max-width:940px;
@@ -42,38 +65,15 @@
     align-items:start;
   }
 
-  /* Cabeçalho reformulado */
   header{
     grid-column: 1 / -1;
-    display:flex;
-    align-items:flex-start;
-    gap:16px;
-    background: linear-gradient(90deg, rgba(255,255,255,0.88), rgba(255,255,255,0.78));
-    padding: 14px;
-    border-radius: 14px;
+    margin-bottom:8px;
   }
-  .logo {
-    width:68px;
-    height:68px;
-    border-radius:14px;
-    overflow:hidden;
-    flex:0 0 68px;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
-  }
-  .logo img{width:100%;height:100%;object-fit:cover}
-  header h1{
+  header h2 {
     margin:0;
-    font-size:1.6rem;
+    font-size:1.3rem;
+    font-weight:600;
     color:#3b115b;
-    font-weight:700;
-  }
-  header p{
-    margin:0;
-    font-size:0.9rem;
-  }
-  .lead{
-    margin-bottom:6px;
-    color:var(--muted);
   }
 
   /* Left column: escolhas */
@@ -120,14 +120,6 @@
   .size-card.active{ border-color:var(--accent1); box-shadow:0 10px 28px rgba(255,152,0,0.12)}
 
   /* fruta & adicionais */
-  .choices {
-    display:flex;
-    gap:12px;
-    flex-wrap:wrap;
-  }
-  .choice {
-    flex:1 1 150px;
-  }
   .radio-list, .check-list{
     background: #fff;
     padding:12px;
@@ -199,21 +191,27 @@
 </head>
 <body>
 
+<!-- Área fora do bloco branco -->
+<div class="top-info">
+  <h1>AçaíFrre</h1>
+  <div class="slogan">Açaí que te surpreende</div>
+  <p>📍 Rua Perimetral, Quadra A27, Casa 01, Vila Paraíso – Caxias-MA</p>
+  <p>🕒 Funcionamento: Seg a Sáb — 14h às 22h</p>
+  <p style="color:lightgreen;font-weight:600;">🚚 Entrega grátis no bairro Vila Paraíso!</p>
+</div>
+
 <div class="app" role="application" aria-label="Montar açaí">
   <header>
-    <div class="logo" aria-hidden="true">
-      <img src="Logo.jpg" alt="Logo AçaíFrre">
-    </div>
-    <div>
-      <h1>AçaíFrre</h1>
-      <p class="lead">Monte seu açaí do seu jeito!</p>
-      <p>📍 Rua Perimetral, Quadra A27, Casa 01, Vila Paraíso – Caxias-MA</p>
-      <p>🕒 Funcionamento: Seg a Sáb — 14h às 22h</p>
-      <p style="color:green;font-weight:600;">🚚 Entrega grátis no bairro Vila Paraíso!</p>
-    </div>
+    <h2>Escolha suas opções favoritas</h2>
   </header>
 
   <div class="left">
+    <!-- Quantidade -->
+    <section class="section">
+      <div class="title">Quantidade</div>
+      <input type="number" id="quantidade" value="1" min="1" onchange="atualizarResumo()" style="width:80px;padding:6px;border-radius:8px;border:1px solid #ccc;">
+    </section>
+
     <!-- Tamanhos -->
     <section class="section">
       <div class="title">Tamanho</div>
@@ -262,6 +260,7 @@
     <div class="summary" aria-live="polite">
       <h3>Resumo do pedido</h3>
 
+      <div class="line"><span class="small">Quantidade</span><span id="res-quantidade">1</span></div>
       <div class="line"><span class="small">Tamanho</span><span id="res-tamanho">300 ml - R$ 10,00</span></div>
       <div class="line"><span class="small">Fruta</span><span id="res-fruta">Uva</span></div>
       <div class="line"><span class="small">Adicionais</span><span id="res-adicionais">Nenhum</span></div>
@@ -291,6 +290,9 @@
   }
 
   function atualizarResumo(){
+    const quantidade = parseInt(document.getElementById('quantidade').value) || 1;
+    document.getElementById('res-quantidade').innerText = quantidade;
+
     const fruta = document.querySelector('input[name="fruta"]:checked').value;
     document.getElementById('res-fruta').innerText = fruta;
 
@@ -298,7 +300,8 @@
       .map(i => i.value);
     document.getElementById('res-adicionais').innerText = adicionais.length ? adicionais.join(', ') : 'Nenhum';
 
-    document.getElementById('res-preco').innerText = 'R$ ' + precoAtual.toFixed(2);
+    const total = precoAtual * quantidade;
+    document.getElementById('res-preco').innerText = 'R$ ' + total.toFixed(2).replace('.', ',');
   }
 
   document.addEventListener('DOMContentLoaded', function(){
@@ -311,16 +314,20 @@
   });
 
   function finalizarPedido(){
+    const quantidade = parseInt(document.getElementById('quantidade').value) || 1;
     const fruta = document.querySelector('input[name="fruta"]:checked').value;
     const adicionais = Array.from(document.querySelectorAll('.check-list input[type="checkbox"]:checked'))
       .map(i => i.value);
 
+    const total = precoAtual * quantidade;
+
     const mensagem = 
       "🍧 *Novo Pedido de Açaí* 🍧\n" +
+      "*Quantidade:* " + quantidade + "\n" +
       "*Tamanho:* " + textoTamanho + "\n" +
       "*Fruta:* " + fruta + "\n" +
       "*Adicionais:* " + (adicionais.length ? adicionais.join(', ') : 'Nenhum') + "\n" +
-      "*Total:* R$ " + precoAtual.toFixed(2);
+      "*Total:* R$ " + total.toFixed(2).replace('.', ',');
 
     const numero = "5599984557326";
     const url = "https://wa.me/" + numero + "?text=" + encodeURIComponent(mensagem);
