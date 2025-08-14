@@ -42,6 +42,7 @@
     align-items:start;
   }
 
+  /* Cabeçalho reformulado */
   header{
     grid-column: 1 / -1;
     display:flex;
@@ -75,6 +76,7 @@
     color:var(--muted);
   }
 
+  /* Left column: escolhas */
   .left {
     padding-top:6px;
   }
@@ -89,6 +91,7 @@
     font-size:0.98rem;
   }
 
+  /* tamanhos - cards */
   .sizes {
     display:flex;
     justify-content:center;
@@ -116,6 +119,7 @@
   .size-card:hover{ transform:translateY(-6px); box-shadow: 0 10px 28px rgba(67,0,85,0.12)}
   .size-card.active{ border-color:var(--accent1); box-shadow:0 10px 28px rgba(255,152,0,0.12)}
 
+  /* fruta & adicionais */
   .choices {
     display:flex;
     gap:12px;
@@ -145,6 +149,7 @@
     accent-color: var(--accent1);
   }
 
+  /* right column: resumo */
   .right {
     position:relative;
   }
@@ -180,24 +185,10 @@
   }
   .btn-order:active{ transform:translateY(2px) }
 
+  /* footer small */
   .note { margin-top:12px; font-size:0.85rem; color:var(--muted) }
 
-  .carrinho-lista {
-    margin-top: 10px;
-    background: #fff;
-    padding: 10px;
-    border-radius: 10px;
-    font-size: 0.85rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-  }
-  .carrinho-lista div {
-    border-bottom: 1px solid #ddd;
-    padding: 6px 0;
-  }
-  .carrinho-lista div:last-child {
-    border-bottom: none;
-  }
-
+  /* responsive */
   @media (max-width:880px){
     .app{ grid-template-columns: 1fr; padding:16px }
     .right{ order: 2 }
@@ -269,96 +260,72 @@
 
   <aside class="right">
     <div class="summary" aria-live="polite">
-      <h3>Resumo do pedido atual</h3>
+      <h3>Resumo do pedido</h3>
+
       <div class="line"><span class="small">Tamanho</span><span id="res-tamanho">300 ml - R$ 10,00</span></div>
       <div class="line"><span class="small">Fruta</span><span id="res-fruta">Uva</span></div>
       <div class="line"><span class="small">Adicionais</span><span id="res-adicionais">Nenhum</span></div>
-      <div class="line" style="margin-top:14px;"><span class="small">Preço</span><span class="price" id="res-preco">R$ 10,00</span></div>
 
-      <button class="btn-order" onclick="adicionarAoCarrinho()">Adicionar ao pedido</button>
+      <div class="line" style="margin-top:14px;"><span class="small">Total</span><span class="price" id="res-preco">R$ 10,00</span></div>
 
-      <h3 style="margin-top:20px;">Carrinho</h3>
-      <div class="carrinho-lista" id="carrinhoLista">Nenhum item adicionado</div>
+      <button class="btn-order" id="btnOrder" onclick="finalizarPedido()">Enviar pedido pelo WhatsApp</button>
 
-      <div class="line" style="margin-top:14px;">
-        <span class="small">Total</span>
-        <span class="price" id="totalPedido">R$ 0,00</span>
-      </div>
-
-      <button class="btn-order" style="margin-top:10px;background:#4CAF50" onclick="finalizarPedido()">Enviar pedido pelo WhatsApp</button>
       <p class="note">Ao enviar, o WhatsApp abrirá com a mensagem pronta para confirmar o pedido.</p>
     </div>
   </aside>
 </div>
 
 <script>
-let precoAtual = 10;
-let textoTamanho = "300 ml - R$ 10,00";
-let carrinho = [];
+  let precoAtual = 10;
+  let textoTamanho = "300 ml - R$ 10,00";
 
-function selecionarTamanho(card){
-  document.querySelectorAll('.size-card').forEach(c => c.classList.remove('active'));
-  card.classList.add('active');
-  precoAtual = parseFloat(card.getAttribute('data-price'));
-  textoTamanho = card.getAttribute('data-text');
-  document.getElementById('res-tamanho').innerText = textoTamanho;
-  atualizarResumo();
-}
+  function selecionarTamanho(card){
+    document.querySelectorAll('.size-card').forEach(c => c.classList.remove('active'));
+    card.classList.add('active');
 
-function atualizarResumo(){
-  const fruta = document.querySelector('input[name="fruta"]:checked').value;
-  document.getElementById('res-fruta').innerText = fruta;
-  const adicionais = Array.from(document.querySelectorAll('.check-list input[type="checkbox"]:checked')).map(i => i.value);
-  document.getElementById('res-adicionais').innerText = adicionais.length ? adicionais.join(', ') : 'Nenhum';
-  document.getElementById('res-preco').innerText = 'R$ ' + precoAtual.toFixed(2);
-}
+    precoAtual = parseFloat(card.getAttribute('data-price'));
+    textoTamanho = card.getAttribute('data-text');
 
-function adicionarAoCarrinho(){
-  const fruta = document.querySelector('input[name="fruta"]:checked').value;
-  const adicionais = Array.from(document.querySelectorAll('.check-list input[type="checkbox"]:checked')).map(i => i.value);
-  
-  carrinho.push({
-    tamanho: textoTamanho,
-    fruta: fruta,
-    adicionais: adicionais.length ? adicionais.join(', ') : 'Nenhum',
-    preco: precoAtual
-  });
-
-  atualizarCarrinho();
-}
-
-function atualizarCarrinho(){
-  const lista = document.getElementById('carrinhoLista');
-  lista.innerHTML = '';
-  let total = 0;
-  carrinho.forEach((item, i) => {
-    total += item.preco;
-    lista.innerHTML += `<div><b>${i+1}.</b> ${item.tamanho} - ${item.fruta} - ${item.adicionais} <br><small>R$ ${item.preco.toFixed(2)}</small></div>`;
-  });
-  if(carrinho.length === 0){
-    lista.innerHTML = 'Nenhum item adicionado';
+    document.getElementById('res-tamanho').innerText = textoTamanho;
+    atualizarResumo();
   }
-  document.getElementById('totalPedido').innerText = 'R$ ' + total.toFixed(2);
-}
 
-function finalizarPedido(){
-  if(carrinho.length === 0){
-    alert('Adicione pelo menos um açaí ao pedido!');
-    return;
+  function atualizarResumo(){
+    const fruta = document.querySelector('input[name="fruta"]:checked').value;
+    document.getElementById('res-fruta').innerText = fruta;
+
+    const adicionais = Array.from(document.querySelectorAll('.check-list input[type="checkbox"]:checked'))
+      .map(i => i.value);
+    document.getElementById('res-adicionais').innerText = adicionais.length ? adicionais.join(', ') : 'Nenhum';
+
+    document.getElementById('res-preco').innerText = 'R$ ' + precoAtual.toFixed(2);
   }
-  let mensagem = "🍧 *Novo Pedido de Açaí* 🍧\n";
-  carrinho.forEach((item, i) => {
-    mensagem += `\n*${i+1}º Açaí*\nTamanho: ${item.tamanho}\nFruta: ${item.fruta}\nAdicionais: ${item.adicionais}\nPreço: R$ ${item.preco.toFixed(2)}\n`;
+
+  document.addEventListener('DOMContentLoaded', function(){
+    const first = document.querySelector('.size-card.active');
+    if(first){
+      precoAtual = parseFloat(first.dataset.price || 10);
+      textoTamanho = first.dataset.text || '300 ml - R$ 10,00';
+    }
+    atualizarResumo();
   });
-  let total = carrinho.reduce((s, i) => s + i.preco, 0);
-  mensagem += `\n*Total:* R$ ${total.toFixed(2)}`;
 
-  const numero = "5599984557326";
-  const url = "https://wa.me/" + numero + "?text=" + encodeURIComponent(mensagem);
-  window.open(url, "_blank");
-}
+  function finalizarPedido(){
+    const fruta = document.querySelector('input[name="fruta"]:checked').value;
+    const adicionais = Array.from(document.querySelectorAll('.check-list input[type="checkbox"]:checked'))
+      .map(i => i.value);
 
-document.addEventListener('DOMContentLoaded', atualizarResumo);
+    const mensagem = 
+      "🍧 *Novo Pedido de Açaí* 🍧\n" +
+      "*Tamanho:* " + textoTamanho + "\n" +
+      "*Fruta:* " + fruta + "\n" +
+      "*Adicionais:* " + (adicionais.length ? adicionais.join(', ') : 'Nenhum') + "\n" +
+      "*Total:* R$ " + precoAtual.toFixed(2);
+
+    const numero = "5599984557326";
+    const url = "https://wa.me/" + numero + "?text=" + encodeURIComponent(mensagem);
+    window.open(url, "_blank");
+  }
 </script>
 
 </body>
