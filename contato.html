@@ -2,270 +2,266 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Controle de Compras entre Professores</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Divisão de Mantimentos</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
-  body {
-    font-family: Arial, sans-serif;
-    background: #f9fafb;
-    margin: 20px;
-    color: #333;
-  }
-
-  h2, h3 {
-    color: #4CAF50;
-  }
-
-  /* Cards de professores */
-  .professor-card, .consumidor-card {
-    display: inline-flex;
-    align-items: center;
-    border-radius: 10px;
-    padding: 8px 14px;
-    margin: 5px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s;
-  }
-
-  .professor-card {
-    background: #f1f1f1;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  }
-
-  .professor-card i {
-    margin-right: 6px;
-    color: #4CAF50;
-  }
-
-  .professor-card:hover {
-    background: #e6f4ea;
-    transform: scale(1.05);
-  }
-
-  .consumidor-card {
-    background: #fff;
-    border: 2px solid #ddd;
-    min-width: 120px;
-    justify-content: center;
-  }
-
-  .consumidor-card.selected {
-    background: #4CAF50;
-    color: #fff;
-    border-color: #4CAF50;
-  }
-
-  .consumidor-card i {
-    margin-right: 6px;
-  }
-
-  /* Formulário de compra */
-  .form-group {
-    margin-bottom: 12px;
-  }
-
-  label {
-    display: block;
-    margin-bottom: 4px;
-    font-weight: 500;
-  }
-
-  input, select, button {
-    padding: 6px 10px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    font-size: 0.95em;
-  }
-
-  button {
-    background: #4CAF50;
-    color: #fff;
-    border: none;
-    cursor: pointer;
-    transition: 0.3s;
-  }
-
-  button:hover {
-    background: #45a049;
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
-  }
-
-  th, td {
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    text-align: left;
-  }
-
-  th {
-    background: #4CAF50;
-    color: white;
-  }
-
-  .btn-editar {
-    background: #ff9800;
-  }
-
-  .btn-editar:hover {
-    background: #e68a00;
-  }
-
-  .btn-excluir {
-    background: #f44336;
-  }
-
-  .btn-excluir:hover {
-    background: #d32f2f;
-  }
+body { font-family: 'Roboto', sans-serif; background: #f0f2f5; margin:0; padding:0; font-size:14px; }
+header { text-align:center; padding:15px; background:#4CAF50; color:white; font-size:1.4em; }
+main { max-width: 500px; margin: 10px auto; background:#fff; border-radius:8px; box-shadow:0 3px 8px rgba(0,0,0,0.1); padding:10px; }
+.tab { display:flex; flex-wrap: wrap; margin-bottom:5px; }
+.tab button { flex:1; padding:10px; font-size:1em; cursor:pointer; background:#eee; border:none; font-weight:600; transition:.3s; border-radius:5px 5px 0 0; margin-right:2px; }
+.tab button.active { background:#4CAF50; color:white; box-shadow:0 2px 5px rgba(0,0,0,0.2); }
+.tabcontent { display:none; padding:10px; }
+label { display:block; margin:5px 0 3px; font-weight:500; }
+input, select, button { padding:6px 8px; margin-top:3px; font-size:0.9em; border-radius:5px; border:1px solid #ccc; }
+button:hover { opacity:.9; }
+.btn { font-size:0.7em; padding:3px 6px; margin-right:2px; border:none; border-radius:4px; }
+.btn-editar { background:#ffb74d; color:#fff; }
+.btn-excluir { background:#e57373; color:#fff; }
+.btn-gerar { background:#2196F3; color:white; margin-top:5px; padding:6px 10px; font-size:0.9em; }
+ul { list-style:none; padding-left:0; margin:0; }
+li { margin-bottom:5px; }
+.saldo-positivo { color:green; font-weight:bold; }
+.saldo-negativo { color:red; font-weight:bold; }
+table { width:100%; border-collapse: collapse; font-size:0.8em; }
+table th, table td { border:1px solid #ccc; padding:4px; text-align:left; }
+table th { background:#eee; }
+h2,h3 { font-size:1em; margin:5px 0; }
+#consumidores { max-height:120px; overflow-y:auto; border:1px solid #ccc; padding:5px; border-radius:5px; }
+.instrucao { font-size:0.85em; color:#555; margin:5px 0; padding:6px; background:#f9f9f9; border-left:3px solid #4CAF50; border-radius:4px; }
 </style>
 </head>
 <body>
+<header>Divisão de Mantimentos</header>
+<main>
 
-<h2>Controle de Compras entre Professores</h2>
+  <div class="tab">
+    <button class="tablinks active" onclick="openTab(event,'professores')">Professores</button>
+    <button class="tablinks" onclick="openTab(event,'compras')">Compras</button>
+    <button class="tablinks" onclick="openTab(event,'saldos')">Saldos</button>
+    <button class="tablinks" onclick="openTab(event,'relatorio')">Relatório</button>
+  </div>
 
-<h3>Professores disponíveis:</h3>
-<div id="listaProfessores" style="display:flex; flex-wrap:wrap;"></div>
+  <!-- Aba Professores -->
+  <div id="professores" class="tabcontent" style="display:block;">
+    <h2>Escolher Grupo</h2>
+    <p class="instrucao">Escolha um grupo para começar. Os professores do grupo serão usados em todas as divisões.</p>
+    <label>
+      <input type="radio" name="grupo" value="A" onclick="selecionarGrupo('A')"> Grupo A (Wanderson, Gu, Cris)
+    </label><br>
+    <label>
+      <input type="radio" name="grupo" value="B" onclick="selecionarGrupo('B')"> Grupo B (Gu, Emerson, Galeno)
+    </label>
+    
+    <h3>Professores selecionados:</h3>
+    <ul id="listaProfessores"></ul>
+  </div>
 
-<h3>Cadastro de Compra:</h3>
-<div class="form-group">
-  <label for="produto">Produto:</label>
-  <input type="text" id="produto" placeholder="Ex: Café">
-</div>
-<div class="form-group">
-  <label for="valor">Valor (R$):</label>
-  <input type="number" id="valor" placeholder="Ex: 25.50" step="0.01">
-</div>
-<div class="form-group">
-  <label for="comprador">Quem comprou:</label>
-  <select id="comprador">
-    <option value="">Selecione</option>
-  </select>
-</div>
-<div class="form-group">
-  <label>Quem consumiu:</label>
-  <div id="consumidores" style="display:flex; flex-wrap:wrap;"></div>
-</div>
-<button onclick="addCompra()">Adicionar Compra</button>
+  <!-- Aba Compras -->
+  <div id="compras" class="tabcontent">
+    <h2>Registrar Compra</h2>
+    <p class="instrucao">Preencha todos os campos antes de salvar. O valor deve ser numérico e selecione pelo menos um consumidor.</p>
+    <label>Produto: <input id="produto" required placeholder="Ex: Arroz"/></label>
+    <label>Valor: <input id="valor" type="number" step="0.01" required placeholder="Ex: 25.50"/></label>
+    <label>Quem comprou:
+      <select id="comprador" required></select>
+    </label>
+    <label>Quem consumiu:</label>
+    <div id="consumidores"></div>
+    <button onclick="addCompra()">Salvar Compra</button>
 
-<h3>Tabela de Compras:</h3>
-<table id="tabelaCompras">
-  <thead>
-    <tr>
-      <th>Produto</th>
-      <th>Valor (R$)</th>
-      <th>Comprador</th>
-      <th>Consumidores</th>
-      <th>Ações</th>
-    </tr>
-  </thead>
-  <tbody></tbody>
-</table>
+    <h3>Compras Registradas</h3>
+    <div class="list">
+      <table id="tabelaCompras">
+        <thead>
+          <tr>
+            <th>Produto</th>
+            <th>Valor (R$)</th>
+            <th>Comprador</th>
+            <th>Consumidores</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Aba Saldos -->
+  <div id="saldos" class="tabcontent">
+    <h2>Saldos</h2>
+    <p class="instrucao">Clique em "Calcular" para ver quanto cada professor pagou, deveria pagar e qual o saldo final.</p>
+    <button onclick="calcular()">Calcular</button>
+    <div id="saldosLista"></div>
+    <h3>Sugestão de Acertos</h3>
+    <div id="transferencias"></div>
+  </div>
+
+  <!-- Aba Relatório -->
+  <div id="relatorio" class="tabcontent">
+    <h2>Relatório PDF</h2>
+    <p class="instrucao">Clique no botão abaixo para gerar um relatório em PDF com todas as compras, saldos e sugestões de acertos.</p>
+    <button class="btn btn-gerar" onclick="gerarPDF()">Gerar Relatório PDF</button>
+  </div>
+
+</main>
 
 <script>
-  // Dados iniciais
-  let professores = ["João", "Maria", "Ana", "Pedro", "Lucas"];
-  let compras = [];
-  let editIndex = null;
+let professores = [];
+let compras = [];
+let editIndex = null;
 
-  // Atualiza toda a interface
-  function atualizarUI(){
-    // Professores
-    const lista = document.getElementById("listaProfessores");
-    lista.innerHTML = professores.map(p =>
-      `<div class="professor-card"><i>👨‍🏫</i>${p}</div>`
-    ).join("");
+// Função de abas
+function openTab(evt, tabName){
+  document.querySelectorAll(".tabcontent").forEach(tc=>tc.style.display="none");
+  document.querySelectorAll(".tab button").forEach(tb=>tb.classList.remove("active"));
+  document.getElementById(tabName).style.display="block";
+  evt.currentTarget.classList.add("active");
+}
 
-    // Dropdown comprador
-    const comprador = document.getElementById("comprador");
-    comprador.innerHTML = '<option value="">Selecione</option>' + 
-      professores.map(p => `<option value="${p}">${p}</option>`).join("");
-
-    // Consumidores
-    const consumidoresDiv = document.getElementById("consumidores");
-    consumidoresDiv.innerHTML = "";
-    professores.forEach(p => {
-      const card = document.createElement("div");
-      card.className = "consumidor-card";
-      card.innerHTML = `<i>👨‍🏫</i>${p}`;
-      card.dataset.value = p;
-      card.onclick = () => card.classList.toggle("selected");
-      consumidoresDiv.appendChild(card);
-    });
-
-    // Tabela de compras
-    const tbody = document.querySelector("#tabelaCompras tbody");
-    tbody.innerHTML = compras.map((c,i) => `
-      <tr>
-        <td>${c.produto}</td>
-        <td>${c.valor.toFixed(2)}</td>
-        <td>${c.comprador}</td>
-        <td>${c.consumidores.join(", ")}</td>
-        <td>
-          <button class="btn-editar" onclick="editarCompra(${i})">Editar</button>
-          <button class="btn-excluir" onclick="excluirCompra(${i})">Apagar</button>
-        </td>
-      </tr>
-    `).join("");
+// Seleção de grupo
+function selecionarGrupo(grupo){
+  if(grupo === "A"){
+    professores = ["Wanderson", "Gu", "Cris"];
+  } else if(grupo === "B"){
+    professores = ["Gu", "Emerson", "Galeno"];
   }
-
-  // Pega consumidores selecionados
-  function getConsumidoresSelecionados(){
-    return Array.from(document.querySelectorAll(".consumidor-card.selected"))
-      .map(c => c.dataset.value);
-  }
-
-  // Adicionar ou atualizar compra
-  function addCompra(){
-    const produto = document.getElementById("produto").value.trim();
-    const valor = parseFloat(document.getElementById("valor").value);
-    const comprador = document.getElementById("comprador").value;
-    const consumidores = getConsumidoresSelecionados();
-
-    if(!produto){ alert("Informe o produto."); return; }
-    if(isNaN(valor) || valor <= 0){ alert("Valor inválido."); return; }
-    if(!comprador){ alert("Selecione quem comprou."); return; }
-    if(consumidores.length === 0){ alert("Selecione pelo menos um consumidor."); return; }
-
-    if(editIndex !== null){
-      compras[editIndex] = {produto, valor, comprador, consumidores};
-      editIndex = null;
-    } else {
-      compras.push({produto, valor, comprador, consumidores});
-    }
-
-    document.getElementById("produto").value = "";
-    document.getElementById("valor").value = "";
-    document.getElementById("comprador").value = "";
-    document.querySelectorAll(".consumidor-card").forEach(c => c.classList.remove("selected"));
-    atualizarUI();
-  }
-
-  // Editar compra
-  function editarCompra(i){
-    const compra = compras[i];
-    document.getElementById("produto").value = compra.produto;
-    document.getElementById("valor").value = compra.valor;
-    document.getElementById("comprador").value = compra.comprador;
-    document.querySelectorAll(".consumidor-card").forEach(c => 
-      c.classList.toggle("selected", compra.consumidores.includes(c.dataset.value))
-    );
-    editIndex = i;
-  }
-
-  // Excluir compra
-  function excluirCompra(i){
-    if(confirm("Deseja realmente apagar esta compra?")){
-      compras.splice(i, 1);
-      atualizarUI();
-    }
-  }
-
-  // Inicializa interface
   atualizarUI();
+}
+
+// Atualiza interface
+function atualizarUI(){
+  const lista=document.getElementById("listaProfessores");
+  lista.innerHTML=professores.map(p=>`<li>${p}</li>`).join("");
+
+  document.getElementById("comprador").innerHTML=professores.map(p=>`<option value="${p}">${p}</option>`).join("");
+
+  document.getElementById("consumidores").innerHTML=professores.map(p=>`<label><input type="checkbox" value="${p}">${p}</label>`).join("<br>");
+
+  // Compras tabela
+  const tbody=document.querySelector("#tabelaCompras tbody");
+  tbody.innerHTML=compras.map((c,i)=>`
+    <tr>
+      <td>${c.produto}</td>
+      <td>${c.valor.toFixed(2)}</td>
+      <td>${c.comprador}</td>
+      <td>${c.consumidores.join(", ")}</td>
+      <td>
+        <button class="btn btn-editar" onclick="editarCompra(${i})">Editar</button>
+        <button class="btn btn-excluir" onclick="excluirCompra(${i})">Apagar</button>
+      </td>
+    </tr>
+  `).join("");
+}
+
+// Compras
+function addCompra(){
+  const produto=document.getElementById("produto").value.trim();
+  const valor=parseFloat(document.getElementById("valor").value);
+  const comprador=document.getElementById("comprador").value;
+  const consumidores=Array.from(document.querySelectorAll("#consumidores input:checked")).map(c=>c.value);
+
+  if(!produto){
+    alert("Erro: informe o nome do produto.");
+    return;
+  }
+  if(isNaN(valor) || valor <= 0){
+    alert("Erro: o valor deve ser numérico e maior que zero.");
+    return;
+  }
+  if(!comprador){
+    alert("Erro: selecione quem comprou.");
+    return;
+  }
+  if(consumidores.length === 0){
+    alert("Erro: selecione pelo menos um consumidor.");
+    return;
+  }
+
+  if(editIndex!==null){ 
+    compras[editIndex]={produto,valor,comprador,consumidores}; 
+    editIndex=null; 
+  } else {
+    compras.push({produto,valor,comprador,consumidores});
+  }
+  document.getElementById("produto").value="";
+  document.getElementById("valor").value="";
+  document.querySelectorAll("#consumidores input").forEach(cb=>cb.checked=false);
+  atualizarUI();
+}
+
+function editarCompra(i){
+  const c=compras[i];
+  document.getElementById("produto").value=c.produto;
+  document.getElementById("valor").value=c.valor;
+  document.getElementById("comprador").value=c.comprador;
+  document.querySelectorAll("#consumidores input").forEach(cb=>cb.checked=c.consumidores.includes(cb.value));
+  editIndex=i;
+}
+
+function excluirCompra(i){ compras.splice(i,1); atualizarUI(); }
+
+// Saldos
+function calcular(){
+  if(compras.length === 0){
+    alert("Não há compras registradas. Adicione pelo menos uma compra.");
+    return;
+  }
+
+  let pagou={}, deveria={};
+  professores.forEach(p=>{pagou[p]=0;deveria[p]=0;});
+  compras.forEach(c=>{
+    pagou[c.comprador]+=c.valor;
+    let p=c.valor/c.consumidores.length;
+    c.consumidores.forEach(cons=>{deveria[cons]+=p;});
+  });
+  const saldos=professores.map(p=>({nome:p,pagou:pagou[p],deveria:deveria[p],saldo:pagou[p]-deveria[p]}));
+  document.getElementById("saldosLista").innerHTML=saldos.map(s=>
+    `<p>${s.nome}: pagou R$${s.pagou.toFixed(2)}, deveria R$${s.deveria.toFixed(2)} → 
+     <span class="${s.saldo>=0?'saldo-positivo':'saldo-negativo'}">Saldo: R$${s.saldo.toFixed(2)}</span></p>`).join("");
+
+  // Transferencias
+  let devedores=saldos.filter(s=>s.saldo<-0.01).map(s=>({...s,saldo:-s.saldo}));
+  let credores=saldos.filter(s=>s.saldo>0.01).map(s=>({...s}));
+  let transf=[],i=0,j=0;
+  while(i<devedores.length && j<credores.length){
+    let val=Math.min(devedores[i].saldo, credores[j].saldo);
+    transf.push(`${devedores[i].nome} paga R$${val.toFixed(2)} para ${credores[j].nome}`);
+    devedores[i].saldo-=val; credores[j].saldo-=val;
+    if(devedores[i].saldo<0.01)i++; if(credores[j].saldo<0.01) j++;
+  }
+  document.getElementById("transferencias").innerHTML=transf.length?transf.map(t=>`<p>${t}</p>`).join(""):"<p>Ninguém deve nada 🎉</p>";
+}
+
+// PDF
+function gerarPDF(){
+  if(compras.length === 0){
+    alert("Não há dados para gerar o relatório. Registre pelo menos uma compra.");
+    return;
+  }
+
+  calcular();
+  const { jsPDF } = window.jspdf;
+  const doc=new jsPDF();
+  doc.setFontSize(14); doc.text("Relatório de Mantimentos",105,15,null,null,"center");
+  let y=25; doc.setFontSize(10);
+  doc.text("Compras:",10,y); y+=8;
+  compras.forEach(c=>{doc.text(`${c.produto} - R$${c.valor.toFixed(2)} (Comprado por ${c.comprador}, Consumido por ${c.consumidores.join(", ")})`,10,y); y+=6; if(y>280){doc.addPage();y=20;}});
+  y+=10; doc.text("Saldos:",10,y); y+=8;
+  professores.forEach(p=>{const s=comprasSaldo(p); doc.text(`${p}: R$${s}`,10,y); y+=6;if(y>280){doc.addPage();y=20;}});
+  y+=10; doc.text("Sugestão de Acertos:",10,y); y+=8;
+  const t=document.getElementById("transferencias").innerText.split("\n");
+  t.forEach(ti=>{doc.text(ti,10,y); y+=6; if(y>280){doc.addPage();y=20;}});
+  doc.save("relatorio_mantimentos.pdf");
+
+  function comprasSaldo(nome){
+    let pagou=0,deveria=0;
+    compras.forEach(c=>{if(c.comprador===nome)pagou+=c.valor; if(c.consumidores.includes(nome))deveria+=c.valor/c.consumidores.length;});
+    return (pagou-deveria).toFixed(2);
+  }
+}
 </script>
 </body>
 </html>
