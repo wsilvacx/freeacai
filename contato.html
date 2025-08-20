@@ -10,7 +10,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
 <style>
-body { font-family: 'Roboto', sans-serif; background: #f0f2f5; margin:0; padding:0; font-size:14px; }
+body { font-family: 'Roboto', sans-serif; background: #f0f2f5; margin:0; padding:0 0 50px 0; font-size:14px; }
 header { text-align:center; padding:15px; background:#4CAF50; color:white; font-size:1.4em; }
 main { max-width: 600px; margin: 10px auto; background:#fff; border-radius:8px; box-shadow:0 3px 8px rgba(0,0,0,0.1); padding:12px; }
 .tab { display:flex; flex-wrap: wrap; margin-bottom:5px; }
@@ -39,7 +39,7 @@ h2,h3 { font-size:1em; margin:5px 0; }
 .toast {
   position: fixed;
   right: 20px;
-  bottom: 20px;
+  bottom: 60px;
   background: rgba(0,0,0,0.85);
   color: #fff;
   padding: 10px 14px;
@@ -52,8 +52,25 @@ h2,h3 { font-size:1em; margin:5px 0; }
 }
 .toast.show { opacity: 1; transform: translateY(0); }
 
+/* Rodapé do sistema (desenvolvedor) */
+.site-footer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 40px;
+  background: #263238;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size:0.9em;
+  box-shadow: 0 -2px 6px rgba(0,0,0,0.15);
+  z-index: 999;
+}
+
 /* Small responsive tweak */
-@media (max-width:520px){ main{margin:6px;} .tab button{font-size:0.9em; padding:8px;} }
+@media (max-width:520px){ main{margin:6px;} .tab button{font-size:0.9em; padding:8px;} .toast{right:10px; left:10px;} }
 </style>
 </head>
 <body>
@@ -136,6 +153,8 @@ h2,h3 { font-size:1em; margin:5px 0; }
 
 <div id="toast" class="toast"></div>
 
+<footer class="site-footer">Desenvolvido por <strong>Professor Wanderson</strong></footer>
+
 <script>
 /* ====== Estado e persistência ====== */
 const STORAGE_KEY = "divMantimentos_estado_v1";
@@ -154,11 +173,9 @@ function init(){
   } else {
     // Se houver professores salvos: preencher UI e garantir radio marcado
     atualizarUI();
-    // tentar marcar o rádio correspondente ao grupo mais próximo (opcional)
     if(arraysEqual(state.professores, ["Wanderson","Gu","Cris"])) document.getElementById("grupoA").checked = true;
     else if(arraysEqual(state.professores, ["Gu","Emerson","Galeno"])) document.getElementById("grupoB").checked = true;
   }
-  // mostrar compras salvas (se houver)
   atualizarUI();
 }
 
@@ -188,12 +205,11 @@ function openTab(evt, tabName){
   document.querySelectorAll(".tabcontent").forEach(tc=>tc.style.display="none");
   document.querySelectorAll(".tab button").forEach(tb=>tb.classList.remove("active"));
   document.getElementById(tabName).style.display="block";
-  evt.currentTarget.classList.add("active");
+  if(evt && evt.currentTarget) evt.currentTarget.classList.add("active");
 }
 
 /* ====== Grupos / Professores ====== */
 function selecionarGrupo(grupo, perguntar=true){
-  // Se há compras e vamos trocar de grupo, perguntar se o usuário deseja limpar compras
   if(state.compras && state.compras.length > 0 && perguntar){
     const ok = confirm("Existem compras registradas. Deseja limpar as compras ao mudar de grupo? (Cancelar mantém as compras)");
     if(ok){
@@ -203,8 +219,10 @@ function selecionarGrupo(grupo, perguntar=true){
   }
   if(grupo === "A"){
     state.professores = ["Wanderson", "Gu", "Cris"];
+    document.getElementById("grupoA").checked = true;
   } else if(grupo === "B"){
     state.professores = ["Gu", "Emerson", "Galeno"];
+    document.getElementById("grupoB").checked = true;
   }
   saveState();
   atualizarUI();
@@ -275,7 +293,6 @@ function editarCompra(i){
   if(!c) return;
   document.getElementById("produto").value = c.produto;
   document.getElementById("valor").value = c.valor;
-  // se comprador não existir mais no grupo, adiciona temporariamente ao select para edição
   if(!state.professores.includes(c.comprador)){
     const opt = document.createElement('option');
     opt.value = c.comprador;
@@ -286,7 +303,9 @@ function editarCompra(i){
   document.querySelectorAll("#consumidores input").forEach(cb=>cb.checked = c.consumidores.includes(cb.value));
   editIndex = i;
   showToast("Modo edição ativado.");
-  openTab({currentTarget: document.querySelector(".tab button[onclick*='compras']")}, 'compras'); // abre aba compras
+  // abrir aba compras
+  const tabBtns = document.querySelectorAll(".tab button");
+  tabBtns.forEach(b=>{ if(b.textContent.includes("Compras")) { openTab({currentTarget:b}, 'compras'); }});
 }
 
 function cancelEdit(){
@@ -312,36 +331,30 @@ function calcular(){
     return;
   }
   const professores = state.professores.slice();
-  // inicializar
   let pagou = {}, deveria = {};
   professores.forEach(p=>{ pagou[p]=0; deveria[p]=0; });
 
-  // Acumular
   state.compras.forEach(c=>{
-    if(!pagou[c.comprador]) pagou[c.comprador] = 0; // caso comprador externo
+    if(!pagou[c.comprador]) pagou[c.comprador] = 0;
     pagou[c.comprador] += Number(c.valor);
     const parte = Number(c.valor) / c.consumidores.length;
     c.consumidores.forEach(cons=>{
-      if(!deveria[cons]) deveria[cons] = 0; // caso consumidor externo
+      if(!deveria[cons]) deveria[cons] = 0;
       deveria[cons] += parte;
     });
   });
 
-  // Montar saldos por todos os envolvidos (garantir que pegamos todos nomes)
   const nomes = new Set([...Object.keys(pagou), ...Object.keys(deveria)]);
   const saldos = Array.from(nomes).map(n=>{
     const p = Number(pagou[n]||0), d = Number(deveria[n]||0);
     return {nome:n, pagou:p, deveria:d, saldo: +(p-d)};
   });
 
-  // Totais
   const totalPago = saldos.reduce((s,x)=>s + x.pagou, 0);
   const totalDevido = saldos.reduce((s,x)=>s + x.deveria, 0);
 
-  // Ordenar para exibir
   saldos.sort((a,b)=>b.saldo - a.saldo);
 
-  // Mostrar na UI: tabela de saldos + totais
   const sList = document.getElementById("saldosLista");
   let html = `<p><strong>Total pago:</strong> R$${totalPago.toFixed(2)} &nbsp;&nbsp; <strong>Total devido:</strong> R$${totalDevido.toFixed(2)}</p>`;
   html += `<table><thead><tr><th>Nome</th><th>Pagou (R$)</th><th>Deveria (R$)</th><th>Saldo (R$)</th></tr></thead><tbody>`;
@@ -352,10 +365,8 @@ function calcular(){
   html += `</tbody></table>`;
   sList.innerHTML = html;
 
-  // Gerar sugestões de acertos
-  let devedores = saldos.filter(s=>s.saldo < -0.01).map(s=>({nome:s.nome, saldo: -s.saldo})); // precisa pagar
-  let credores = saldos.filter(s=>s.saldo > 0.01).map(s=>({nome:s.nome, saldo: s.saldo})); // a receber
-  // ordenar para estabilidade
+  let devedores = saldos.filter(s=>s.saldo < -0.01).map(s=>({nome:s.nome, saldo: -s.saldo}));
+  let credores = saldos.filter(s=>s.saldo > 0.01).map(s=>({nome:s.nome, saldo: s.saldo}));
   devedores.sort((a,b)=>b.saldo - a.saldo);
   credores.sort((a,b)=>b.saldo - a.saldo);
 
@@ -364,7 +375,6 @@ function calcular(){
   let i=0, j=0;
   while(i<devedores.length && j<credores.length){
     let val = Math.min(devedores[i].saldo, credores[j].saldo);
-    // arredondar para 2 dec
     val = Math.round(val*100)/100;
     if(val > 0.009){
       transf.push({de:devedores[i].nome, para:credores[j].nome, valor: val});
@@ -378,7 +388,6 @@ function calcular(){
   transfDiv.innerHTML = transf.length ? transf.map(t=>`<p>${escapeHtml(t.de)} paga R$${t.valor.toFixed(2)} para ${escapeHtml(t.para)}</p>`).join("") : "<p>Ninguém deve nada 🎉</p>";
 
   showToast("Cálculo concluído.");
-  // store last calculation to reuse in PDF
   state._lastCalc = {saldos, totalPago, totalDevido, transf};
   saveState();
 }
@@ -389,17 +398,22 @@ function gerarPDF(){
     alert("Não há dados para gerar o relatório. Registre pelo menos uma compra.");
     return;
   }
-  // Realiza cálculo se não houver
   if(!state._lastCalc) calcular();
 
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({unit:'pt', format:'a4'});
   const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
 
   doc.setFontSize(14);
   doc.text("Relatório de Mantimentos", pageWidth/2, 40, {align:'center'});
 
-  // Compras tabela
+  // cores mais vivas para cabeçalhos
+  const blueHeader = {fillColor:[33,150,243], textColor:255};    // azul vivo
+  const greenHeader = {fillColor:[76,175,80], textColor:255};    // verde vivo
+  const orangeHeader = {fillColor:[255,152,0], textColor:255};   // laranja
+
+  // Compras tabela (azul)
   const comprasHead = [['Produto','Valor (R$)','Comprador','Consumidores']];
   const comprasBody = state.compras.map(c=>[c.produto, c.valor.toFixed(2), c.comprador, c.consumidores.join(", ")]);
   doc.setFontSize(11);
@@ -409,11 +423,11 @@ function gerarPDF(){
     head: comprasHead,
     body: comprasBody,
     styles: {fontSize:10},
-    headStyles: {fillColor:[240,240,240]},
+    headStyles: blueHeader,
     margin: {left:40, right:40}
   });
 
-  // Saldos tabela
+  // Saldos tabela (verde)
   let y = doc.lastAutoTable ? doc.lastAutoTable.finalY + 18 : 160;
   doc.text("Saldos:", 40, y);
   const saldos = state._lastCalc ? state._lastCalc.saldos : [];
@@ -424,11 +438,11 @@ function gerarPDF(){
     head: saldosHead,
     body: saldosBody,
     styles: {fontSize:10},
-    headStyles: {fillColor:[240,240,240]},
+    headStyles: greenHeader,
     margin: {left:40, right:40}
   });
 
-  // Totais e transferências
+  // Totais e transferências (laranja)
   y = doc.lastAutoTable ? doc.lastAutoTable.finalY + 18 : 400;
   const totalPago = state._lastCalc ? state._lastCalc.totalPago : 0;
   const totalDevido = state._lastCalc ? state._lastCalc.totalDevido : 0;
@@ -445,11 +459,20 @@ function gerarPDF(){
       head: [['Transação','Valor']],
       body: transfBody,
       styles: {fontSize:10},
-      headStyles: {fillColor:[240,240,240]},
+      headStyles: orangeHeader,
       margin: {left:40, right:40}
     });
   } else {
     doc.text("Nenhuma transferência necessária.", 40, y+6);
+  }
+
+  // Rodapé em todas as páginas: "Desenvolvido por Professor Wanderson"
+  const pageCount = doc.internal.getNumberOfPages();
+  doc.setFontSize(9);
+  for(let i=1;i<=pageCount;i++){
+    doc.setPage(i);
+    doc.setTextColor(100);
+    doc.text("Desenvolvido por Professor Wanderson", pageWidth - 40, pageHeight - 20, {align:'right'});
   }
 
   doc.save("relatorio_mantimentos.pdf");
@@ -475,7 +498,6 @@ function escapeHtml(text){
     .replace(/"/g, "&quot;");
 }
 
-// comparador de arrays simples (mesmos elementos e ordem)
 function arraysEqual(a,b){
   if(!a || !b) return false;
   if(a.length !== b.length) return false;
