@@ -30,6 +30,10 @@ table th, table td { border:1px solid #ccc; padding:4px; text-align:left; }
 table th { background:#eee; }
 h2,h3 { font-size:1em; margin:5px 0; }
 #consumidores { max-height:120px; overflow-y:auto; border:1px solid #ccc; padding:5px; border-radius:5px; }
+
+/* Estilo de erro */
+.erro { color: red; font-size: 0.8em; display: block; margin-top: 2px; }
+.campo-erro { border-color: red !important; }
 </style>
 </head>
 <body>
@@ -46,7 +50,8 @@ h2,h3 { font-size:1em; margin:5px 0; }
   <!-- Aba Professores -->
   <div id="professores" class="tabcontent" style="display:block;">
     <h2>Professores</h2>
-    <input id="nomeProfessor" placeholder="Nome do professor"/>
+    <input id="nomeProfessor" placeholder="Nome do professor" required/>
+    <small id="erroProfessor" class="erro"></small><br>
     <button onclick="addProfessor()">Adicionar</button>
     <ul id="listaProfessores"></ul>
   </div>
@@ -54,30 +59,22 @@ h2,h3 { font-size:1em; margin:5px 0; }
   <!-- Aba Compras -->
   <div id="compras" class="tabcontent">
     <h2>Registrar Compra</h2>
-    <label>Produto: <input id="produto"/></label>
-    <label>Valor: <input id="valor" type="number" step="0.01"/></label>
+    <label>Produto: 
+      <input id="produto" placeholder="Ex: Arroz" required/>
+      <small id="erroProduto" class="erro"></small>
+    </label>
+    <label>Valor: 
+      <input id="valor" type="number" step="0.01" min="0.01" placeholder="0,00" required/>
+      <small id="erroValor" class="erro"></small>
+    </label>
     <label>Quem comprou:
-      <select id="comprador"></select>
+      <select id="comprador" required></select>
+      <small id="erroComprador" class="erro"></small>
     </label>
     <label>Quem consumiu:</label>
     <div id="consumidores"></div>
+    <small id="erroConsumidores" class="erro"></small><br>
     <button onclick="addCompra()">Salvar Compra</button>
-
-    <h3>Compras Registradas</h3>
-    <div class="list">
-      <table id="tabelaCompras">
-        <thead>
-          <tr>
-            <th>Produto</th>
-            <th>Valor (R$)</th>
-            <th>Comprador</th>
-            <th>Consumidores</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
   </div>
 
   <!-- Aba Saldos -->
@@ -149,42 +146,82 @@ function atualizarUI(){
   salvarDados(); // salva sempre que atualizar interface
 }
 
+// ===== Validação =====
+function limparErros(){
+  document.querySelectorAll(".erro").forEach(e => e.textContent = "");
+  document.querySelectorAll(".campo-erro").forEach(c => c.classList.remove("campo-erro"));
+}
+
 // Professores
 function addProfessor(){
-  const nome=document.getElementById("nomeProfessor").value.trim();
-  if(nome && !professores.includes(nome)){
-    professores.push(nome);
-    document.getElementById("nomeProfessor").value="";
-    atualizarUI();
+  limparErros();
+  const campo = document.getElementById("nomeProfessor");
+  const nome = campo.value.trim();
+
+  if(!nome){
+    document.getElementById("erroProfessor").textContent = "Digite o nome do professor!";
+    campo.classList.add("campo-erro");
+    return;
   }
+  if(professores.includes(nome)){
+    document.getElementById("erroProfessor").textContent = "Esse professor já está cadastrado!";
+    campo.classList.add("campo-erro");
+    return;
+  }
+
+  professores.push(nome);
+  campo.value="";
+  atualizarUI();
 }
 
 // Compras
 function addCompra(){
-  const produto=document.getElementById("produto").value.trim();
-  const valor=parseFloat(document.getElementById("valor").value);
-  const comprador=document.getElementById("comprador").value;
-  const consumidores=Array.from(document.querySelectorAll("#consumidores input:checked")).map(c=>c.value);
-  if(produto && valor>0 && comprador && consumidores.length>0){
-    if(editIndex!==null){ compras[editIndex]={produto,valor,comprador,consumidores}; editIndex=null; }
-    else compras.push({produto,valor,comprador,consumidores});
-    document.getElementById("produto").value="";
-    document.getElementById("valor").value="";
-    document.querySelectorAll("#consumidores input").forEach(cb=>cb.checked=false);
-    atualizarUI();
+  limparErros();
+  const campoProduto = document.getElementById("produto");
+  const campoValor = document.getElementById("valor");
+  const campoComprador = document.getElementById("comprador");
+
+  const produto = campoProduto.value.trim();
+  const valor = parseFloat(campoValor.value);
+  const comprador = campoComprador.value;
+  const consumidores = Array.from(document.querySelectorAll("#consumidores input:checked")).map(c=>c.value);
+
+  let erro = false;
+
+  if(!produto){
+    document.getElementById("erroProduto").textContent = "Informe o nome do produto!";
+    campoProduto.classList.add("campo-erro");
+    erro = true;
   }
-}
+  if(isNaN(valor) || valor <= 0){
+    document.getElementById("erroValor").textContent = "Informe um valor válido maior que zero!";
+    campoValor.classList.add("campo-erro");
+    erro = true;
+  }
+  if(!comprador){
+    document.getElementById("erroComprador").textContent = "Selecione quem comprou!";
+    campoComprador.classList.add("campo-erro");
+    erro = true;
+  }
+  if(consumidores.length === 0){
+    document.getElementById("erroConsumidores").textContent = "Selecione pelo menos um consumidor!";
+    erro = true;
+  }
 
-function editarCompra(i){
-  const c=compras[i];
-  document.getElementById("produto").value=c.produto;
-  document.getElementById("valor").value=c.valor;
-  document.getElementById("comprador").value=c.comprador;
-  document.querySelectorAll("#consumidores input").forEach(cb=>cb.checked=c.consumidores.includes(cb.value));
-  editIndex=i;
-}
+  if(erro) return;
 
-function excluirCompra(i){ compras.splice(i,1); atualizarUI(); }
+  if(editIndex!==null){ 
+    compras[editIndex] = {produto,valor,comprador,consumidores}; 
+    editIndex = null; 
+  } else {
+    compras.push({produto,valor,comprador,consumidores});
+  }
+
+  campoProduto.value="";
+  campoValor.value="";
+  document.querySelectorAll("#consumidores input").forEach(cb=>cb.checked=false);
+  atualizarUI();
+}
 
 // Saldos
 function calcular(){
