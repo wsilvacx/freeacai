@@ -4,37 +4,50 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Divisão de Mantimentos</title>
-<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
-body { font-family: 'Roboto', sans-serif; background: #f0f2f5; margin:0; padding:0; font-size:14px; }
-header { text-align:center; padding:15px; background:#4CAF50; color:white; font-size:1.4em; }
-main { max-width: 500px; margin: 10px auto; background:#fff; border-radius:8px; box-shadow:0 3px 8px rgba(0,0,0,0.1); padding:10px; }
-.tab { display:flex; flex-wrap: wrap; margin-bottom:5px; }
-.tab button { flex:1; padding:10px; font-size:1em; cursor:pointer; background:#eee; border:none; font-weight:600; transition:.3s; border-radius:5px 5px 0 0; margin-right:2px; }
-.tab button.active { background:#4CAF50; color:white; box-shadow:0 2px 5px rgba(0,0,0,0.2); }
-.tabcontent { display:none; padding:10px; }
-label { display:block; margin:5px 0 3px; font-weight:500; }
-input, select, button { padding:6px 8px; margin-top:3px; font-size:0.9em; border-radius:5px; border:1px solid #ccc; }
-button:hover { opacity:.9; }
-.btn { font-size:0.7em; padding:3px 6px; margin-right:2px; border:none; border-radius:4px; }
-.btn-editar { background:#ffb74d; color:#fff; }
-.btn-excluir { background:#e57373; color:#fff; }
-.btn-gerar { background:#2196F3; color:white; margin-top:5px; padding:6px 10px; font-size:0.9em; }
-ul { list-style:none; padding-left:0; margin:0; }
+/* === Reset e Base === */
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Roboto', sans-serif; background:#f4f7fa; color:#333; }
+header { background:linear-gradient(90deg,#4CAF50,#81C784); color:white; padding:20px; text-align:center; font-size:1.6em; font-weight:700; box-shadow:0 4px 8px rgba(0,0,0,0.1); }
+main { max-width:700px; margin:20px auto; padding:15px; background:white; border-radius:10px; box-shadow:0 6px 15px rgba(0,0,0,0.1); }
+
+/* === Abas === */
+.tab { display:flex; flex-wrap:wrap; margin-bottom:10px; border-bottom:2px solid #eee; }
+.tab button { flex:1; padding:12px; font-weight:600; border:none; cursor:pointer; background:#f0f0f0; transition:.3s; border-radius:8px 8px 0 0; margin-right:2px; }
+.tab button.active { background:#4CAF50; color:white; box-shadow:0 -2px 8px rgba(0,0,0,0.15); }
+
+/* === Conteúdo das abas === */
+.tabcontent { display:none; animation:fadeIn 0.4s; padding:10px; }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+/* === Inputs e Botões === */
+label { display:block; margin:10px 0 5px; font-weight:500; }
+input, select, button { padding:8px 10px; border-radius:6px; border:1px solid #ccc; font-size:0.95em; width:100%; }
+button:hover { opacity:0.9; }
+.btn { display:inline-block; font-size:0.85em; padding:5px 10px; margin:3px; border:none; border-radius:5px; cursor:pointer; transition:.2s; }
+.btn-editar { background:#FFB74D; color:white; }
+.btn-excluir { background:#E57373; color:white; }
+.btn-gerar { background:#2196F3; color:white; font-weight:600; }
+
+/* === Listas e Tabelas === */
+ul { list-style:none; padding-left:0; margin:5px 0; }
 li { margin-bottom:5px; }
+#consumidores { max-height:150px; overflow-y:auto; border:1px solid #ccc; padding:5px; border-radius:6px; background:#fafafa; }
 .saldo-positivo { color:green; font-weight:bold; }
 .saldo-negativo { color:red; font-weight:bold; }
-table { width:100%; border-collapse: collapse; font-size:0.8em; }
-table th, table td { border:1px solid #ccc; padding:4px; text-align:left; }
-table th { background:#eee; }
-h2,h3 { font-size:1em; margin:5px 0; }
-#consumidores { max-height:120px; overflow-y:auto; border:1px solid #ccc; padding:5px; border-radius:5px; }
-.instrucao { font-size:0.85em; color:#555; margin:5px 0; padding:6px; background:#f9f9f9; border-left:3px solid #4CAF50; border-radius:4px; }
+table { width:100%; border-collapse: collapse; font-size:0.85em; margin-top:10px; }
+table th, table td { border:1px solid #ddd; padding:6px; text-align:left; }
+table th { background:#f0f0f0; }
+h2,h3 { margin:10px 0 5px; }
+
+/* === Cards de Saldos e Transferências === */
+.card { background:#f9f9f9; padding:10px; margin:5px 0; border-left:4px solid #4CAF50; border-radius:6px; }
 </style>
 </head>
 <body>
-<header>Divisão de Mantimentos</header>
+<header>Divisão de Mantimentos - Elegante</header>
 <main>
 
   <div class="tab">
@@ -47,13 +60,9 @@ h2,h3 { font-size:1em; margin:5px 0; }
   <!-- Aba Professores -->
   <div id="professores" class="tabcontent" style="display:block;">
     <h2>Escolher Grupo</h2>
-    <p class="instrucao">Escolha um grupo para começar. Os professores do grupo serão usados em todas as divisões.</p>
-    <label>
-      <input type="radio" name="grupo" value="A" onclick="selecionarGrupo('A')"> Grupo A (Wanderson, Gu, Cris)
-    </label><br>
-    <label>
-      <input type="radio" name="grupo" value="B" onclick="selecionarGrupo('B')"> Grupo B (Gu, Emerson, Galeno)
-    </label>
+    <p class="card">Escolha um grupo. Os professores selecionados serão usados em todas as divisões.</p>
+    <label><input type="radio" name="grupo" value="A" onclick="selecionarGrupo('A')"> Grupo A (Wanderson, Gu, Cris)</label>
+    <label><input type="radio" name="grupo" value="B" onclick="selecionarGrupo('B')"> Grupo B (Gu, Emerson, Galeno)</label>
     
     <h3>Professores selecionados:</h3>
     <ul id="listaProfessores"></ul>
@@ -62,15 +71,13 @@ h2,h3 { font-size:1em; margin:5px 0; }
   <!-- Aba Compras -->
   <div id="compras" class="tabcontent">
     <h2>Registrar Compra</h2>
-    <p class="instrucao">Preencha todos os campos antes de salvar. O valor deve ser numérico e selecione pelo menos um consumidor.</p>
-    <label>Produto: <input id="produto" required placeholder="Ex: Arroz"/></label>
-    <label>Valor: <input id="valor" type="number" step="0.01" required placeholder="Ex: 25.50"/></label>
-    <label>Quem comprou:
-      <select id="comprador" required></select>
-    </label>
+    <p class="card">Preencha todos os campos e selecione pelo menos um consumidor. Valores devem ser numéricos.</p>
+    <label>Produto: <input id="produto" placeholder="Ex: Arroz"/></label>
+    <label>Valor (R$): <input id="valor" type="number" step="0.01" placeholder="Ex: 25.50"/></label>
+    <label>Quem comprou: <select id="comprador"></select></label>
     <label>Quem consumiu:</label>
     <div id="consumidores"></div>
-    <button onclick="addCompra()">Salvar Compra</button>
+    <button class="btn btn-gerar" onclick="addCompra()">Salvar Compra</button>
 
     <h3>Compras Registradas</h3>
     <div class="list">
@@ -78,7 +85,7 @@ h2,h3 { font-size:1em; margin:5px 0; }
         <thead>
           <tr>
             <th>Produto</th>
-            <th>Valor (R$)</th>
+            <th>Valor</th>
             <th>Comprador</th>
             <th>Consumidores</th>
             <th>Ações</th>
@@ -92,8 +99,8 @@ h2,h3 { font-size:1em; margin:5px 0; }
   <!-- Aba Saldos -->
   <div id="saldos" class="tabcontent">
     <h2>Saldos</h2>
-    <p class="instrucao">Clique em "Calcular" para ver quanto cada professor pagou, deveria pagar e qual o saldo final.</p>
-    <button onclick="calcular()">Calcular</button>
+    <p class="card">Clique em "Calcular" para ver os saldos e sugestões de acertos.</p>
+    <button class="btn btn-gerar" onclick="calcular()">Calcular</button>
     <div id="saldosLista"></div>
     <h3>Sugestão de Acertos</h3>
     <div id="transferencias"></div>
@@ -102,18 +109,15 @@ h2,h3 { font-size:1em; margin:5px 0; }
   <!-- Aba Relatório -->
   <div id="relatorio" class="tabcontent">
     <h2>Relatório PDF</h2>
-    <p class="instrucao">Clique no botão abaixo para gerar um relatório em PDF com todas as compras, saldos e sugestões de acertos.</p>
+    <p class="card">Clique abaixo para gerar PDF com todas as compras, saldos e transferências.</p>
     <button class="btn btn-gerar" onclick="gerarPDF()">Gerar Relatório PDF</button>
   </div>
 
 </main>
 
 <script>
-let professores = [];
-let compras = [];
-let editIndex = null;
+let professores=[], compras=[], editIndex=null;
 
-// Função de abas
 function openTab(evt, tabName){
   document.querySelectorAll(".tabcontent").forEach(tc=>tc.style.display="none");
   document.querySelectorAll(".tab button").forEach(tb=>tb.classList.remove("active"));
@@ -121,28 +125,17 @@ function openTab(evt, tabName){
   evt.currentTarget.classList.add("active");
 }
 
-// Seleção de grupo
 function selecionarGrupo(grupo){
-  if(grupo === "A"){
-    professores = ["Wanderson", "Gu", "Cris"];
-  } else if(grupo === "B"){
-    professores = ["Gu", "Emerson", "Galeno"];
-  }
+  professores = grupo==="A"?["Wanderson","Gu","Cris"]:["Gu","Emerson","Galeno"];
   atualizarUI();
 }
 
-// Atualiza interface
 function atualizarUI(){
-  const lista=document.getElementById("listaProfessores");
-  lista.innerHTML=professores.map(p=>`<li>${p}</li>`).join("");
-
-  document.getElementById("comprador").innerHTML=professores.map(p=>`<option value="${p}">${p}</option>`).join("");
-
-  document.getElementById("consumidores").innerHTML=professores.map(p=>`<label><input type="checkbox" value="${p}">${p}</label>`).join("<br>");
-
-  // Compras tabela
+  document.getElementById("listaProfessores").innerHTML = professores.map(p=>`<li>${p}</li>`).join("");
+  document.getElementById("comprador").innerHTML = professores.map(p=>`<option value="${p}">${p}</option>`).join("");
+  document.getElementById("consumidores").innerHTML = professores.map(p=>`<label><input type="checkbox" value="${p}">${p}</label>`).join("<br>");
   const tbody=document.querySelector("#tabelaCompras tbody");
-  tbody.innerHTML=compras.map((c,i)=>`
+  tbody.innerHTML = compras.map((c,i)=>`
     <tr>
       <td>${c.produto}</td>
       <td>${c.valor.toFixed(2)}</td>
@@ -150,45 +143,20 @@ function atualizarUI(){
       <td>${c.consumidores.join(", ")}</td>
       <td>
         <button class="btn btn-editar" onclick="editarCompra(${i})">Editar</button>
-        <button class="btn btn-excluir" onclick="excluirCompra(${i})">Apagar</button>
+        <button class="btn btn-excluir" onclick="excluirCompra(${i})">Excluir</button>
       </td>
-    </tr>
-  `).join("");
+    </tr>`).join("");
 }
 
-// Compras
 function addCompra(){
   const produto=document.getElementById("produto").value.trim();
   const valor=parseFloat(document.getElementById("valor").value);
   const comprador=document.getElementById("comprador").value;
-  const consumidores=Array.from(document.querySelectorAll("#consumidores input:checked")).map(c=>c.value);
-
-  if(!produto){
-    alert("Erro: informe o nome do produto.");
-    return;
-  }
-  if(isNaN(valor) || valor <= 0){
-    alert("Erro: o valor deve ser numérico e maior que zero.");
-    return;
-  }
-  if(!comprador){
-    alert("Erro: selecione quem comprou.");
-    return;
-  }
-  if(consumidores.length === 0){
-    alert("Erro: selecione pelo menos um consumidor.");
-    return;
-  }
-
-  if(editIndex!==null){ 
-    compras[editIndex]={produto,valor,comprador,consumidores}; 
-    editIndex=null; 
-  } else {
-    compras.push({produto,valor,comprador,consumidores});
-  }
-  document.getElementById("produto").value="";
-  document.getElementById("valor").value="";
-  document.querySelectorAll("#consumidores input").forEach(cb=>cb.checked=false);
+  const consumidores=[...document.querySelectorAll("#consumidores input:checked")].map(c=>c.value);
+  if(!produto || isNaN(valor) || valor<=0 || !comprador || consumidores.length===0){ alert("Preencha todos os campos corretamente."); return;}
+  const compra={produto, valor, comprador, consumidores};
+  if(editIndex!==null){ compras[editIndex]=compra; editIndex=null; } else { compras.push(compra); }
+  document.getElementById("produto").value=""; document.getElementById("valor").value=""; document.querySelectorAll("#consumidores input").forEach(c=>c.checked=false);
   atualizarUI();
 }
 
@@ -199,68 +167,67 @@ function editarCompra(i){
   document.getElementById("comprador").value=c.comprador;
   document.querySelectorAll("#consumidores input").forEach(cb=>cb.checked=c.consumidores.includes(cb.value));
   editIndex=i;
+  openTab({currentTarget:document.querySelector(".tab button[onclick*='compras']")},'compras');
 }
 
 function excluirCompra(i){ compras.splice(i,1); atualizarUI(); }
 
-// Saldos
 function calcular(){
-  if(compras.length === 0){
-    alert("Não há compras registradas. Adicione pelo menos uma compra.");
-    return;
-  }
-
-  let pagou={}, deveria={};
-  professores.forEach(p=>{pagou[p]=0;deveria[p]=0;});
+  if(professores.length===0){ alert("Selecione um grupo primeiro."); return;}
+  let saldos={}; professores.forEach(p=>saldos[p]=0);
   compras.forEach(c=>{
-    pagou[c.comprador]+=c.valor;
-    let p=c.valor/c.consumidores.length;
-    c.consumidores.forEach(cons=>{deveria[cons]+=p;});
+    const div=c.valor/c.consumidores.length;
+    c.consumidores.forEach(p=>saldos[p]-=div);
+    saldos[c.comprador]+=c.valor;
   });
-  const saldos=professores.map(p=>({nome:p,pagou:pagou[p],deveria:deveria[p],saldo:pagou[p]-deveria[p]}));
-  document.getElementById("saldosLista").innerHTML=saldos.map(s=>
-    `<p>${s.nome}: pagou R$${s.pagou.toFixed(2)}, deveria R$${s.deveria.toFixed(2)} → 
-     <span class="${s.saldo>=0?'saldo-positivo':'saldo-negativo'}">Saldo: R$${s.saldo.toFixed(2)}</span></p>`).join("");
-
-  // Transferencias
-  let devedores=saldos.filter(s=>s.saldo<-0.01).map(s=>({...s,saldo:-s.saldo}));
-  let credores=saldos.filter(s=>s.saldo>0.01).map(s=>({...s}));
-  let transf=[],i=0,j=0;
-  while(i<devedores.length && j<credores.length){
-    let val=Math.min(devedores[i].saldo, credores[j].saldo);
-    transf.push(`${devedores[i].nome} paga R$${val.toFixed(2)} para ${credores[j].nome}`);
-    devedores[i].saldo-=val; credores[j].saldo-=val;
-    if(devedores[i].saldo<0.01)i++; if(credores[j].saldo<0.01) j++;
+  const lista=document.getElementById("saldosLista");
+  lista.innerHTML="";
+  for(const p of professores){
+    const s=saldos[p];
+    const div=document.createElement("div");
+    div.className="card "+(s>=0?"saldo-positivo":"saldo-negativo");
+    div.textContent=`${p}: R$ ${s.toFixed(2)}`;
+    lista.appendChild(div);
   }
-  document.getElementById("transferencias").innerHTML=transf.length?transf.map(t=>`<p>${t}</p>`).join(""):"<p>Ninguém deve nada 🎉</p>";
+
+  // Sugestão de transferências
+  const transferencias=[];
+  let devedores=professores.filter(p=>saldos[p]<0).map(p=>({p, val:-saldos[p]}));
+  let credores=professores.filter(p=>saldos[p]>0).map(p=>({p, val:saldos[p]}));
+  for(const d of devedores){
+    for(const c of credores){
+      if(d.val>0 && c.val>0){
+        const v=Math.min(d.val,c.val);
+        transferencias.push({de:d.p, para:c.p, valor:v});
+        d.val-=v; c.val-=v;
+      }
+    }
+  }
+  const tDiv=document.getElementById("transferencias");
+  tDiv.innerHTML=transferencias.map(t=>`<div class="card">${t.de} paga R$ ${t.valor.toFixed(2)} para ${t.para}</div>`).join("");
 }
 
-// PDF
 function gerarPDF(){
-  if(compras.length === 0){
-    alert("Não há dados para gerar o relatório. Registre pelo menos uma compra.");
-    return;
-  }
-
-  calcular();
+  calcular(); // garante que saldos estão atualizados
   const { jsPDF } = window.jspdf;
-  const doc=new jsPDF();
-  doc.setFontSize(14); doc.text("Relatório de Mantimentos",105,15,null,null,"center");
-  let y=25; doc.setFontSize(10);
-  doc.text("Compras:",10,y); y+=8;
-  compras.forEach(c=>{doc.text(`${c.produto} - R$${c.valor.toFixed(2)} (Comprado por ${c.comprador}, Consumido por ${c.consumidores.join(", ")})`,10,y); y+=6; if(y>280){doc.addPage();y=20;}});
-  y+=10; doc.text("Saldos:",10,y); y+=8;
-  professores.forEach(p=>{const s=comprasSaldo(p); doc.text(`${p}: R$${s}`,10,y); y+=6;if(y>280){doc.addPage();y=20;}});
-  y+=10; doc.text("Sugestão de Acertos:",10,y); y+=8;
-  const t=document.getElementById("transferencias").innerText.split("\n");
-  t.forEach(ti=>{doc.text(ti,10,y); y+=6; if(y>280){doc.addPage();y=20;}});
+  const doc = new jsPDF();
+  doc.setFontSize(16); doc.text("Relatório de Mantimentos", 105, 15, {align:"center"});
+  let y=30;
+  doc.setFontSize(12);
+  compras.forEach(c=>{
+    doc.text(`${c.produto} - R$ ${c.valor.toFixed(2)} - Comprador: ${c.comprador} - Consumidores: ${c.consumidores.join(", ")}`, 15, y);
+    y+=8; if(y>280){ doc.addPage(); y=20; }
+  });
+  y+=10; doc.text("Saldos:",15,y); y+=8;
+  professores.forEach(p=>{
+    doc.text(`${p}: R$ ${saldos[p].toFixed(2)}`,15,y); y+=6; if(y>280){ doc.addPage(); y=20; }
+  });
+  y+=10; doc.text("Transferências Sugeridas:",15,y); y+=8;
+  const tDiv=document.getElementById("transferencias");
+  [...tDiv.children].forEach(div=>{
+    doc.text(div.textContent,15,y); y+=6; if(y>280){ doc.addPage(); y=20; }
+  });
   doc.save("relatorio_mantimentos.pdf");
-
-  function comprasSaldo(nome){
-    let pagou=0,deveria=0;
-    compras.forEach(c=>{if(c.comprador===nome)pagou+=c.valor; if(c.consumidores.includes(nome))deveria+=c.valor/c.consumidores.length;});
-    return (pagou-deveria).toFixed(2);
-  }
 }
 </script>
 </body>
