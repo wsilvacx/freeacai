@@ -102,6 +102,18 @@ let professores = ["Galeno", "Wanderson", "Cris", "Gu", "Emerson", "Vitor"];
 let compras = [];
 let editIndex = null;
 
+// ===== Persistência com localStorage =====
+function salvarDados(){
+  localStorage.setItem("professores", JSON.stringify(professores));
+  localStorage.setItem("compras", JSON.stringify(compras));
+}
+function carregarDados(){
+  const p = localStorage.getItem("professores");
+  const c = localStorage.getItem("compras");
+  if(p) professores = JSON.parse(p);
+  if(c) compras = JSON.parse(c);
+}
+
 // Função de abas
 function openTab(evt, tabName){
   document.querySelectorAll(".tabcontent").forEach(tc=>tc.style.display="none");
@@ -133,6 +145,8 @@ function atualizarUI(){
       </td>
     </tr>
   `).join("");
+
+  salvarDados(); // salva sempre que atualizar interface
 }
 
 // Professores
@@ -222,6 +236,8 @@ function gerarPDF(){
   }
 }
 
+// Inicialização
+carregarDados();
 atualizarUI();
 </script>
 </body>
