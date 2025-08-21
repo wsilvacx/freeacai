@@ -30,6 +30,14 @@
   .muted{color:var(--muted);font-size:13px}
   .controls{display:flex;gap:8px;align-items:center}
   @media (max-width:720px){ .grid{grid-template-columns:1fr} .balances{flex-direction:column} }
+
+  /* estilos para exportação (garante fundo branco e espaçamento) */
+  .export-wrapper { background: #fff; color: #111; padding: 18px; border-radius: 8px; width: 900px; box-sizing: border-box; }
+  .export-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+  .export-sub { font-size: 13px; color: var(--muted); margin-bottom: 12px; }
+  .export-portion { margin-bottom: 12px; }
+  /* evitar overflow na imagem */
+  .no-scroll { overflow: visible !important; max-height: none !important; }
 </style>
 </head>
 <body>
@@ -40,8 +48,9 @@
       <small class="muted">Grupos configurados: A (Wanderson, Gu, Cris) — B (Gu, Galeno, Emerson)</small>
     </div>
     <div class="controls">
-      <button id="exportBtn" title="Exportar histórico (.json)">Exportar</button>
+      <button id="exportJsonBtn" title="Exportar histórico (.json)">Exportar JSON</button>
       <button id="importBtn" title="Importar histórico (.json)">Importar</button>
+      <button id="exportPngBtn" title="Exportar tabela + acerto como PNG">Exportar PNG</button>
       <button id="resetBtn" class="danger" title="Apagar todos os dados">Resetar dados</button>
     </div>
   </header>
@@ -112,6 +121,9 @@
   <footer style="margin-top:12px" class="muted">Sistema local — dados armazenados no seu navegador. Feito para uso prático — ajuste os nomes e grupos se precisar.</footer>
 </div>
 
+<!-- html2canvas CDN (usado para gerar PNG) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
 <script>
 (() => {
   // CONFIGURAÇÃO INICIAL: nomes e grupos
@@ -133,9 +145,10 @@
   const settlementList = document.getElementById('settlementList');
   const noSettlements = document.getElementById('noSettlements');
   const toggleAllBtn = document.getElementById('toggleAllBtn');
-  const exportBtn = document.getElementById('exportBtn');
+  const exportJsonBtn = document.getElementById('exportJsonBtn');
   const importBtn = document.getElementById('importBtn');
   const resetBtn = document.getElementById('resetBtn');
+  const exportPngBtn = document.getElementById('exportPngBtn');
 
   // Local storage key
   const STORAGE_KEY = 'despesas_casa_professores_v1';
@@ -401,8 +414,8 @@
     settlementList.appendChild(ul);
   }
 
-  // Export / Import
-  exportBtn.addEventListener('click', () => {
+  // Export JSON
+  exportJsonBtn.addEventListener('click', () => {
     const data = {
       generated_at: new Date().toISOString(),
       expenses,
@@ -417,6 +430,7 @@
     URL.revokeObjectURL(url);
   });
 
+  // Import
   importBtn.addEventListener('click', () => {
     const input = document.createElement('input');
     input.type = 'file';
@@ -451,6 +465,90 @@
     saveExpenses();
     renderLedger();
     renderBalancesAndSettlements();
+  });
+
+  // === EXPORTAR PNG: tabela + sugestão de acerto ===
+  exportPngBtn.addEventListener('click', async () => {
+    try {
+      // montar um wrapper limpo com conteúdo que queremos exportar
+      const wrapper = document.createElement('div');
+      wrapper.className = 'export-wrapper';
+      // título e metadata
+      const title = document.createElement('div');
+      title.className = 'export-title';
+      title.textContent = 'Divisão de Despesas — Casa dos Professores';
+      const sub = document.createElement('div');
+      sub.className = 'export-sub';
+      const now = new Date();
+      sub.textContent = 'Gerado em: ' + now.toLocaleString('pt-BR');
+
+      wrapper.appendChild(title);
+      wrapper.appendChild(sub);
+
+      // clonar a tabela inteira (sem barras de rolagem)
+      const ledgerTable = document.getElementById('ledgerTable');
+      const ledgerClone = ledgerTable.cloneNode(true);
+      ledgerClone.classList.add('no-scroll');
+      // remover botões "Remover" da cópia
+      ledgerClone.querySelectorAll('button').forEach(b => b.remove());
+      const ledgerPortion = document.createElement('div');
+      ledgerPortion.className = 'export-portion';
+      const hLedger = document.createElement('div'); hLedger.style.fontWeight='600'; hLedger.style.marginBottom='6px'; hLedger.textContent='Histórico de despesas';
+      ledgerPortion.appendChild(hLedger);
+      ledgerPortion.appendChild(ledgerClone);
+      wrapper.appendChild(ledgerPortion);
+
+      // clonar settlements (sugestão de acerto)
+      const settlementsOrig = document.getElementById('settlementsContainer');
+      const settlementsClone = settlementsOrig.cloneNode(true);
+      // remover controles internos se tiverem (não há), garantir estilo
+      settlementsClone.classList.add('no-scroll');
+      const settlePortion = document.createElement('div');
+      settlePortion.className = 'export-portion';
+      const hSettle = document.createElement('div'); hSettle.style.fontWeight='600'; hSettle.style.marginBottom='6px'; hSettle.textContent='Sugestão de acerto';
+      settlePortion.appendChild(hSettle);
+      settlePortion.appendChild(settlementsClone);
+      wrapper.appendChild(settlePortion);
+
+      // renderizar em um container invisível no documento para capturar estilos
+      wrapper.style.position = 'fixed';
+      wrapper.style.left = '-10000px';
+      wrapper.style.top = '0';
+      document.body.appendChild(wrapper);
+
+      // Esperar um momento para o layout se estabilizar (rápido)
+      await new Promise(r => setTimeout(r, 50));
+
+      // usar html2canvas para capturar (scale 2 para melhor resolução)
+      const canvas = await html2canvas(wrapper, {
+        backgroundColor: '#ffffff',
+        scale: 2,
+        useCORS: true,
+        logging: false
+      });
+
+      // converter para blob e disparar download
+      canvas.toBlob(blob => {
+        if(!blob) {
+          alert('Falha ao gerar imagem.');
+          document.body.removeChild(wrapper);
+          return;
+        }
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const ts = now.toISOString().slice(0,19).replace(/[:T]/g,'-');
+        a.download = `despesas_acerto_${ts}.png`;
+        a.click();
+        URL.revokeObjectURL(url);
+        // remover wrapper
+        document.body.removeChild(wrapper);
+      }, 'image/png');
+
+    } catch (err) {
+      alert('Erro ao exportar PNG: ' + (err && err.message ? err.message : err));
+      console.error(err);
+    }
   });
 
   // iniciar
