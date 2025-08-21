@@ -32,12 +32,12 @@
   @media (max-width:720px){ .grid{grid-template-columns:1fr} .balances{flex-direction:column} }
 
   /* estilos para exportação (garante fundo branco e espaçamento) */
-  .export-wrapper { background: #fff; color: #111; padding: 18px; border-radius: 8px; width: 900px; box-sizing: border-box; }
+  .export-wrapper { background: #fff; color: #111; padding: 18px; border-radius: 8px; width: 900px; box-sizing: border-box; font-family: inherit; }
   .export-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
   .export-sub { font-size: 13px; color: var(--muted); margin-bottom: 12px; }
   .export-portion { margin-bottom: 12px; }
-  /* evitar overflow na imagem */
   .no-scroll { overflow: visible !important; max-height: none !important; }
+  .export-balance-card { min-width:150px; padding:8px; border-radius:8px; background:#f7fafc; display:flex; flex-direction:column; gap:6px; }
 </style>
 </head>
 <body>
@@ -354,6 +354,7 @@
       p.style.fontSize = '16px';
       p.style.marginBottom = '6px';
       p.textContent = balFmt;
+      p.style.color = balance > 0 ? '#2e7d32' : (balance < 0 ? '#c62828' : '#333');
       div.appendChild(h4);
       div.appendChild(p);
       div.appendChild(small);
@@ -467,9 +468,10 @@
     renderBalancesAndSettlements();
   });
 
-  // === EXPORTAR PNG: tabela + sugestão de acerto ===
+  // === EXPORTAR PNG: incluir saldos (coloridos), tabela + sugestão de acerto ===
   exportPngBtn.addEventListener('click', async () => {
     try {
+      const fmt = new Intl.NumberFormat('pt-BR', {style:'currency', currency:'BRL'});
       // montar um wrapper limpo com conteúdo que queremos exportar
       const wrapper = document.createElement('div');
       wrapper.className = 'export-wrapper';
@@ -484,6 +486,45 @@
 
       wrapper.appendChild(title);
       wrapper.appendChild(sub);
+
+      // SALDOS (coloridos) - construir manualmente a partir do cálculo atual
+      const net = calculateNetBalances(); // em centavos
+      const balancesPortion = document.createElement('div');
+      balancesPortion.className = 'export-portion';
+      const hBal = document.createElement('div'); hBal.style.fontWeight='600'; hBal.style.marginBottom='6px'; hBal.textContent='Saldos';
+      balancesPortion.appendChild(hBal);
+      const balGrid = document.createElement('div');
+      balGrid.style.display = 'flex';
+      balGrid.style.gap = '8px';
+      balGrid.style.flexWrap = 'wrap';
+      uniquePeople.forEach(name => {
+        const balance = net[name] || 0;
+        const card = document.createElement('div');
+        card.className = 'export-balance-card';
+        card.style.minWidth = '140px';
+        card.style.padding = '8px';
+        card.style.borderRadius = '8px';
+        card.style.background = '#f7fafc';
+        card.style.display = 'flex';
+        card.style.flexDirection = 'column';
+        card.style.alignItems = 'flex-start';
+        const nm = document.createElement('div');
+        nm.style.fontWeight = '700';
+        nm.textContent = name;
+        const amt = document.createElement('div');
+        amt.style.fontSize = '16px';
+        amt.style.marginTop = '6px';
+        amt.textContent = fmt.format(balance / 100);
+        // cores: verde para positivo, vermelho para negativo, cinza para zero
+        if(balance > 0) amt.style.color = '#2e7d32';
+        else if(balance < 0) amt.style.color = '#c62828';
+        else amt.style.color = '#333';
+        card.appendChild(nm);
+        card.appendChild(amt);
+        balGrid.appendChild(card);
+      });
+      balancesPortion.appendChild(balGrid);
+      wrapper.appendChild(balancesPortion);
 
       // clonar a tabela inteira (sem barras de rolagem)
       const ledgerTable = document.getElementById('ledgerTable');
@@ -501,7 +542,6 @@
       // clonar settlements (sugestão de acerto)
       const settlementsOrig = document.getElementById('settlementsContainer');
       const settlementsClone = settlementsOrig.cloneNode(true);
-      // remover controles internos se tiverem (não há), garantir estilo
       settlementsClone.classList.add('no-scroll');
       const settlePortion = document.createElement('div');
       settlePortion.className = 'export-portion';
