@@ -1,232 +1,194 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Controle de Compras</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Consumidores e Compras</title>
 <style>
-  /* Estilos existentes */
-  body {
-    font-family: Arial, sans-serif;
-    background-color: #f2f2f2;
-  }
-  #toast {
-    visibility: hidden;
-    min-width: 250px;
-    background-color: #333;
-    color: white;
-    text-align: center;
-    border-radius: 5px;
-    padding: 15px;
-    position: fixed;
-    z-index: 9999;
-    left: 50%;
-    bottom: 30px;
-    font-size: 17px;
-    transform: translateX(-50%);
-  }
-  #toast.show {
-    visibility: visible;
-    animation: fadein 0.5s, fadeout 0.5s 2.5s;
-  }
-  @keyframes fadein {
-    from {bottom: 0; opacity: 0;}
-    to {bottom: 30px; opacity: 1;}
-  }
-  @keyframes fadeout {
-    from {bottom: 30px; opacity: 1;}
-    to {bottom: 0; opacity: 0;}
-  }
+body {
+  font-family: 'Arial', sans-serif;
+  background: #f7f7f7;
+  margin:0;
+  padding:20px;
+}
 
-  /* Modal customizada */
-  .modal {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.5);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 10000;
-  }
-  .modal-content {
-    background: white;
-    padding: 20px 30px;
-    border-radius: 8px;
-    max-width: 320px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-    text-align: center;
-    font-size: 1em;
-  }
-  .modal-buttons {
-    margin-top: 20px;
-    display: flex;
-    justify-content: space-around;
-  }
-  .btn {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  .btn-gerar {
-    background-color: #4CAF50;
-    color: white;
-  }
+/* Container de cards */
+.cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 15px;
+}
+
+/* Card individual */
+.card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 15px 20px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
+}
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.12);
+}
+
+/* Card header */
+.card h3 {
+  margin:0 0 8px 0;
+  font-size:1.1em;
+  color:#333;
+  font-weight:600;
+}
+
+/* Saldo */
+.card .saldo {
+  font-size:1em;
+  font-weight:700;
+  margin-bottom:8px;
+}
+.card .saldo-positivo { color:#4CAF50; }
+.card .saldo-negativo { color:#f44336; }
+
+/* Lista de compras dentro do card */
+.card ul {
+  list-style:none;
+  padding-left:0;
+  margin:0;
+}
+.card ul li {
+  font-size:0.9em;
+  padding:4px 0;
+  border-bottom:1px dashed #eee;
+}
+.card ul li:last-child {
+  border-bottom:none;
+}
+
+/* Botões de ação no card */
+.card .btn-card {
+  position:absolute;
+  top:12px;
+  right:12px;
+  display:flex;
+  gap:6px;
+}
+.card .btn-editar { background:#ff9800; color:#fff; padding:4px 8px; font-size:0.8em; border-radius:6px; cursor:pointer; }
+.card .btn-excluir { background:#f44336; color:#fff; padding:4px 8px; font-size:0.8em; border-radius:6px; cursor:pointer; }
+
+/* Scroll do container */
+.cards-container {
+  max-height:450px;
+  overflow-y:auto;
+}
+.cards-container::-webkit-scrollbar {
+  width:6px;
+}
+.cards-container::-webkit-scrollbar-thumb {
+  background:#4CAF50;
+  border-radius:3px;
+}
+.cards-container::-webkit-scrollbar-track {
+  background:#f0f0f0;
+}
 </style>
 </head>
 <body>
 
-<h1>Controle de Compras</h1>
-
-<!-- Grupos -->
-<div>
-  <label><input type="radio" id="grupoA" name="grupo" value="A" checked /> Grupo A</label>
-  <label><input type="radio" id="grupoB" name="grupo" value="B" /> Grupo B</label>
-</div>
-
-<!-- Outras partes do formulário / interface aqui -->
-
-<!-- Toast para mensagens -->
-<div id="toast" class="toast"></div>
-
-<!-- Modal de confirmação -->
-<div id="modalConfirm" class="modal">
-  <div class="modal-content">
-    <p id="modalMessage"></p>
-    <div class="modal-buttons">
-      <button id="modalBtnYes" class="btn btn-gerar">Sim</button>
-      <button id="modalBtnNo" class="btn" style="background:#ddd">Não</button>
-    </div>
-  </div>
-</div>
+<h1>Consumidores e Compras</h1>
+<div id="consumidores" class="cards-container"></div>
 
 <script>
-  // Estado global (exemplo)
-  const state = {
-    compras: [],
-    professores: ["Wanderson", "Gu", "Cris"], // exemplo grupo A
-  };
-
-  // Função para mostrar toast (mensagem rápida)
-  function showToast(message) {
-    const toast = document.getElementById("toast");
-    toast.textContent = message;
-    toast.className = "toast show";
-    setTimeout(() => {
-      toast.className = toast.className.replace("show", "");
-    }, 3000);
+// Dados de exemplo
+const consumidores = [
+  {
+    nome: "Maria Silva",
+    saldo: 45,
+    compras: [
+      {item:"Arroz", valor:15},
+      {item:"Feijão", valor:10},
+      {item:"Leite", valor:20}
+    ]
+  },
+  {
+    nome: "João Souza",
+    saldo: -30,
+    compras: [
+      {item:"Pão", valor:5},
+      {item:"Manteiga", valor:10},
+      {item:"Café", valor:15}
+    ]
+  },
+  {
+    nome: "Ana Costa",
+    saldo: 120,
+    compras: [
+      {item:"Frutas", valor:50},
+      {item:"Verduras", valor:30},
+      {item:"Carnes", valor:40}
+    ]
   }
+];
 
-  // Função para mostrar modal de confirmação e retornar Promise
-  function showConfirm(message) {
-    return new Promise((resolve) => {
-      const modal = document.getElementById('modalConfirm');
-      const msgEl = document.getElementById('modalMessage');
-      const btnYes = document.getElementById('modalBtnYes');
-      const btnNo = document.getElementById('modalBtnNo');
+// Função para gerar cards
+function gerarCards() {
+  const container = document.getElementById('consumidores');
+  container.innerHTML = ''; // Limpa antes de gerar
 
-      msgEl.textContent = message;
-      modal.style.display = 'flex';
-
-      function cleanup() {
-        modal.style.display = 'none';
-        btnYes.removeEventListener('click', onYes);
-        btnNo.removeEventListener('click', onNo);
-      }
-
-      function onYes() {
-        cleanup();
-        resolve(true);
-      }
-
-      function onNo() {
-        cleanup();
-        resolve(false);
-      }
-
-      btnYes.addEventListener('click', onYes);
-      btnNo.addEventListener('click', onNo);
+  consumidores.forEach((c, index) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    
+    // Nome
+    const nome = document.createElement('h3');
+    nome.textContent = c.nome;
+    card.appendChild(nome);
+    
+    // Saldo
+    const saldo = document.createElement('div');
+    saldo.className = 'saldo ' + (c.saldo >=0 ? 'saldo-positivo':'saldo-negativo');
+    saldo.textContent = `R$ ${c.saldo.toFixed(2)}`;
+    card.appendChild(saldo);
+    
+    // Lista de compras
+    const ul = document.createElement('ul');
+    c.compras.forEach(compra => {
+      const li = document.createElement('li');
+      li.textContent = `${compra.item} - R$ ${compra.valor.toFixed(2)}`;
+      ul.appendChild(li);
     });
-  }
-
-  // Função utilitária para comparar arrays (para decidir grupo)
-  function arraysEqual(a, b) {
-    if(a.length !== b.length) return false;
-    for(let i=0; i < a.length; i++){
-      if(a[i] !== b[i]) return false;
-    }
-    return true;
-  }
-
-  // Função para salvar estado (exemplo)
-  function saveState(){
-    // Pode salvar no localStorage ou outra forma
-    localStorage.setItem("comprasAppState", JSON.stringify(state));
-  }
-
-  // Função para atualizar UI com base no estado
-  function atualizarUI(){
-    // Atualize os elementos da página conforme necessário
-  }
-
-  // Função para lidar com troca de grupo (exemplo)
-  async function selecionarGrupo(grupo, perguntar = true){
-    if(state.compras && state.compras.length > 0 && perguntar){
-      const ok = await showConfirm("Existem compras registradas. Deseja limpar as compras ao mudar de grupo? (Cancelar mantém as compras)");
-      if(ok){
-        state.compras = [];
-        showToast("Compras limpas.");
-        // Continua troca de grupo
-      } else {
-        // Se cancelar, desfaz troca de radio para grupo atual
-        if(state.professores.length > 0){
-          if(arraysEqual(state.professores, ["Wanderson","Gu","Cris"])) document.getElementById("grupoA").checked = true;
-          else if(arraysEqual(state.professores, ["Gu","Emerson","Galeno"])) document.getElementById("grupoB").checked = true;
-        }
-        return; // cancela troca
+    card.appendChild(ul);
+    
+    // Botões
+    const btnDiv = document.createElement('div');
+    btnDiv.className = 'btn-card';
+    
+    const btnEditar = document.createElement('button');
+    btnEditar.className = 'btn-editar';
+    btnEditar.textContent = 'Editar';
+    btnEditar.onclick = () => alert(`Editar ${c.nome}`);
+    
+    const btnExcluir = document.createElement('button');
+    btnExcluir.className = 'btn-excluir';
+    btnExcluir.textContent = 'Excluir';
+    btnExcluir.onclick = () => {
+      if(confirm(`Deseja excluir ${c.nome}?`)){
+        consumidores.splice(index,1);
+        gerarCards();
       }
-    }
-    // Define professores conforme grupo
-    if(grupo === "A"){
-      state.professores = ["Wanderson", "Gu", "Cris"];
-      document.getElementById("grupoA").checked = true;
-    } else if(grupo === "B"){
-      state.professores = ["Gu", "Emerson", "Galeno"];
-      document.getElementById("grupoB").checked = true;
-    }
-    saveState();
-    atualizarUI();
-    showToast(`Grupo ${grupo} selecionado.`);
-  }
-
-  // Evento para mudança dos grupos
-  document.getElementById("grupoA").addEventListener("change", () => {
-    if(document.getElementById("grupoA").checked) {
-      selecionarGrupo("A");
-    }
+    };
+    
+    btnDiv.appendChild(btnEditar);
+    btnDiv.appendChild(btnExcluir);
+    card.appendChild(btnDiv);
+    
+    container.appendChild(card);
   });
-  document.getElementById("grupoB").addEventListener("change", () => {
-    if(document.getElementById("grupoB").checked) {
-      selecionarGrupo("B");
-    }
-  });
+}
 
-  // Exemplo para substituir alert simples
-  // Suponha que você tenha código que fazia:
-  // alert("Erro: informe o nome do produto.");
-  // Substituir por:
-  // showToast("Erro: informe o nome do produto.");
-
-  // Você pode usar assim no código:
-  /*
-  if(!nomeProduto) {
-    showToast("Erro: informe o nome do produto.");
-    return;
-  }
-  */
-
-  // Inicialização
-  atualizarUI();
+// Gera cards ao carregar a página
+gerarCards();
 </script>
+
 </body>
 </html>
