@@ -1,122 +1,373 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Divisão de Mantimentos</title>
-<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Divisão de Mantimentos — Versão Moderna</title>
+
+<!-- Tipografia -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+<!-- Icons (Material Symbols) -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,0,0" />
+
 <!-- jsPDF e autoTable -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
 <style>
-body { font-family: 'Roboto', sans-serif; background: #f0f2f5; margin:0; padding:0 0 50px 0; font-size:14px; }
-header { text-align:center; padding:15px; background:#4CAF50; color:white; font-size:1.4em; }
-main { max-width: 600px; margin: 10px auto; background:#fff; border-radius:8px; box-shadow:0 3px 8px rgba(0,0,0,0.1); padding:12px; }
-.tab { display:flex; flex-wrap: wrap; margin-bottom:5px; }
-.tab button { flex:1; padding:10px; font-size:1em; cursor:pointer; background:#eee; border:none; font-weight:600; transition:.3s; border-radius:5px 5px 0 0; margin-right:2px; }
-.tab button.active { background:#4CAF50; color:white; box-shadow:0 2px 5px rgba(0,0,0,0.2); }
-.tabcontent { display:none; padding:10px; }
-label { display:block; margin:5px 0 3px; font-weight:500; }
-input, select, button { padding:6px 8px; margin-top:3px; font-size:0.9em; border-radius:5px; border:1px solid #ccc; }
-button:hover { opacity:.9; }
-.btn { font-size:0.7em; padding:3px 6px; margin-right:2px; border:none; border-radius:4px; cursor:pointer; }
-.btn-editar { background:#ffb74d; color:#fff; }
-.btn-excluir { background:#e57373; color:#fff; }
-.btn-gerar { background:#2196F3; color:white; margin-top:5px; padding:6px 10px; font-size:0.9em; }
-ul { list-style:none; padding-left:0; margin:0; }
-li { margin-bottom:5px; }
-.saldo-positivo { color:green; font-weight:bold; }
-.saldo-negativo { color:red; font-weight:bold; }
-table { width:100%; border-collapse: collapse; font-size:0.85em; margin-top:6px;}
-table th, table td { border:1px solid #ccc; padding:6px; text-align:left; }
-table th { background:#eee; }
-h2,h3 { font-size:1em; margin:5px 0; }
-#consumidores { max-height:120px; overflow-y:auto; border:1px solid #ccc; padding:5px; border-radius:5px; }
-.instrucao { font-size:0.85em; color:#555; margin:5px 0; padding:6px; background:#f9f9f9; border-left:3px solid #4CAF50; border-radius:4px; }
-
-/* Toast */
-.toast {
-  position: fixed;
-  right: 20px;
-  bottom: 60px;
-  background: rgba(0,0,0,0.85);
-  color: #fff;
-  padding: 10px 14px;
-  border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  opacity: 0;
-  transform: translateY(10px);
-  transition: opacity .25s, transform .25s;
-  z-index: 9999;
-}
-.toast.show { opacity: 1; transform: translateY(0); }
-
-/* Rodapé do sistema (desenvolvedor) */
-.site-footer {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 40px;
-  background: #263238;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size:0.9em;
-  box-shadow: 0 -2px 6px rgba(0,0,0,0.15);
-  z-index: 999;
+:root{
+  --bg: #f6f8fb;
+  --card: #ffffff;
+  --text: #273143;
+  --muted: #6b7280;
+  --brand-1: #7dd3fc;  /* azul claro */
+  --brand-2: #a7f3d0;  /* verde água */
+  --brand-3: #c7d2fe;  /* lilás */
+  --accent: #4f46e5;   /* índigo */
+  --ok: #16a34a;
+  --warn: #ef4444;
+  --shadow: 0 8px 24px rgba(17, 24, 39, .08);
+  --radius: 14px;
+  --radius-sm: 10px;
+  --transition: 220ms cubic-bezier(.2,.8,.2,1);
 }
 
-/* Small responsive tweak */
-@media (max-width:520px){ main{margin:6px;} .tab button{font-size:0.9em; padding:8px;} .toast{right:10px; left:10px;} }
+/* page */
+*{ box-sizing: border-box; }
+html, body{ height:100%; }
+body{
+  margin:0;
+  background:
+    radial-gradient(1200px 600px at 10% -10%, rgba(167,243,208,.25), transparent 60%),
+    radial-gradient(1000px 500px at 110% 0%, rgba(125,211,252,.30), transparent 60%),
+    var(--bg);
+  color: var(--text);
+  font: 400 15px/1.5 'Poppins', 'Roboto', system-ui, -apple-system, Segoe UI, Arial, sans-serif;
+  letter-spacing:.2px;
+}
+
+/* header */
+header{
+  position: sticky; top:0; z-index:10;
+  padding:16px clamp(12px, 3vw, 24px);
+  background: linear-gradient(135deg, rgba(79,70,229,.95), rgba(14,165,233,.95));
+  color:#fff;
+  backdrop-filter: blur(6px);
+  box-shadow: var(--shadow);
+}
+.header-wrap{
+  max-width:1100px; margin:0 auto; display:flex; align-items:center; gap:12px;
+}
+.header-icon{
+  display:grid; place-items:center; width:40px; height:40px; border-radius:12px;
+  background: linear-gradient(135deg, rgba(255,255,255,.3), rgba(255,255,255,.1));
+}
+header h1{ margin:0; font-size:clamp(18px, 2.6vw, 22px); letter-spacing:.3px; font-weight:600; }
+
+/* main container */
+main{
+  max-width:1100px;
+  margin:18px auto 80px;
+  padding:0 clamp(10px, 3vw, 18px);
+}
+
+/* tabs */
+.tab{
+  display:flex; flex-wrap:wrap; gap:8px;
+  margin-bottom:12px;
+}
+.tab button{
+  appearance:none; border:none; cursor:pointer;
+  padding:10px 14px; font-weight:600; border-radius:999px;
+  background: linear-gradient(135deg, #eef2ff, #ecfeff);
+  color:#334155;
+  box-shadow: 0 2px 0 rgba(0,0,0,.04) inset;
+  transition: transform var(--transition), box-shadow var(--transition), background var(--transition);
+}
+.tab button:hover{ transform: translateY(-1px); }
+.tab button.active{
+  background: linear-gradient(135deg, var(--brand-3), var(--brand-1));
+  box-shadow: var(--shadow);
+  color:#111827;
+}
+
+.tabcontent{ display:none; }
+.tabcontent.active{ display:block; }
+
+/* section shells */
+.section{
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: clamp(12px, 2.4vw, 18px);
+}
+
+/* helpers */
+h2{ font-size:1rem; margin:0 0 8px; font-weight:600; }
+h3{ font-size:.95rem; margin:12px 0 8px; font-weight:600; }
+p.instrucao{
+  margin:8px 0 12px;
+  padding:10px 12px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  color: var(--muted);
+  border:1px solid #e5e7eb;
+}
+
+/* group selector */
+.group-grid{
+  display:grid; gap:10px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+.group-card{
+  display:flex; gap:12px; align-items:center;
+  background: linear-gradient(135deg, #ffffff, #fbfdff);
+  border:1px solid #eef2f7;
+  padding:12px; border-radius: var(--radius);
+  transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+}
+.group-card:hover{ transform: translateY(-2px); box-shadow: var(--shadow); border-color:#e5e7eb; }
+.group-card input{ accent-color: var(--accent); width:18px; height:18px; }
+.group-card strong{ display:block; }
+
+/* professor cards (saldos) */
+.card-grid{
+  display:grid; gap:14px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+.prof-card{
+  display:flex; flex-direction:column; gap:10px;
+  background: linear-gradient(160deg, #ffffff 0%, #fafcff 60%, #f8fbff 100%);
+  border:1px solid #eef2f7;
+  border-radius: var(--radius);
+  padding:14px;
+  transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+}
+.prof-card:hover{ transform: translateY(-3px); box-shadow: var(--shadow); border-color:#e5e7eb; }
+.prof-head{
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+}
+.prof-name{
+  display:flex; align-items:center; gap:10px; font-weight:600;
+}
+.prof-name .avatar{
+  width:36px; height:36px; border-radius:50%;
+  background: linear-gradient(135deg, var(--brand-1), var(--brand-3));
+  display:grid; place-items:center; color:#111827; font-weight:700;
+}
+.badge{
+  padding:4px 10px; border-radius:999px; font-size:.8rem; font-weight:600;
+  border:1px solid #e5e7eb; background:#fff;
+}
+.badge.ok{ color:var(--ok); border-color: rgba(22,163,74,.25); background: rgba(16,185,129,.06); }
+.badge.neg{ color:var(--warn); border-color: rgba(239,68,68,.25); background: rgba(239,68,68,.06); }
+
+.prof-body{
+  display:flex; gap:12px; align-items:flex-start;
+}
+.prof-col{
+  flex:1 1 50%;
+}
+.prof-label{ font-size:.8rem; color:var(--muted); margin-bottom:4px; }
+.prof-amount{ font-size:1.05rem; font-weight:600; }
+
+/* compras list inside card */
+.card-list{
+  max-height: 140px; overflow:auto; padding-right:4px;
+  border:1px dashed #e5e7eb; border-radius: var(--radius-sm);
+  background: #fff;
+}
+.list-item{
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  padding:8px 10px; border-bottom:1px solid #f1f5f9;
+}
+.list-item:last-child{ border-bottom:none; }
+.list-item .left{
+  display:flex; flex-direction:column;
+}
+.list-item .title{ font-weight:600; font-size:.92rem; }
+.list-item .meta{ font-size:.8rem; color:var(--muted); }
+
+/* purchases table (aba Compras) */
+.table-wrap{
+  background: var(--card); border:1px solid #eef2f7; border-radius: var(--radius);
+  box-shadow: var(--shadow); overflow:auto; white-space: nowrap;
+}
+table{ width:100%; border-collapse: collapse; font-size:.9rem; }
+th, td{ text-align:left; padding:10px 12px; border-bottom:1px solid #eef2f7; }
+th{ background: linear-gradient(180deg, #fafcff, #f6f8fb); position: sticky; top:0; z-index:1; }
+
+/* bottões */
+.button{
+  appearance:none; border:none; cursor:pointer;
+  padding:10px 12px; border-radius: 10px;
+  font-weight:600; display:inline-flex; align-items:center; gap:8px;
+  background: linear-gradient(135deg, #eef2ff, #ecfeff);
+  transition: transform var(--transition), box-shadow var(--transition), opacity var(--transition), background var(--transition);
+}
+.button:hover{ transform: translateY(-1px); box-shadow: var(--shadow); }
+.button.primary{
+  background: linear-gradient(135deg, #c7d2fe, #a7f3d0);
+}
+.button.danger{
+  background: linear-gradient(135deg, #fee2e2, #fff1f2);
+  color:#b91c1c;
+}
+.icon{ font-family: 'Material Symbols Rounded'; font-size:20px; line-height:0; }
+
+/* FAB */
+.fab{
+  position: fixed; right: 18px; bottom: 76px; z-index: 50;
+  width:56px; height:56px; border-radius:50%;
+  display:grid; place-items:center;
+  border:none; cursor:pointer; color:#fff;
+  background: linear-gradient(135deg, #4f46e5, #06b6d4);
+  box-shadow: 0 10px 28px rgba(79,70,229,.35);
+  transition: transform var(--transition), box-shadow var(--transition), opacity var(--transition);
+}
+.fab:hover{ transform: translateY(-2px) scale(1.02); box-shadow: 0 12px 32px rgba(79,70,229,.45); }
+
+/* modal */
+.modal{
+  position: fixed; inset:0; display:none; place-items:center; z-index:1000;
+}
+.modal.open{ display:grid; }
+.modal-backdrop{
+  position:absolute; inset:0; background: rgba(15,23,42,.45);
+  backdrop-filter: blur(3px);
+  animation: fadeIn .22s ease-out;
+}
+@keyframes fadeIn{ from{opacity:.0} to{opacity:1} }
+.modal-card{
+  position:relative; width:min(640px, 94vw);
+  background:#fff; border-radius:16px; box-shadow: var(--shadow);
+  overflow:hidden;
+  transform: translateY(6px);
+  animation: slideUp var(--transition) forwards;
+}
+@keyframes slideUp{ to{ transform: translateY(0);} }
+.modal-head{
+  padding:14px 16px;
+  background: linear-gradient(135deg, #eef2ff, #ecfeff);
+  border-bottom:1px solid #e5e7eb;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.modal-title{ font-weight:600; }
+.modal-body{ padding:14px 16px; display:grid; gap:12px; }
+.modal-actions{
+  padding:12px 16px; display:flex; justify-content:flex-end; gap:10px;
+  border-top:1px solid #e5e7eb; background:#fbfdff;
+}
+
+/* form inside modal */
+.form-grid{ display:grid; gap:10px; grid-template-columns: 1fr 160px; }
+.form-grid label{ font-size:.85rem; color:var(--muted); }
+.form-grid input[type="text"],
+.form-grid input[type="number"],
+.form-grid select{
+  width:100%; padding:10px 12px;
+  border:1px solid #e5e7eb; border-radius:10px; outline:none;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+.form-grid input:focus, .form-grid select:focus{
+  border-color:#c7d2fe; box-shadow: 0 0 0 4px rgba(199,210,254,.35);
+}
+.consumidores-box{
+  max-height: 160px; overflow:auto; border:1px solid #e5e7eb; border-radius:10px; padding:8px;
+  background:#fff;
+}
+.consumidores-box label{ display:flex; align-items:center; gap:8px; padding:6px 8px; border-radius:8px; }
+.consumidores-box label:hover{ background:#f8fafc; }
+.consumidores-box input{ accent-color: var(--accent); }
+
+/* toast */
+.toast{
+  position: fixed; right: 18px; bottom: 18px; z-index: 60;
+  background: #111827; color:#fff; padding:10px 14px; border-radius: 10px;
+  box-shadow: var(--shadow); opacity:0; transform: translateY(8px); pointer-events:none;
+  transition: opacity var(--transition), transform var(--transition);
+}
+.toast.show{ opacity:1; transform: translateY(0); }
+
+/* footer */
+.site-footer{
+  position: fixed; left:0; right:0; bottom:0; height: 50px;
+  background:#0b1220; color:#e5e7eb; display:flex; align-items:center; justify-content:center;
+  font-size:.9rem; z-index: 30; box-shadow: 0 -6px 20px rgba(2,6,23,.25);
+}
+
+/* minimal scrollbars */
+*{ scrollbar-width: thin; scrollbar-color: #d1d5db transparent; }
+*::-webkit-scrollbar{ width:10px; height:10px; }
+*::-webkit-scrollbar-thumb{ background:#d1d5db; border-radius:999px; border:3px solid transparent; background-clip: padding-box; }
+*::-webkit-scrollbar-track{ background: transparent; }
+
+/* small */
+@media (max-width:560px){
+  .form-grid{ grid-template-columns: 1fr; }
+  .prof-body{ flex-direction: column; }
+}
 </style>
 </head>
 <body>
-<header>Divisão de Mantimentos</header>
+
+<header>
+  <div class="header-wrap">
+    <div class="header-icon"><span class="icon">shelves</span></div>
+    <h1>Divisão de Mantimentos</h1>
+  </div>
+</header>
+
 <main>
-
+  <!-- tabs -->
   <div class="tab">
-    <button class="tablinks active" onclick="openTab(event,'professores')">Professores</button>
-    <button class="tablinks" onclick="openTab(event,'compras')">Compras</button>
-    <button class="tablinks" onclick="openTab(event,'saldos')">Saldos</button>
-    <button class="tablinks" onclick="openTab(event,'relatorio')">Relatório</button>
+    <button class="tablinks active" data-target="professores">Professores</button>
+    <button class="tablinks" data-target="compras">Compras</button>
+    <button class="tablinks" data-target="saldos">Saldos</button>
+    <button class="tablinks" data-target="relatorio">Relatório</button>
   </div>
 
-  <!-- Aba Professores -->
-  <div id="professores" class="tabcontent" style="display:block;">
+  <!-- Professores -->
+  <section id="professores" class="tabcontent active section">
     <h2>Escolher Grupo</h2>
-    <p class="instrucao">Escolha um grupo para começar. Os professores do grupo serão usados em todas as divisões.</p>
-    <label>
-      <input id="grupoA" type="radio" name="grupo" value="A" onclick="selecionarGrupo('A')"> Grupo A (Wanderson, Gu, Cris)
-    </label><br>
-    <label>
-      <input id="grupoB" type="radio" name="grupo" value="B" onclick="selecionarGrupo('B')"> Grupo B (Gu, Emerson, Galeno)
-    </label>
+    <p class="instrucao">Selecione um grupo. Os professores do grupo serão usados nas compras, saldos e relatório.</p>
 
-    <h3>Professores selecionados:</h3>
-    <ul id="listaProfessores"></ul>
-  </div>
+    <div class="group-grid">
+      <label class="group-card">
+        <input id="grupoA" type="radio" name="grupo" value="A">
+        <div>
+          <strong>Grupo A</strong>
+          <div>Wanderson, Gu, Cris</div>
+        </div>
+      </label>
 
-  <!-- Aba Compras -->
-  <div id="compras" class="tabcontent">
-    <h2>Registrar Compra</h2>
-    <p class="instrucao">Preencha todos os campos antes de salvar. O valor deve ser numérico e selecione pelo menos um consumidor.</p>
-    <label>Produto: <input id="produto" required placeholder="Ex: Arroz"/></label>
-    <label>Valor: <input id="valor" type="number" step="0.01" required placeholder="Ex: 25.50"/></label>
-    <label>Quem comprou:
-      <select id="comprador" required></select>
-    </label>
-    <label>Quem consumiu:</label>
-    <div id="consumidores"></div>
-    <div style="margin-top:8px;">
-      <button class="btn btn-gerar" onclick="addCompra()">Salvar Compra</button>
-      <button class="btn" onclick="cancelEdit()" style="background:#ddd">Cancelar Edição</button>
+      <label class="group-card">
+        <input id="grupoB" type="radio" name="grupo" value="B">
+        <div>
+          <strong>Grupo B</strong>
+          <div>Gu, Emerson, Galeno</div>
+        </div>
+      </label>
     </div>
 
-    <h3 style="margin-top:10px">Compras Registradas</h3>
-    <div class="list">
+    <h3 style="margin-top:14px;">Professores selecionados</h3>
+    <p id="listaProfessores" style="margin:6px 0 0;"></p>
+  </section>
+
+  <!-- Compras -->
+  <section id="compras" class="tabcontent section">
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+      <div>
+        <h2>Compras</h2>
+        <p class="instrucao">Use o botão <strong>+</strong> no canto inferior para adicionar novas compras. Clique em editar no item para alterar.</p>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <button class="button" id="btnCalcularTop"><span class="icon">equal</span> Calcular</button>
+        <button class="button danger" id="btnLimparCompras"><span class="icon">delete</span> Limpar compras</button>
+      </div>
+    </div>
+
+    <div class="table-wrap" style="margin-top:10px;">
       <table id="tabelaCompras">
         <thead>
           <tr>
@@ -124,32 +375,84 @@ h2,h3 { font-size:1em; margin:5px 0; }
             <th>Valor (R$)</th>
             <th>Comprador</th>
             <th>Consumidores</th>
-            <th>Ações</th>
+            <th style="min-width:120px;">Ações</th>
           </tr>
         </thead>
         <tbody></tbody>
       </table>
     </div>
-  </div>
+  </section>
 
-  <!-- Aba Saldos -->
-  <div id="saldos" class="tabcontent">
-    <h2>Saldos</h2>
-    <p class="instrucao">Clique em "Calcular" para ver quanto cada professor pagou, deveria pagar e qual o saldo final.</p>
-    <button class="btn btn-gerar" onclick="calcular()">Calcular</button>
-    <div id="saldosLista"></div>
-    <h3>Sugestão de Acertos</h3>
-    <div id="transferencias"></div>
-  </div>
+  <!-- Saldos (com cards) -->
+  <section id="saldos" class="tabcontent section">
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+      <div>
+        <h2>Saldos & Cards</h2>
+        <p class="instrucao">Cards com nome do professor, quanto pagou/deveria e saldo. Abaixo, as compras associadas.</p>
+      </div>
+      <button class="button primary" id="btnCalcular"><span class="icon">equal</span> Calcular</button>
+    </div>
 
-  <!-- Aba Relatório -->
-  <div id="relatorio" class="tabcontent">
+    <div id="resumoTotais" style="margin:8px 0 10px; font-weight:600;"></div>
+
+    <div class="card-grid" id="cardsProfessores"></div>
+
+    <h3 style="margin-top:14px;">Sugestão de acertos</h3>
+    <div id="transferencias" class="section" style="padding:10px; background:linear-gradient(180deg,#fafcff,#ffffff); border:1px dashed #e5e7eb;"></div>
+  </section>
+
+  <!-- Relatório -->
+  <section id="relatorio" class="tabcontent section">
     <h2>Relatório PDF</h2>
-    <p class="instrucao">Clique no botão abaixo para gerar um relatório em PDF com todas as compras, saldos e sugestões de acertos.</p>
-    <button class="btn btn-gerar" onclick="gerarPDF()">Gerar Relatório PDF</button>
-  </div>
-
+    <p class="instrucao">Gere um PDF com as compras, saldos e sugestões de acerto.</p>
+    <button class="button primary" id="btnPDF"><span class="icon">picture_as_pdf</span> Gerar Relatório PDF</button>
+  </section>
 </main>
+
+<!-- FAB -->
+<button class="fab" id="fabAdd" title="Adicionar compra">
+  <span class="icon">add</span>
+</button>
+
+<!-- Modal Compra -->
+<div class="modal" id="modalCompra" aria-hidden="true">
+  <div class="modal-backdrop" data-close></div>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-head">
+      <div class="modal-title" id="modalTitle">Nova compra</div>
+      <button class="button" data-close><span class="icon">close</span></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div>
+          <label>Produto</label>
+          <input id="m_produto" type="text" placeholder="Ex: Arroz" />
+        </div>
+        <div>
+          <label>Valor (R$)</label>
+          <input id="m_valor" type="number" inputmode="decimal" step="0.01" min="0.01" placeholder="25.50" />
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div>
+          <label>Quem comprou</label>
+          <select id="m_comprador"></select>
+        </div>
+        <div>
+          <label>Consumidores (marque pelo menos 1)</label>
+          <!-- espaço vazio; abaixo a caixa com checkboxes ocupa toda a largura -->
+        </div>
+      </div>
+
+      <div class="consumidores-box" id="m_consumidores"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="button" data-close>Cancelar</button>
+      <button class="button primary" id="m_salvar"><span class="icon">save</span> Salvar</button>
+    </div>
+  </div>
+</div>
 
 <div id="toast" class="toast"></div>
 
@@ -157,247 +460,356 @@ h2,h3 { font-size:1em; margin:5px 0; }
 
 <script>
 /* ====== Estado e persistência ====== */
-const STORAGE_KEY = "divMantimentos_estado_v1";
-let state = {professores: [], compras: []};
-let editIndex = null;
+const STORAGE_KEY = "divMantimentos_estado_v2";
+let state = { professores: [], compras: [], _lastCalc: null };
+let editIndex = null; // índice da compra em edição (modal)
+let currentTab = 'professores';
 
-// Inicialização
 window.addEventListener('load', init);
 
+/* ====== Inicialização ====== */
 function init(){
   loadState();
-  // Se não houver professores salvos, pré-seleciona Grupo A
+
+  // default grupo
   if(!state.professores || state.professores.length === 0){
-    selecionarGrupo('A', false); // false: não perguntar sobre limpeza
-    document.getElementById("grupoA").checked = true;
+    setGrupo('A', false);
+    document.getElementById('grupoA').checked = true;
   } else {
-    // Se houver professores salvos: preencher UI e garantir radio marcado
+    if (arraysEqual(state.professores, ["Wanderson","Gu","Cris"])) document.getElementById('grupoA').checked = true;
+    if (arraysEqual(state.professores, ["Gu","Emerson","Galeno"])) document.getElementById('grupoB').checked = true;
+  }
+
+  wireUI();
+  atualizarUI();
+}
+
+/* ====== UI Handlers ====== */
+function wireUI(){
+  // tabs
+  document.querySelectorAll('.tab button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.tab button').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      const target = btn.dataset.target;
+      currentTab = target;
+      document.querySelectorAll('.tabcontent').forEach(sec=>sec.classList.remove('active'));
+      document.getElementById(target).classList.add('active');
+    });
+  });
+
+  // radio grupos
+  document.getElementById('grupoA').addEventListener('change', ()=> onTrocarGrupo('A'));
+  document.getElementById('grupoB').addEventListener('change', ()=> onTrocarGrupo('B'));
+
+  // FAB abrir modal
+  document.getElementById('fabAdd').addEventListener('click', openModalNova);
+
+  // botões calcular
+  document.getElementById('btnCalcular').addEventListener('click', calcular);
+  document.getElementById('btnCalcularTop').addEventListener('click', calcular);
+
+  // limpar compras
+  document.getElementById('btnLimparCompras').addEventListener('click', limparCompras);
+
+  // PDF
+  document.getElementById('btnPDF').addEventListener('click', gerarPDF);
+
+  // Modal: fechar
+  document.querySelectorAll('[data-close]').forEach(el=> el.addEventListener('click', closeModal));
+  document.getElementById('modalCompra').addEventListener('click', (e)=>{ if(e.target.dataset.close!==undefined) closeModal(); });
+
+  // Modal: salvar
+  document.getElementById('m_salvar').addEventListener('click', salvarCompraModal);
+}
+
+function onTrocarGrupo(g){
+  if(state.compras?.length){
+    // modalzinho simples com confirmação elegante
+    confirmElegante(
+      "Trocar de grupo",
+      "Existem compras registradas. Deseja limpar as compras ao mudar de grupo?",
+      "Trocar e limpar", "Cancelar"
+    ).then(ok=>{
+      if(ok){
+        state.compras = [];
+        setGrupo(g, true);
+        showToast("Grupo trocado e compras limpas.");
+      } else {
+        setGrupo(g, true);
+        showToast("Grupo trocado. Compras mantidas.");
+      }
+      atualizarUI();
+      saveState();
+    });
+  } else {
+    setGrupo(g, true);
     atualizarUI();
-    if(arraysEqual(state.professores, ["Wanderson","Gu","Cris"])) document.getElementById("grupoA").checked = true;
-    else if(arraysEqual(state.professores, ["Gu","Emerson","Galeno"])) document.getElementById("grupoB").checked = true;
-  }
-  atualizarUI();
-}
-
-// Salva state no localStorage
-function saveState(){
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  } catch(e){
-    console.error("Erro salvando localStorage", e);
-  }
-}
-function loadState(){
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if(raw){
-      state = JSON.parse(raw);
-      if(!state.professores) state.professores = [];
-      if(!state.compras) state.compras = [];
-    }
-  } catch(e){
-    console.error("Erro carregando localStorage", e);
+    saveState();
+    showToast(`Grupo ${g} selecionado.`);
   }
 }
 
-/* ====== UI / abas ====== */
-function openTab(evt, tabName){
-  document.querySelectorAll(".tabcontent").forEach(tc=>tc.style.display="none");
-  document.querySelectorAll(".tab button").forEach(tb=>tb.classList.remove("active"));
-  document.getElementById(tabName).style.display="block";
-  if(evt && evt.currentTarget) evt.currentTarget.classList.add("active");
+function setGrupo(grupo, explicito){
+  if(grupo === 'A') state.professores = ["Wanderson", "Gu", "Cris"];
+  if(grupo === 'B') state.professores = ["Gu", "Emerson", "Galeno"];
+  // atualizar selects/checks do modal
+  montarFormModal();
 }
 
-/* ====== Grupos / Professores ====== */
-function selecionarGrupo(grupo, perguntar=true){
-  if(state.compras && state.compras.length > 0 && perguntar){
-    const ok = confirm("Existem compras registradas. Deseja limpar as compras ao mudar de grupo? (Cancelar mantém as compras)");
-    if(ok){
-      state.compras = [];
-      showToast("Compras limpas.");
-    }
-  }
-  if(grupo === "A"){
-    state.professores = ["Wanderson", "Gu", "Cris"];
-    document.getElementById("grupoA").checked = true;
-  } else if(grupo === "B"){
-    state.professores = ["Gu", "Emerson", "Galeno"];
-    document.getElementById("grupoB").checked = true;
-  }
-  saveState();
-  atualizarUI();
-  showToast(`Grupo ${grupo} selecionado.`);
+/* ====== Modal Compra ====== */
+function montarFormModal(){
+  const buyers = document.getElementById('m_comprador');
+  const consumersWrap = document.getElementById('m_consumidores');
+  buyers.innerHTML = (state.professores||[]).map(p=>`<option value="${p}">${p}</option>`).join('');
+  consumersWrap.innerHTML = (state.professores||[]).map(p=>
+    `<label><input type="checkbox" value="${p}"> ${p}</label>`
+  ).join('');
 }
-
-/* ====== Atualizar interface ====== */
-function atualizarUI(){
-  const professores = state.professores || [];
-  const lista=document.getElementById("listaProfessores");
-  lista.innerHTML=professores.map(p=>`<li>${p}</li>`).join("") || "<li><em>Nenhum</em></li>";
-
-  // comprador select
-  const comprador = document.getElementById("comprador");
-  comprador.innerHTML = professores.map(p=>`<option value="${p}">${p}</option>`).join("");
-
-  // consumidores checkboxes
-  document.getElementById("consumidores").innerHTML = professores.map(p=>`<label><input type="checkbox" value="${p}">${p}</label>`).join("<br>");
-
-  // Compras tabela
-  const tbody=document.querySelector("#tabelaCompras tbody");
-  tbody.innerHTML=state.compras.map((c,i)=>`
-    <tr>
-      <td>${escapeHtml(c.produto)}</td>
-      <td>R$${Number(c.valor).toFixed(2)}</td>
-      <td>${escapeHtml(c.comprador)}</td>
-      <td>${c.consumidores.map(escapeHtml).join(", ")}</td>
-      <td>
-        <button class="btn btn-editar" onclick="editarCompra(${i})">Editar</button>
-        <button class="btn btn-excluir" onclick="excluirCompra(${i})">Apagar</button>
-      </td>
-    </tr>
-  `).join("");
+function openModalNova(){
+  editIndex = null;
+  document.getElementById('modalTitle').textContent = "Nova compra";
+  document.getElementById('m_produto').value = "";
+  document.getElementById('m_valor').value = "";
+  montarFormModal();
+  // marcar todos por padrão
+  document.querySelectorAll('#m_consumidores input').forEach(cb=> cb.checked = true);
+  openModal();
 }
-
-/* ====== Compras: adicionar/editar/excluir ====== */
-function addCompra(){
-  const produto=document.getElementById("produto").value.trim();
-  const valor=parseFloat(document.getElementById("valor").value);
-  const comprador=document.getElementById("comprador").value;
-  const consumidores=Array.from(document.querySelectorAll("#consumidores input:checked")).map(c=>c.value);
-
-  if(!produto){ alert("Erro: informe o nome do produto."); return; }
-  if(isNaN(valor) || valor <= 0){ alert("Erro: o valor deve ser numérico e maior que zero."); return; }
-  if(!comprador){ alert("Erro: selecione quem comprou."); return; }
-  if(consumidores.length === 0){ alert("Erro: selecione pelo menos um consumidor."); return; }
-
-  if(editIndex!==null){
-    state.compras[editIndex] = {produto, valor: Number(valor), comprador, consumidores};
-    showToast("Compra atualizada.");
-    editIndex = null;
-  } else {
-    state.compras.push({produto, valor: Number(valor), comprador, consumidores});
-    showToast("Compra registrada.");
-  }
-
-  // limpar inputs
-  document.getElementById("produto").value="";
-  document.getElementById("valor").value="";
-  document.querySelectorAll("#consumidores input").forEach(cb=>cb.checked=false);
-
-  saveState();
-  atualizarUI();
-}
-
-function editarCompra(i){
-  const c = state.compras[i];
+function openModalEditar(index){
+  const c = state.compras[index];
   if(!c) return;
-  document.getElementById("produto").value = c.produto;
-  document.getElementById("valor").value = c.valor;
+  editIndex = index;
+  document.getElementById('modalTitle').textContent = "Editar compra";
+  document.getElementById('m_produto').value = c.produto;
+  document.getElementById('m_valor').value = c.valor;
+  montarFormModal();
+  // se comprador não estiver no grupo atual (caso troca de grupo), mantém
   if(!state.professores.includes(c.comprador)){
     const opt = document.createElement('option');
-    opt.value = c.comprador;
-    opt.text = c.comprador;
-    document.getElementById('comprador').appendChild(opt);
+    opt.value = c.comprador; opt.textContent = c.comprador;
+    document.getElementById('m_comprador').appendChild(opt);
   }
-  document.getElementById("comprador").value = c.comprador;
-  document.querySelectorAll("#consumidores input").forEach(cb=>cb.checked = c.consumidores.includes(cb.value));
-  editIndex = i;
-  showToast("Modo edição ativado.");
-  // abrir aba compras
-  const tabBtns = document.querySelectorAll(".tab button");
-  tabBtns.forEach(b=>{ if(b.textContent.includes("Compras")) { openTab({currentTarget:b}, 'compras'); }});
+  document.getElementById('m_comprador').value = c.comprador;
+  document.querySelectorAll('#m_consumidores input').forEach(cb=> cb.checked = c.consumidores.includes(cb.value));
+  openModal();
+}
+function openModal(){
+  document.getElementById('modalCompra').classList.add('open');
+  document.getElementById('modalCompra').setAttribute('aria-hidden','false');
+}
+function closeModal(){
+  document.getElementById('modalCompra').classList.remove('open');
+  document.getElementById('modalCompra').setAttribute('aria-hidden','true');
 }
 
-function cancelEdit(){
+function salvarCompraModal(){
+  const produto = document.getElementById('m_produto').value.trim();
+  const valor = parseFloat(document.getElementById('m_valor').value);
+  const comprador = document.getElementById('m_comprador').value;
+  const consumidores = Array.from(document.querySelectorAll('#m_consumidores input:checked')).map(i=>i.value);
+
+  if(!produto) return showToast("Informe o produto.");
+  if(isNaN(valor) || valor<=0) return showToast("Valor inválido.");
+  if(!comprador) return showToast("Selecione o comprador.");
+  if(consumidores.length===0) return showToast("Marque pelo menos um consumidor.");
+
+  const registro = { produto, valor: Number(valor), comprador, consumidores };
+  if(editIndex!==null){
+    state.compras[editIndex] = registro;
+    showToast("Compra atualizada.");
+  } else {
+    state.compras.push(registro);
+    showToast("Compra registrada.");
+  }
   editIndex = null;
-  document.getElementById("produto").value="";
-  document.getElementById("valor").value="";
-  document.querySelectorAll("#consumidores input").forEach(cb=>cb.checked=false);
-  showToast("Edição cancelada.");
-}
-
-function excluirCompra(i){
-  if(!confirm("Confirma apagar esta compra?")) return;
-  state.compras.splice(i,1);
   saveState();
   atualizarUI();
-  showToast("Compra removida.");
+  closeModal();
 }
 
-/* ====== Cálculo de saldos e transferências ====== */
-function calcular(){
-  if(!state.compras || state.compras.length === 0){
-    alert("Não há compras registradas. Adicione pelo menos uma compra.");
+/* ====== Compras tabela / ações ====== */
+function atualizarTabelaCompras(){
+  const tbody = document.querySelector('#tabelaCompras tbody');
+  if(!state.compras?.length){
+    tbody.innerHTML = `<tr><td colspan="5" style="color:var(--muted);">Nenhuma compra ainda. Use o botão “+”.</td></tr>`;
     return;
   }
-  const professores = state.professores.slice();
-  let pagou = {}, deveria = {};
-  professores.forEach(p=>{ pagou[p]=0; deveria[p]=0; });
+  tbody.innerHTML = state.compras.map((c,i)=> `
+    <tr>
+      <td>${escapeHtml(c.produto)}</td>
+      <td>${Number(c.valor).toFixed(2)}</td>
+      <td>${escapeHtml(c.comprador)}</td>
+      <td>${c.consumidores.map(escapeHtml).join(", ")}</td>
+      <td style="display:flex; gap:8px;">
+        <button class="button" onclick="openModalEditar(${i})"><span class="icon">edit</span>Editar</button>
+        <button class="button danger" onclick="excluirCompra(${i})"><span class="icon">delete</span>Apagar</button>
+      </td>
+    </tr>
+  `).join('');
+}
+function excluirCompra(i){
+  confirmElegante("Apagar compra", "Tem certeza que deseja excluir esta compra?", "Apagar", "Cancelar")
+  .then(ok=>{
+    if(!ok) return;
+    state.compras.splice(i,1);
+    saveState();
+    atualizarUI();
+    showToast("Compra removida.");
+  });
+}
+function limparCompras(){
+  if(!state.compras?.length){ showToast("Não há compras para limpar."); return; }
+  confirmElegante("Limpar todas as compras", "Esta ação não pode ser desfeita.", "Limpar", "Cancelar")
+  .then(ok=>{
+    if(!ok) return;
+    state.compras = [];
+    state._lastCalc = null;
+    saveState();
+    atualizarUI();
+    showToast("Compras limpas.");
+  });
+}
+
+/* ====== Saldos & Cards ====== */
+function calcular(){
+  if(!state.compras?.length){
+    showToast("Adicione ao menos uma compra.");
+    return;
+  }
+  const profs = state.professores.slice();
+  const pagou = {}; const deveria = {};
+  profs.forEach(p=>{ pagou[p]=0; deveria[p]=0; });
 
   state.compras.forEach(c=>{
-    if(!pagou[c.comprador]) pagou[c.comprador] = 0;
-    pagou[c.comprador] += Number(c.valor);
+    pagou[c.comprador] = (pagou[c.comprador]||0) + Number(c.valor);
     const parte = Number(c.valor) / c.consumidores.length;
-    c.consumidores.forEach(cons=>{
-      if(!deveria[cons]) deveria[cons] = 0;
-      deveria[cons] += parte;
-    });
+    c.consumidores.forEach(n=> deveria[n] = (deveria[n]||0) + parte);
   });
 
   const nomes = new Set([...Object.keys(pagou), ...Object.keys(deveria)]);
   const saldos = Array.from(nomes).map(n=>{
-    const p = Number(pagou[n]||0), d = Number(deveria[n]||0);
-    return {nome:n, pagou:p, deveria:d, saldo: +(p-d)};
+    const p = +(pagou[n]||0);
+    const d = +(deveria[n]||0);
+    return { nome:n, pagou:p, deveria:d, saldo: +(p-d) };
   });
 
   const totalPago = saldos.reduce((s,x)=>s + x.pagou, 0);
   const totalDevido = saldos.reduce((s,x)=>s + x.deveria, 0);
 
-  saldos.sort((a,b)=>b.saldo - a.saldo);
-
-  const sList = document.getElementById("saldosLista");
-  let html = `<p><strong>Total pago:</strong> R$${totalPago.toFixed(2)} &nbsp;&nbsp; <strong>Total devido:</strong> R$${totalDevido.toFixed(2)}</p>`;
-  html += `<table><thead><tr><th>Nome</th><th>Pagou (R$)</th><th>Deveria (R$)</th><th>Saldo (R$)</th></tr></thead><tbody>`;
-  saldos.forEach(s=>{
-    html += `<tr><td>${escapeHtml(s.nome)}</td><td>R$${s.pagou.toFixed(2)}</td><td>R$${s.deveria.toFixed(2)}</td>
-             <td><span class="${s.saldo>=0?'saldo-positivo':'saldo-negativo'}">R$${s.saldo.toFixed(2)}</span></td></tr>`;
-  });
-  html += `</tbody></table>`;
-  sList.innerHTML = html;
-
-  let devedores = saldos.filter(s=>s.saldo < -0.01).map(s=>({nome:s.nome, saldo: -s.saldo}));
-  let credores = saldos.filter(s=>s.saldo > 0.01).map(s=>({nome:s.nome, saldo: s.saldo}));
-  devedores.sort((a,b)=>b.saldo - a.saldo);
-  credores.sort((a,b)=>b.saldo - a.saldo);
-
-  const transfDiv = document.getElementById("transferencias");
-  let transf = [];
-  let i=0, j=0;
-  while(i<devedores.length && j<credores.length){
-    let val = Math.min(devedores[i].saldo, credores[j].saldo);
+  // transferências
+  const devs = saldos.filter(s=>s.saldo < -0.01).map(s=>({nome:s.nome, saldo:-s.saldo}));
+  const creds = saldos.filter(s=>s.saldo > 0.01).map(s=>({nome:s.nome, saldo:s.saldo}));
+  devs.sort((a,b)=>b.saldo - a.saldo);
+  creds.sort((a,b)=>b.saldo - a.saldo);
+  const transf = [];
+  let i=0,j=0;
+  while(i<devs.length && j<creds.length){
+    let val = Math.min(devs[i].saldo, creds[j].saldo);
     val = Math.round(val*100)/100;
-    if(val > 0.009){
-      transf.push({de:devedores[i].nome, para:credores[j].nome, valor: val});
-      devedores[i].saldo = +(devedores[i].saldo - val).toFixed(2);
-      credores[j].saldo = +(credores[j].saldo - val).toFixed(2);
-      if(devedores[i].saldo < 0.01) i++;
-      if(credores[j].saldo < 0.01) j++;
+    if(val>0.009){
+      transf.push({de:devs[i].nome, para:creds[j].nome, valor:val});
+      devs[i].saldo = +(devs[i].saldo - val).toFixed(2);
+      creds[j].saldo = +(creds[j].saldo - val).toFixed(2);
+      if(devs[i].saldo < 0.01) i++;
+      if(creds[j].saldo < 0.01) j++;
     } else break;
   }
 
-  transfDiv.innerHTML = transf.length ? transf.map(t=>`<p>${escapeHtml(t.de)} paga R$${t.valor.toFixed(2)} para ${escapeHtml(t.para)}</p>`).join("") : "<p>Ninguém deve nada 🎉</p>";
-
-  showToast("Cálculo concluído.");
-  state._lastCalc = {saldos, totalPago, totalDevido, transf};
+  state._lastCalc = { saldos, totalPago, totalDevido, transf };
   saveState();
+  renderCards();
+  renderTransferencias();
+  renderResumoTotais();
+  showToast("Cálculo concluído.");
 }
 
-/* ====== PDF (usando jsPDF + autoTable) ====== */
-function gerarPDF(){
-  if(!state.compras || state.compras.length === 0){
-    alert("Não há dados para gerar o relatório. Registre pelo menos uma compra.");
-    return;
+function renderResumoTotais(){
+  const res = document.getElementById('resumoTotais');
+  if(!state._lastCalc){ res.textContent = ""; return; }
+  const { totalPago, totalDevido } = state._lastCalc;
+  res.textContent = `Total pago: R$${totalPago.toFixed(2)} • Total devido: R$${totalDevido.toFixed(2)}`;
+}
+
+function renderCards(){
+  const wrap = document.getElementById('cardsProfessores');
+  const profs = state.professores||[];
+  const mapaComprasPorPessoa = {};
+  state.compras.forEach((c, idx)=>{
+    // compras feitas pelo professor
+    (mapaComprasPorPessoa[c.comprador] ||= []).push({ ...c, idx, tipo:'comprou' });
+    // e também compras onde ele consumiu (sem duplicar referência)
+    c.consumidores.forEach(cons=>{
+      (mapaComprasPorPessoa[cons] ||= []).push({ ...c, idx, tipo: cons===c.comprador ? 'comprou/consumiu' : 'consumiu' });
+    });
+  });
+
+  let saldos = {};
+  if(state._lastCalc){
+    state._lastCalc.saldos.forEach(s=> saldos[s.nome]=s);
   }
+
+  wrap.innerHTML = profs.map(nome=>{
+    const s = saldos[nome] || {pagou:0, deveria:0, saldo:0};
+    const badgeClass = s.saldo>=0 ? 'ok' : 'neg';
+    const lista = (mapaComprasPorPessoa[nome]||[]).map(item=>{
+      const meta = `${item.tipo} • R$${item.valor.toFixed(2)} • ${escapeHtml(item.consumidores.join(", "))}`;
+      return `
+        <div class="list-item">
+          <div class="left">
+            <div class="title">${escapeHtml(item.produto)}</div>
+            <div class="meta">${meta}</div>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <button class="button" onclick="openModalEditar(${item.idx})" title="Editar"><span class="icon">edit</span></button>
+          </div>
+        </div>
+      `;
+    }).join('') || `<div class="list-item"><div class="left"><div class="meta">Sem compras relacionadas.</div></div></div>`;
+
+    const iniciais = nome.slice(0,2).toUpperCase();
+
+    return `
+      <div class="prof-card">
+        <div class="prof-head">
+          <div class="prof-name">
+            <div class="avatar">${iniciais}</div>
+            <div>${escapeHtml(nome)}</div>
+          </div>
+          <div class="badge ${badgeClass}">${s.saldo>=0?'+':''}R$${s.saldo.toFixed(2)}</div>
+        </div>
+
+        <div class="prof-body">
+          <div class="prof-col">
+            <div class="prof-label">Pagou</div>
+            <div class="prof-amount">R$${s.pagou.toFixed(2)}</div>
+          </div>
+          <div class="prof-col">
+            <div class="prof-label">Deveria</div>
+            <div class="prof-amount">R$${s.deveria.toFixed(2)}</div>
+          </div>
+        </div>
+
+        <div class="prof-col">
+          <div class="prof-label">Compras relacionadas</div>
+          <div class="card-list">${lista}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderTransferencias(){
+  const el = document.getElementById('transferencias');
+  const transf = state._lastCalc?.transf || [];
+  el.innerHTML = transf.length
+    ? transf.map(t=>`<p><strong>${escapeHtml(t.de)}</strong> paga <strong>R$${t.valor.toFixed(2)}</strong> para <strong>${escapeHtml(t.para)}</strong></p>`).join('')
+    : "<p>Ninguém deve nada 🎉</p>";
+}
+
+/* ====== Relatório PDF ====== */
+function gerarPDF(){
+  if(!state.compras?.length){ showToast("Nada para gerar. Adicione compras."); return; }
   if(!state._lastCalc) calcular();
 
   const { jsPDF } = window.jspdf;
@@ -405,68 +817,50 @@ function gerarPDF(){
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
 
+  const hoje = new Date().toLocaleDateString("pt-BR");
   doc.setFontSize(14);
   doc.text("Relatório de Mantimentos", pageWidth/2, 40, {align:'center'});
+  doc.setFontSize(10);
+  doc.text(`Data: ${hoje}`, 40, 58);
+  doc.text(`Grupo: ${state.professores.join(", ")}`, 40, 72);
 
-  // cores mais vivas para cabeçalhos
-  const blueHeader = {fillColor:[33,150,243], textColor:255};    // azul vivo
-  const greenHeader = {fillColor:[76,175,80], textColor:255};    // verde vivo
-  const orangeHeader = {fillColor:[255,152,0], textColor:255};   // laranja
+  const blueHeader = {fillColor:[99,102,241], textColor:255};
+  const greenHeader = {fillColor:[16,185,129], textColor:255};
+  const orangeHeader = {fillColor:[245,158,11], textColor:255};
 
-  // Compras tabela (azul)
+  // Compras
+  doc.setFontSize(11);
+  doc.text("Compras:", 40, 92);
   const comprasHead = [['Produto','Valor (R$)','Comprador','Consumidores']];
   const comprasBody = state.compras.map(c=>[c.produto, c.valor.toFixed(2), c.comprador, c.consumidores.join(", ")]);
-  doc.setFontSize(11);
-  doc.text("Compras:", 40, 70);
-  doc.autoTable({
-    startY: 80,
-    head: comprasHead,
-    body: comprasBody,
-    styles: {fontSize:10},
-    headStyles: blueHeader,
-    margin: {left:40, right:40}
-  });
+  doc.autoTable({ startY: 100, head: comprasHead, body: comprasBody, styles:{fontSize:10}, headStyles: blueHeader, margin:{left:40,right:40} });
 
-  // Saldos tabela (verde)
+  // Saldos
   let y = doc.lastAutoTable ? doc.lastAutoTable.finalY + 18 : 160;
+  const saldos = state._lastCalc?.saldos || [];
   doc.text("Saldos:", 40, y);
-  const saldos = state._lastCalc ? state._lastCalc.saldos : [];
   const saldosHead = [['Nome','Pagou (R$)','Deveria (R$)','Saldo (R$)']];
   const saldosBody = saldos.map(s=>[s.nome, s.pagou.toFixed(2), s.deveria.toFixed(2), s.saldo.toFixed(2)]);
-  doc.autoTable({
-    startY: y+8,
-    head: saldosHead,
-    body: saldosBody,
-    styles: {fontSize:10},
-    headStyles: greenHeader,
-    margin: {left:40, right:40}
-  });
+  doc.autoTable({ startY: y+8, head: saldosHead, body: saldosBody, styles:{fontSize:10}, headStyles: greenHeader, margin:{left:40,right:40} });
 
-  // Totais e transferências (laranja)
+  // Totais & transferências
   y = doc.lastAutoTable ? doc.lastAutoTable.finalY + 18 : 400;
-  const totalPago = state._lastCalc ? state._lastCalc.totalPago : 0;
-  const totalDevido = state._lastCalc ? state._lastCalc.totalDevido : 0;
+  const totalPago = state._lastCalc?.totalPago || 0;
+  const totalDevido = state._lastCalc?.totalDevido || 0;
   doc.text(`Total pago: R$${totalPago.toFixed(2)}    Total devido: R$${totalDevido.toFixed(2)}`, 40, y);
 
   y += 18;
-  doc.text("Sugestão de Acertos:", 40, y);
+  doc.text("Sugestão de acertos:", 40, y);
   y += 8;
-  const transf = state._lastCalc ? state._lastCalc.transf : [];
-  if(transf && transf.length){
-    const transfBody = transf.map(t=>[t.de + " → " + t.para, "R$" + t.valor.toFixed(2)]);
-    doc.autoTable({
-      startY: y,
-      head: [['Transação','Valor']],
-      body: transfBody,
-      styles: {fontSize:10},
-      headStyles: orangeHeader,
-      margin: {left:40, right:40}
-    });
+  const transf = state._lastCalc?.transf || [];
+  if(transf.length){
+    const tBody = transf.map(t=>[t.de + " → " + t.para, "R$" + t.valor.toFixed(2)]);
+    doc.autoTable({ startY: y, head: [['Transação','Valor']], body: tBody, styles:{fontSize:10}, headStyles: orangeHeader, margin:{left:40,right:40} });
   } else {
     doc.text("Nenhuma transferência necessária.", 40, y+6);
   }
 
-  // Rodapé em todas as páginas: "Desenvolvido por Professor Wanderson"
+  // rodapé
   const pageCount = doc.internal.getNumberOfPages();
   doc.setFontSize(9);
   for(let i=1;i<=pageCount;i++){
@@ -479,30 +873,106 @@ function gerarPDF(){
   showToast("PDF gerado.");
 }
 
+/* ====== Atualização geral de UI ====== */
+function atualizarUI(){
+  // lista professores (texto)
+  const lista = document.getElementById('listaProfessores');
+  const profs = state.professores||[];
+  lista.textContent = profs.length ? profs.join(" • ") : "Nenhum selecionado";
+
+  // tabela compras
+  atualizarTabelaCompras();
+
+  // se houver cálculo, atualiza cards/transfer
+  if(state._lastCalc){
+    renderCards();
+    renderTransferencias();
+    renderResumoTotais();
+  } else {
+    // monta cards vazios baseados nos professores
+    document.getElementById('cardsProfessores').innerHTML = (profs||[]).map(nome=>`
+      <div class="prof-card">
+        <div class="prof-head">
+          <div class="prof-name">
+            <div class="avatar">${nome.slice(0,2).toUpperCase()}</div>
+            <div>${escapeHtml(nome)}</div>
+          </div>
+          <div class="badge">R$0,00</div>
+        </div>
+        <div class="prof-body">
+          <div class="prof-col">
+            <div class="prof-label">Pagou</div>
+            <div class="prof-amount">R$0,00</div>
+          </div>
+          <div class="prof-col">
+            <div class="prof-label">Deveria</div>
+            <div class="prof-amount">R$0,00</div>
+          </div>
+        </div>
+        <div class="prof-col">
+          <div class="prof-label">Compras relacionadas</div>
+          <div class="card-list"><div class="list-item"><div class="left"><div class="meta">Sem compras relacionadas.</div></div></div></div>
+        </div>
+      </div>
+    `).join('');
+    document.getElementById('transferencias').innerHTML = "<p>Calcule para ver as sugestões de acerto.</p>";
+    document.getElementById('resumoTotais').textContent = "";
+  }
+}
+
 /* ====== Utilitários ====== */
+function saveState(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){} }
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){
+      state = JSON.parse(raw);
+      state.professores ||= [];
+      state.compras ||= [];
+    }
+  }catch(e){}
+}
 function showToast(msg, time=2000){
-  const el = document.getElementById("toast");
-  el.innerText = msg;
-  el.classList.add("show");
-  clearTimeout(el._timeout);
-  el._timeout = setTimeout(()=>{ el.classList.remove("show"); }, time);
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(el._t); el._t = setTimeout(()=> el.classList.remove('show'), time);
 }
-
-// Escape simples para evitar injeção ao renderizar texto
 function escapeHtml(text){
-  if(text === undefined || text === null) return "";
-  return String(text)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+  if(text===undefined||text===null) return "";
+  return String(text).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+function arraysEqual(a,b){
+  if(!a||!b||a.length!==b.length) return false;
+  for(let i=0;i<a.length;i++) if(a[i]!==b[i]) return false;
+  return true;
 }
 
-function arraysEqual(a,b){
-  if(!a || !b) return false;
-  if(a.length !== b.length) return false;
-  for(let i=0;i<a.length;i++) if(a[i] !== b[i]) return false;
-  return true;
+/* Pequeno modal de confirmação elegante (resolve boolean) */
+function confirmElegante(titulo, mensagem, okText="OK", cancelText="Cancelar"){
+  return new Promise(resolve=>{
+    const root = document.createElement('div');
+    root.innerHTML = `
+      <div class="modal open" style="z-index:1100;">
+        <div class="modal-backdrop" data-x></div>
+        <div class="modal-card" role="dialog" aria-modal="true" style="max-width:480px;">
+          <div class="modal-head">
+            <div class="modal-title">${escapeHtml(titulo)}</div>
+            <button class="button" data-x><span class="icon">close</span></button>
+          </div>
+          <div class="modal-body">
+            <p style="margin:0; color:var(--muted);">${escapeHtml(mensagem)}</p>
+          </div>
+          <div class="modal-actions">
+            <button class="button" data-x>${escapeHtml(cancelText)}</button>
+            <button class="button primary" data-ok><span class="icon">check</span> ${escapeHtml(okText)}</button>
+          </div>
+        </div>
+      </div>`;
+    document.body.appendChild(root);
+    const close = (val)=>{ root.remove(); resolve(val); };
+    root.querySelectorAll('[data-x]').forEach(n=> n.addEventListener('click', ()=> close(false)));
+    root.querySelector('[data-ok]').addEventListener('click', ()=> close(true));
+  });
 }
 </script>
 </body>
