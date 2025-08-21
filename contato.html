@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Despesas — Casa dos Professores</title>
 
-<!-- Fonte suave (fallbacks) -->
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <style>
@@ -15,14 +14,11 @@
     --muted:#6b7280;
     --primary-600: #3b82f6;
     --primary-500: #60a5fa;
-    --accent: linear-gradient(135deg,#fdfbfb 0%, #ebedee 100%);
     --success: #2e7d32;
     --danger: #c62828;
-    --glass: rgba(255,255,255,0.6);
     font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
   }
 
-  /* reset e base */
   *{box-sizing:border-box}
   html,body{height:100%}
   body{
@@ -35,126 +31,58 @@
     padding:24px;
   }
 
-  .wrap{
-    max-width:1100px;
-    margin:0 auto;
-    display:flex;
-    flex-direction:column;
-    gap:18px;
-  }
+  .wrap{max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
 
-  header{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:12px;
-  }
-  .title {
-    display:flex;
-    flex-direction:column;
-  }
-  h1{margin:0;font-size:20px;letter-spacing:-0.2px}
-  .subtitle{color:var(--muted);font-size:13px;margin-top:6px;}
+  header{display:flex;justify-content:space-between;align-items:center;gap:12px}
+  .title{display:flex;flex-direction:column}
+  h1{margin:0;font-size:20px}
+  .subtitle{color:var(--muted);font-size:13px;margin-top:6px}
 
-  /* top controls */
   .controls{display:flex;gap:8px;align-items:center}
-  .btn{
-    display:inline-flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;border:0;cursor:pointer;
-    background:linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.75));
-    box-shadow: 0 6px 18px rgba(15,23,42,0.06); color:#0b1220; font-weight:600; transition:transform .18s ease, box-shadow .18s ease;
-  }
-  .btn:hover{transform:translateY(-3px); box-shadow: 0 12px 28px rgba(15,23,42,0.08);}
-  .btn.primary{background:linear-gradient(180deg,var(--primary-500),var(--primary-600)); color:#fff;}
-  .btn.ghost{background:transparent; box-shadow:none; color:var(--muted); border:1px solid rgba(15,23,42,0.04); font-weight:600;}
-  .btn.danger{background:linear-gradient(180deg,#ff7b7b,#ff6b6b); color:#fff;}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;border:0;cursor:pointer;background:linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.75));box-shadow:0 6px 18px rgba(15,23,42,0.06);color:#0b1220;font-weight:600;transition:transform .18s ease,box-shadow .18s ease}
+  .btn:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(15,23,42,0.08)}
+  .btn.primary{background:linear-gradient(180deg,var(--primary-500),var(--primary-600));color:#fff}
+  .btn.ghost{background:transparent;box-shadow:none;color:var(--muted);border:1px solid rgba(15,23,42,0.04);font-weight:600}
+  .btn.danger{background:linear-gradient(180deg,#ff7b7b,#ff6b6b);color:#fff}
 
-  .icon {width:16px;height:16px;display:inline-block;vertical-align:middle;opacity:0.95}
+  .icon{width:16px;height:16px;display:inline-block;vertical-align:middle;opacity:0.95}
 
-  /* grid layout main */
-  .grid{
-    display:grid;
-    grid-template-columns: 1fr 380px;
-    gap:18px;
-    align-items:start;
-  }
-  @media (max-width:980px){
-    .grid{grid-template-columns:1fr}
-  }
+  /* layout vertical: saldos -> histórico -> sugestão */
+  .col{display:flex;flex-direction:column;gap:14px}
+  .card{background:var(--card);border-radius:14px;padding:14px;box-shadow:0 10px 30px rgba(20,30,60,0.06);border:1px solid rgba(15,23,42,0.03)}
 
-  /* card estilo */
-  .card{
-    background:var(--card);
-    border-radius:14px;
-    padding:14px;
-    box-shadow: 0 10px 30px rgba(20,30,60,0.06);
-    border: 1px solid rgba(15,23,42,0.03);
-  }
-
-  /* form inline (mantive para visualização, mas pode usar o modal) */
-  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  .field{display:flex;flex-direction:column;gap:6px}
-  label{font-size:13px;color:var(--muted)}
-  input[type=text], input[type=number], input[type=date], select{
-    padding:10px;border-radius:10px;border:1px solid rgba(15,23,42,0.06);
-    background:linear-gradient(180deg, #fff, #fbfdff);
-    transition:box-shadow .12s ease, transform .12s ease;
-  }
-  input:focus, select:focus{outline:none; box-shadow:0 6px 20px rgba(59,130,246,0.12); transform:translateY(-1px)}
-  .small-muted{font-size:13px;color:var(--muted);margin-top:8px}
-
-  /* participants chips */
-  .participants{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-  .chip{
-    display:inline-flex;gap:8px;align-items:center;padding:8px 10px;border-radius:999px;background:linear-gradient(180deg,#f8fbff,#f1f6ff);
-    border:1px solid rgba(96,165,250,0.12); font-weight:600; font-size:13px;
-    transition:transform .12s ease, box-shadow .12s ease;
-  }
-  .chip input{margin-right:6px}
-
-  /* ledger table */
-  .ledger{max-height:320px;overflow:auto;border-radius:10px;padding:6px}
-  table{width:100%;border-collapse:collapse}
-  th,td{padding:10px;text-align:left;font-size:14px;border-bottom:1px solid rgba(15,23,42,0.04)}
-  thead th{font-weight:700;color:var(--muted);background:transparent}
-  tr:hover td{background:linear-gradient(90deg, rgba(96,165,250,0.02), transparent)}
-
-  /* balances flex */
   .balances{display:flex;gap:10px;flex-wrap:wrap}
-  .balance-card{
-    flex:1;min-width:160px;padding:12px;border-radius:12px;background:linear-gradient(180deg,#fff,#fbfdff);
-    box-shadow: 0 6px 20px rgba(20,30,60,0.04);display:flex;flex-direction:column;gap:6px;
-  }
+  .balance-card{flex:1;min-width:160px;padding:12px;border-radius:12px;background:linear-gradient(180deg,#fff,#fbfdff);box-shadow:0 6px 20px rgba(20,30,60,0.04);display:flex;flex-direction:column;gap:6px}
   .balance-amt{font-size:16px;font-weight:700}
 
-  /* settlement list */
+  .ledger{max-height:380px;overflow:auto;border-radius:10px;padding:6px}
+  table{width:100%;border-collapse:collapse}
+  thead th{font-weight:700;color:var(--muted);text-align:left;padding:10px}
+  td{padding:10px;border-bottom:1px solid rgba(15,23,42,0.04);font-size:14px}
+  tr:hover td{background:linear-gradient(90deg, rgba(96,165,250,0.02), transparent)}
+
   .settlement-list{display:flex;flex-direction:column;gap:8px}
-  .sett-row{display:flex;justify-content:space-between;align-items:center;padding:8px;border-radius:10px;background:#fff;border:1px solid rgba(15,23,42,0.03); box-shadow: 0 6px 16px rgba(10,15,30,0.02)}
+  .sett-row{display:flex;justify-content:space-between;align-items:center;padding:8px;border-radius:10px;background:#fff;border:1px solid rgba(15,23,42,0.03);box-shadow:0 6px 16px rgba(10,15,30,0.02)}
 
   /* floating action button (+) */
-  .fab{
-    position:fixed;right:22px;bottom:22px;width:60px;height:60px;border-radius:999px;
-    display:flex;align-items:center;justify-content:center;box-shadow: 0 16px 34px rgba(59,130,246,0.18);
-    background:linear-gradient(135deg,#60a5fa,#3b82f6);color:#fff;border:0;cursor:pointer;z-index:1200;
-    transition:transform .12s ease, box-shadow .12s ease;
-  }
-  .fab:hover{transform:translateY(-6px); box-shadow: 0 26px 58px rgba(59,130,246,0.22)}
+  .fab{position:fixed;right:22px;bottom:22px;width:60px;height:60px;border-radius:999px;display:flex;align-items:center;justify-content:center;box-shadow:0 16px 34px rgba(59,130,246,0.18);background:linear-gradient(135deg,#60a5fa,#3b82f6);color:#fff;border:0;cursor:pointer;z-index:1200;transition:transform .12s ease,box-shadow .12s ease}
+  .fab:hover{transform:translateY(-6px);box-shadow:0 26px 58px rgba(59,130,246,0.22)}
 
-  /* modal base */
+  /* modal */
   .modal-backdrop{position:fixed;inset:0;background:rgba(8,12,20,0.45);display:flex;align-items:center;justify-content:center;z-index:1300;opacity:0;pointer-events:none;transition:opacity .16s ease}
   .modal-backdrop.open{opacity:1;pointer-events:auto}
-  .modal{background:var(--card);border-radius:12px;min-width:320px;max-width:760px;padding:18px;box-shadow: 0 24px 60px rgba(10,20,50,0.32);transform:translateY(12px);transition:transform .18s ease,opacity .18s ease}
+  .modal{background:var(--card);border-radius:12px;min-width:320px;max-width:760px;padding:18px;box-shadow:0 24px 60px rgba(10,20,50,0.32);transform:translateY(12px);transition:transform .18s ease,opacity .18s ease}
   .modal-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}
   .modal-body{max-height:60vh;overflow:auto;padding-right:6px}
   .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
 
   /* minimal scrollbar */
-  .ledger::-webkit-scrollbar, .modal-body::-webkit-scrollbar {height:8px;width:8px}
-  .ledger::-webkit-scrollbar-thumb, .modal-body::-webkit-scrollbar-thumb {background:rgba(15,23,42,0.06);border-radius:999px}
-  .ledger::-webkit-scrollbar-track, .modal-body::-webkit-scrollbar-track {background:transparent}
+  .ledger::-webkit-scrollbar,.modal-body::-webkit-scrollbar{height:8px;width:8px}
+  .ledger::-webkit-scrollbar-thumb,.modal-body::-webkit-scrollbar-thumb{background:rgba(15,23,42,0.06);border-radius:999px}
+  .ledger::-webkit-scrollbar-track,.modal-body::-webkit-scrollbar-track{background:transparent}
 
-  /* subtle transitions */
-  button, .chip, input, select {transition:all .12s ease}
-  a{color:inherit}
+  /* responsive */
+  @media (max-width:780px){ .balances{flex-direction:column} .balance-card{min-width:unset} }
 </style>
 </head>
 <body>
@@ -166,17 +94,7 @@
     </div>
 
     <div class="controls">
-      <button id="exportJsonBtn" class="btn ghost" title="Exportar JSON">
-        <svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M12 3v12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 7l4-4 4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><rect x="3" y="13" width="18" height="8" rx="2" stroke="currentColor" stroke-width="1.2"/></svg>
-        Exportar JSON
-      </button>
-
-      <button id="importBtn" class="btn ghost" title="Importar JSON">
-        <svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M12 3v12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 7l4-4 4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Importar
-      </button>
-
-      <button id="exportPngBtn" class="btn" title="Exportar PNG">
+      <button id="exportPngBtn" class="btn primary" title="Exportar PNG">
         <svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M4 7h16v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7z" stroke="white" stroke-width="1.2"/><path d="M9 3h6v4H9z" stroke="white" stroke-width="1.2"/></svg>
         Exportar PNG
       </button>
@@ -188,76 +106,40 @@
     </div>
   </header>
 
-  <main class="grid">
-    <!-- esquerda: histórico -->
-    <section>
-      <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <h3 style="margin:0">Histórico de despesas</h3>
-          <div class="small-muted">Registre despesas e edite quando precisar</div>
-        </div>
+  <main class="col">
+    <!-- SALDOS -->
+    <section class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <h3 style="margin:0">Saldos</h3>
+        <div class="subtitle" style="font-size:13px">Valores positivos: <strong style="color:var(--success)">a receber</strong> • negativos: <strong style="color:var(--danger)">a pagar</strong></div>
+      </div>
+      <div id="balancesContainer" class="balances" style="margin-top:12px"></div>
+    </section>
 
-        <div class="ledger card" style="margin-top:12px;padding:8px">
-          <table id="ledgerTable">
-            <thead>
-              <tr><th>Data</th><th>Descrição</th><th>Pago por</th><th>Valor</th><th>Participantes</th><th>Valor/pessoa</th><th></th></tr>
-            </thead>
-            <tbody id="ledgerBody"></tbody>
-          </table>
-        </div>
+    <!-- HISTÓRICO -->
+    <section class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <h3 style="margin:0">Histórico de despesas</h3>
+        <div class="subtitle" style="font-size:13px">Clique no + para adicionar ou em Editar/Remover</div>
       </div>
 
-      <div style="height:10px"></div>
-
-      <div class="card">
-        <h3 style="margin:0 0 8px 0">Sugestão de acerto</h3>
-        <div id="settlementList" class="settlement-list">
-          <div class="small-muted" id="noSettlements">Ainda sem despesas.</div>
-        </div>
+      <div class="ledger" style="margin-top:12px;padding:8px">
+        <table id="ledgerTable">
+          <thead>
+            <tr><th>Data</th><th>Descrição</th><th>Pago por</th><th>Valor</th><th>Participantes</th><th>Valor/pessoa</th><th></th></tr>
+          </thead>
+          <tbody id="ledgerBody"></tbody>
+        </table>
       </div>
     </section>
 
-    <!-- direita: saldos e formulário resumido -->
-    <aside>
-      <div class="card">
-        <h3 style="margin:0 0 8px 0">Saldos</h3>
-        <div id="balancesContainer" class="balances"></div>
-        <div class="small-muted" style="margin-top:12px">Valores positivos: <strong style="color:var(--success)">a receber</strong> • negativos: <strong style="color:var(--danger)">a pagar</strong></div>
+    <!-- SUGESTÃO DE ACERTO (parte inferior) -->
+    <section class="card">
+      <h3 style="margin:0 0 8px 0">Sugestão de acerto</h3>
+      <div id="settlementList" class="settlement-list">
+        <div class="small-muted" id="noSettlements">Ainda sem despesas.</div>
       </div>
-
-      <div style="height:12px"></div>
-
-      <div class="card">
-        <h3 style="margin:0 0 8px 0">Adicionar rápido</h3>
-        <div class="form-row">
-          <div class="field">
-            <label>Data</label>
-            <input type="date" id="dateInline">
-          </div>
-          <div class="field">
-            <label>Valor (R$)</label>
-            <input type="number" id="amountInline" step="0.01" min="0">
-          </div>
-        </div>
-        <div style="height:10px"></div>
-        <div class="field">
-          <label>Descrição</label>
-          <input type="text" id="descInline" placeholder="Ex: Arroz, Gás...">
-        </div>
-        <div style="height:10px"></div>
-        <div style="display:flex;gap:8px">
-          <button id="openAddModalBtn" class="btn primary" style="flex:1">
-            <svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="white" stroke-width="1.6" stroke-linecap="round"/></svg>
-            Abrir modal
-          </button>
-          <button id="quickAddBtn" class="btn ghost" style="width:110px">
-            <svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-            Adicionar
-          </button>
-        </div>
-        <div class="small-muted" style="margin-top:10px">Use o botão <strong>+</strong> no canto para adicionar pelo modal completo.</div>
-      </div>
-    </aside>
+    </section>
   </main>
 </div>
 
@@ -266,12 +148,9 @@
   <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M12 5v14" stroke="white" stroke-width="1.8" stroke-linecap="round"/><path d="M5 12h14" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>
 </button>
 
-<!-- MODAIS -->
-<!-- generic backdrop -->
+<!-- MODAL BACKDROP -->
 <div id="modalBackdrop" class="modal-backdrop" aria-hidden="true" style="display:none">
-  <div id="modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-    <!-- content is injected by JS -->
-  </div>
+  <div id="modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"></div>
 </div>
 
 <!-- html2canvas CDN -->
@@ -279,7 +158,7 @@
 
 <script>
 (() => {
-  // === Configuração de nomes e grupos ===
+  // ===== configuração nomes/grupos =====
   const groupA = ['Wanderson','Gu','Cris'];
   const groupB = ['Gu','Galeno','Emerson'];
   const uniquePeople = Array.from(new Set([...groupA, ...groupB]));
@@ -289,46 +168,26 @@
   const balancesContainer = document.getElementById('balancesContainer');
   const settlementList = document.getElementById('settlementList');
   const noSettlements = document.getElementById('noSettlements');
-  const exportJsonBtn = document.getElementById('exportJsonBtn');
-  const importBtn = document.getElementById('importBtn');
   const exportPngBtn = document.getElementById('exportPngBtn');
   const resetBtn = document.getElementById('resetBtn');
   const fab = document.getElementById('fab');
-  const openAddModalBtn = document.getElementById('openAddModalBtn');
-  const quickAddBtn = document.getElementById('quickAddBtn');
-
-  const dateInline = document.getElementById('dateInline');
-  const amountInline = document.getElementById('amountInline');
-  const descInline = document.getElementById('descInline');
-
-  // modal elements
   const modalBackdrop = document.getElementById('modalBackdrop');
   const modal = document.getElementById('modal');
 
-  // storage key
   const STORAGE_KEY = 'despesas_casa_professores_v2';
 
-  // load data
+  // dados
   let expenses = loadExpenses();
 
-  // init small inline date default
-  dateInline.valueAsDate = new Date();
-
-  // ==== Modal utilities (Promise-based) ====
-  function openModal(contentHtml, opts = {}) {
-    // contentHtml can be an Element or HTML string
+  // modal utilities (promise based)
+  function openModal(contentHtml) {
     modal.innerHTML = '';
     if (typeof contentHtml === 'string') modal.innerHTML = contentHtml;
     else modal.appendChild(contentHtml);
-
-    // show backdrop
     modalBackdrop.style.display = 'flex';
-    // small delay to animate class
     requestAnimationFrame(() => modalBackdrop.classList.add('open'));
-    // focus first input if exists
     const fi = modal.querySelector('input,select,button,textarea');
     if (fi) setTimeout(()=>fi.focus(), 80);
-
     return {
       close: (cleanup) => {
         modalBackdrop.classList.remove('open');
@@ -337,47 +196,39 @@
     };
   }
 
-  // confirm modal -> returns Promise<boolean>
   function showConfirm(message, title = 'Confirmação') {
     return new Promise(resolve => {
       const wrapper = document.createElement('div');
       wrapper.innerHTML = `
-        <div class="modal-head"><div><strong id="modalTitle">${escapeHtml(title)}</strong></div>
-          <div style="opacity:.6;font-size:13px">${escapeHtml(message)}</div></div>
-        <div class="modal-actions" style="margin-top:16px;">
+        <div class="modal-head"><div><strong id="modalTitle">${escapeHtml(title)}</strong></div></div>
+        <div class="modal-body">${escapeHtml(message)}</div>
+        <div class="modal-actions">
           <button id="noBtn" class="btn ghost">Cancelar</button>
           <button id="yesBtn" class="btn primary">Confirmar</button>
-        </div>
-      `;
+        </div>`;
       const m = openModal(wrapper);
       wrapper.querySelector('#yesBtn').addEventListener('click', () => { m.close(); resolve(true); });
       wrapper.querySelector('#noBtn').addEventListener('click', () => { m.close(); resolve(false); });
-      // backdrop click closes as cancel
       modalBackdrop.onclick = (e) => { if(e.target === modalBackdrop){ m.close(); resolve(false); } };
     });
   }
 
-  // alert/info modal
   function showAlert(message, title = 'Info') {
     return new Promise(resolve => {
       const wrapper = document.createElement('div');
       wrapper.innerHTML = `
         <div class="modal-head"><div><strong id="modalTitle">${escapeHtml(title)}</strong></div></div>
-        <div style="margin-top:8px">${escapeHtml(message)}</div>
-        <div class="modal-actions" style="margin-top:16px;">
-          <button id="okBtn" class="btn primary">OK</button>
-        </div>
-      `;
+        <div class="modal-body">${escapeHtml(message)}</div>
+        <div class="modal-actions"><button id="okBtn" class="btn primary">OK</button></div>`;
       const m = openModal(wrapper);
       wrapper.querySelector('#okBtn').addEventListener('click', () => { m.close(); resolve(); });
       modalBackdrop.onclick = (e) => { if(e.target === modalBackdrop){ m.close(); resolve(); } };
     });
   }
 
-  // open add/edit expense modal; if expense passed -> edit
+  // abrir modal de adicionar/editar despesa
   function openExpenseModal(expense) {
     return new Promise(resolve => {
-      // construct modal DOM
       const isEdit = !!expense;
       const wrapper = document.createElement('div');
       wrapper.innerHTML = `
@@ -386,30 +237,17 @@
         </div>
         <div class="modal-body">
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-            <div class="field">
-              <label>Data</label>
-              <input id="m-date" type="date">
-            </div>
-            <div class="field">
-              <label>Valor (R$)</label>
-              <input id="m-amount" type="number" step="0.01" min="0">
-            </div>
-            <div class="field" style="grid-column:1 / -1">
-              <label>Descrição</label>
-              <input id="m-desc" type="text" placeholder="Ex: Arroz, gás...">
-            </div>
-            <div class="field">
-              <label>Grupo base</label>
+            <div class="field"><label>Data</label><input id="m-date" type="date"></div>
+            <div class="field"><label>Valor (R$)</label><input id="m-amount" type="number" step="0.01" min="0"></div>
+            <div class="field" style="grid-column:1 / -1"><label>Descrição</label><input id="m-desc" type="text" placeholder="Ex: Arroz, gás..."></div>
+            <div class="field"><label>Grupo base</label>
               <select id="m-group">
                 <option value="A">Grupo A (Wanderson, Gu, Cris)</option>
                 <option value="B">Grupo B (Gu, Galeno, Emerson)</option>
                 <option value="manual">Manual (todos)</option>
               </select>
             </div>
-            <div class="field">
-              <label>Quem pagou</label>
-              <select id="m-payer"></select>
-            </div>
+            <div class="field"><label>Quem pagou</label><select id="m-payer"></select></div>
           </div>
 
           <div style="margin-top:12px">
@@ -425,7 +263,6 @@
         </div>
       `;
 
-      // open and populate
       const m = openModal(wrapper);
       const elDate = wrapper.querySelector('#m-date');
       const elAmount = wrapper.querySelector('#m-amount');
@@ -435,19 +272,16 @@
       const elParticipants = wrapper.querySelector('#m-participants');
       const elToggleAll = wrapper.querySelector('#m-toggleAll');
 
-      // render payers options
-      uniquePeople.forEach(n => {
-        const opt = document.createElement('option'); opt.value = n; opt.textContent = n; elPayer.appendChild(opt);
-      });
+      // preencher pagadores
+      uniquePeople.forEach(n => { const opt = document.createElement('option'); opt.value = n; opt.textContent = n; elPayer.appendChild(opt); });
 
-      // set initial values
       if (isEdit) {
         elDate.value = expense.date;
         elAmount.value = (expense.amount_cents/100).toFixed(2);
         elDesc.value = expense.desc;
-        // choose group initially based on participants if subset of A or B
-        const inA = expense.participants.every(p => groupA.includes(p));
-        const inB = expense.participants.every(p => groupB.includes(p));
+        // inferir grupo base para facilitar: se todos participantes estão em A e tamanho igual, escolher A; idem B; caso contrário manual
+        const inA = expense.participants.length > 0 && expense.participants.every(p => groupA.includes(p));
+        const inB = expense.participants.length > 0 && expense.participants.every(p => groupB.includes(p));
         if (expense.participants.length === 0) elGroup.value = 'manual';
         else if (inA && expense.participants.length === groupA.length) elGroup.value = 'A';
         else if (inB && expense.participants.length === groupB.length) elGroup.value = 'B';
@@ -469,13 +303,16 @@
         else people = uniquePeople;
         people.forEach(name => {
           const lab = document.createElement('label');
-          lab.className = 'chip';
-          lab.style.cursor = 'pointer';
+          lab.style.display = 'inline-flex';
+          lab.style.alignItems = 'center';
+          lab.style.gap = '8px';
+          lab.style.padding = '8px';
+          lab.style.borderRadius = '999px';
+          lab.style.background = 'linear-gradient(180deg,#f8fbff,#f1f6ff)';
           lab.innerHTML = `<input type="checkbox" value="${escapeHtml(name)}"> ${escapeHtml(name)}`;
           elParticipants.appendChild(lab);
         });
-
-        // if editing, mark participants selected
+        // marcar se editando
         if (isEdit && expense.participants && expense.participants.length) {
           elParticipants.querySelectorAll('input[type=checkbox]').forEach(cb => {
             if (expense.participants.includes(cb.value)) cb.checked = true;
@@ -492,76 +329,39 @@
 
       renderParticipantsForGroup();
 
-      // handlers
       wrapper.querySelector('#m-cancel').addEventListener('click', () => { m.close(); resolve(null); });
       wrapper.querySelector('#m-save').addEventListener('click', async () => {
         const date = elDate.value || new Date().toISOString().slice(0,10);
         const desc = elDesc.value.trim() || '(sem descrição)';
         const payer = elPayer.value;
         const amount = parseFloat(elAmount.value);
-        if (isNaN(amount) || amount <= 0) {
-          await showAlert('Digite um valor válido maior que 0.', 'Valor inválido');
-          return;
-        }
-        const participants = Array.from(elParticipants.querySelectorAll('input[type=checkbox]'))
-                                .filter(cb => cb.checked).map(cb => cb.value);
+        if (isNaN(amount) || amount <= 0) { await showAlert('Digite um valor válido maior que 0.', 'Valor inválido'); return; }
+        const participants = Array.from(elParticipants.querySelectorAll('input[type=checkbox]')).filter(cb => cb.checked).map(cb => cb.value);
         if (participants.length === 0) {
           const cont = await showConfirm('Nenhum participante selecionado. Deseja registrar a despesa sem dividir (somente o pagador)?', 'Sem participantes');
           if (!cont) return;
         }
         const cents = Math.round(amount*100);
         if (isEdit) {
-          // update object
-          expense.date = date;
-          expense.desc = desc;
-          expense.payer = payer;
-          expense.amount_cents = cents;
-          expense.participants = participants;
-          saveExpenses();
-          renderLedger();
-          renderBalancesAndSettlements();
-          m.close();
-          resolve(expense);
+          expense.date = date; expense.desc = desc; expense.payer = payer; expense.amount_cents = cents; expense.participants = participants;
+          saveExpenses(); renderLedger(); renderBalancesAndSettlements(); m.close(); resolve(expense);
         } else {
-          const newExp = {
-            id: 'e-' + Date.now(),
-            date, desc, payer, amount_cents: cents, participants
-          };
-          expenses.push(newExp);
-          saveExpenses();
-          renderLedger();
-          renderBalancesAndSettlements();
-          m.close();
-          resolve(newExp);
+          const newExp = { id: 'e-' + Date.now(), date, desc, payer, amount_cents: cents, participants };
+          expenses.push(newExp); saveExpenses(); renderLedger(); renderBalancesAndSettlements(); m.close(); resolve(newExp);
         }
       });
 
-      // backdrop click to close
       modalBackdrop.onclick = (e) => { if(e.target === modalBackdrop){ m.close(); resolve(null); } };
     });
   }
 
-  // escape simple
   function escapeHtml(str){ return String(str).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[s]); }
 
-  // load/save
-  function loadExpenses(){
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return [];
-      return JSON.parse(raw);
-    } catch(e) {
-      console.error('erro load', e); return [];
-    }
-  }
-  function saveExpenses(){
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(expenses));
-  }
+  function loadExpenses(){ try { const raw = localStorage.getItem(STORAGE_KEY); if (!raw) return []; return JSON.parse(raw); } catch(e){ console.error(e); return []; } }
+  function saveExpenses(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(expenses)); }
 
-  // calculation (same lógica robusta em centavos)
   function calculateNetBalances(){
-    const net = {};
-    uniquePeople.forEach(p => net[p]=0);
+    const net = {}; uniquePeople.forEach(p => net[p]=0);
     expenses.forEach(e => {
       net[e.payer] += e.amount_cents;
       const n = e.participants.length;
@@ -576,13 +376,11 @@
     return net;
   }
 
-  // render ledger
   function renderLedger(){
     ledgerBody.innerHTML = '';
     if (expenses.length === 0){
       const tr = document.createElement('tr');
-      const td = document.createElement('td');
-      td.colSpan = 7; td.className = 'small-muted'; td.textContent = 'Nenhuma despesa registrada.';
+      const td = document.createElement('td'); td.colSpan = 7; td.className = 'small-muted'; td.textContent = 'Nenhuma despesa registrada.';
       tr.appendChild(td); ledgerBody.appendChild(tr); return;
     }
     const sorted = expenses.slice().sort((a,b) => new Date(b.date) - new Date(a.date) || b.id.localeCompare(a.id));
@@ -600,26 +398,17 @@
         <td>${escapeHtml(participantsText)}</td>
         <td>${perPerson}</td>
         <td style="white-space:nowrap">
-          <button data-id="${exp.id}" class="btn ghost btn-edit" title="Editar" style="margin-right:6px">
-            <svg class="icon" viewBox="0 0 24 24"><path d="M3 21l3-1 11-11 2-3-3 2L6 19 3 21z" stroke="currentColor" stroke-width="1.1" fill="none"/></svg>
-            Editar
-          </button>
-          <button data-id="${exp.id}" class="btn btn-remove" title="Remover" style="background:linear-gradient(180deg,#ff7b7b,#ff6b6b);color:#fff;">
-            <svg class="icon" viewBox="0 0 24 24"><path d="M3 6h18M8 6v12a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V6" stroke="white" stroke-width="1.2" fill="none"/></svg>
-            Remover
-          </button>
-        </td>
-      `;
+          <button data-id="${exp.id}" class="btn ghost btn-edit" style="margin-right:6px">Editar</button>
+          <button data-id="${exp.id}" class="btn btn-remove" style="background:linear-gradient(180deg,#ff7b7b,#ff6b6b);color:#fff;">Remover</button>
+        </td>`;
       ledgerBody.appendChild(tr);
     });
 
-    // attach edit/remove handlers
     ledgerBody.querySelectorAll('.btn-remove').forEach(btn => btn.addEventListener('click', async (ev) => {
       const id = ev.currentTarget.getAttribute('data-id');
-      const ok = await showConfirm('Remover esta despesa?','Remover');
+      const ok = await showConfirm('Remover esta despesa?', 'Remover');
       if (!ok) return;
-      expenses = expenses.filter(e => e.id !== id);
-      saveExpenses(); renderLedger(); renderBalancesAndSettlements();
+      expenses = expenses.filter(e => e.id !== id); saveExpenses(); renderLedger(); renderBalancesAndSettlements();
     }));
 
     ledgerBody.querySelectorAll('.btn-edit').forEach(btn => btn.addEventListener('click', async (ev) => {
@@ -630,7 +419,6 @@
     }));
   }
 
-  // render balances & settlements
   function renderBalancesAndSettlements(){
     const fmt = new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'});
     const net = calculateNetBalances();
@@ -639,7 +427,7 @@
       const balance = net[name] || 0;
       const card = document.createElement('div'); card.className = 'balance-card';
       const nm = document.createElement('div'); nm.style.fontWeight='700'; nm.textContent = name;
-      const amt = document.createElement('div'); amt.className = 'balance-amt'; amt.textContent = fmt.format(balance/100);
+      const amt = document.createElement('div'); amt.className='balance-amt'; amt.textContent = fmt.format(balance/100);
       amt.style.color = balance > 0 ? getComputedStyle(document.documentElement).getPropertyValue('--success') || '#2e7d32'
                       : (balance < 0 ? getComputedStyle(document.documentElement).getPropertyValue('--danger') || '#c62828' : '#333');
       const small = document.createElement('div'); small.className='small-muted'; small.textContent = balance>=0 ? 'A receber':'A pagar';
@@ -647,7 +435,7 @@
       balancesContainer.appendChild(card);
     });
 
-    // settlements (greedy)
+    // settlements
     settlementList.innerHTML = '';
     const creditors = [], debtors = [];
     for(const [name,cents] of Object.entries(net)){
@@ -656,12 +444,10 @@
       else debtors.push({name,cents: -cents});
     }
     if (creditors.length === 0 && debtors.length === 0){
-      noSettlements.style.display = 'block';
-      return;
+      noSettlements.style.display = 'block'; return;
     } else noSettlements.style.display = 'none';
     creditors.sort((a,b)=>b.cents-a.cents); debtors.sort((a,b)=>b.cents-a.cents);
-    const settlements = [];
-    let i=0,j=0;
+    const settlements = []; let i=0,j=0;
     while(i<debtors.length && j<creditors.length){
       const debtor = debtors[i], creditor = creditors[j];
       const pay = Math.min(debtor.cents, creditor.cents);
@@ -669,7 +455,6 @@
       debtor.cents -= pay; creditor.cents -= pay;
       if (debtor.cents === 0) i++; if (creditor.cents === 0) j++;
     }
-    const fmtEl = document.createElement('div');
     settlements.forEach(s => {
       const row = document.createElement('div'); row.className='sett-row';
       row.innerHTML = `<div>${escapeHtml(s.from)} → ${escapeHtml(s.to)}</div><div style="font-weight:700">${new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(s.amount_cents/100)}</div>`;
@@ -677,80 +462,12 @@
     });
   }
 
-  // export JSON
-  exportJsonBtn.addEventListener('click', () => {
-    const data = { generated_at: new Date().toISOString(), expenses, groups:{A:groupA,B:groupB,people:uniquePeople} };
-    const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = 'despesas_casa_professores.json'; a.click(); URL.revokeObjectURL(url);
-  });
-
-  // import JSON -> ask confirm before replacing (modal)
-  importBtn.addEventListener('click', () => {
-    const input = document.createElement('input');
-    input.type='file'; input.accept='.json,application/json';
-    input.onchange = async () => {
-      const file = input.files[0]; if(!file) return;
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        try {
-          const parsed = JSON.parse(e.target.result);
-          if (!parsed.expenses) throw new Error('Arquivo inválido (formato diferente).');
-          const ok = await showConfirm('Importar esse arquivo substituirá o histórico atual. Continuar?','Importar');
-          if (!ok) return;
-          expenses = parsed.expenses;
-          saveExpenses();
-          renderLedger(); renderBalancesAndSettlements();
-          await showAlert('Importação concluída.', 'Importado');
-        } catch(err) {
-          await showAlert('Erro ao importar: '+ (err.message || err), 'Erro');
-        }
-      };
-      reader.readAsText(file);
-    };
-    input.click();
-  });
-
-  // reset
-  resetBtn.addEventListener('click', async () => {
-    const ok = await showConfirm('Apagar todos os dados salvos no navegador? Esta ação não pode ser desfeita.','Resetar');
-    if (!ok) return;
-    expenses = []; saveExpenses(); renderLedger(); renderBalancesAndSettlements();
-    await showAlert('Dados apagados.', 'Resetado');
-  });
-
-  // FAB and open add modal
-  fab.addEventListener('click', async () => { await openExpenseModal(null); });
-  openAddModalBtn.addEventListener('click', async () => { await openExpenseModal(null); });
-
-  // quick inline add (no modal) - keep but uses modal confirmations
-  quickAddBtn.addEventListener('click', async () => {
-    const date = dateInline.value || new Date().toISOString().slice(0,10);
-    const desc = descInline.value.trim() || '(sem descrição)';
-    const amount = parseFloat(amountInline.value);
-    if (isNaN(amount) || amount <= 0) { await showAlert('Digite um valor válido maior que 0.','Valor inválido'); return; }
-    // default: group A and all selected = groupA
-    const participants = groupA.slice();
-    const payer = groupA[0];
-    const cents = Math.round(amount*100);
-    const newExp = { id:'e-'+Date.now(), date, desc, payer, amount_cents:cents, participants };
-    expenses.push(newExp); saveExpenses(); renderLedger(); renderBalancesAndSettlements();
-    descInline.value=''; amountInline.value=''; dateInline.valueAsDate = new Date();
-    await showAlert('Despesa adicionada (rápida). Use o modal para editar detalhes.','Adicionado');
-  });
-
-  // export PNG (inclui saldos coloridos, tabela e acerto)
+  // export PNG (saldos coloridos + histórico + acerto)
   exportPngBtn.addEventListener('click', async () => {
     try {
       const fmt = new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'});
-      // build wrapper
       const wrapper = document.createElement('div');
-      wrapper.style.width = '900px';
-      wrapper.style.background = '#fff';
-      wrapper.style.color = '#111';
-      wrapper.style.padding = '18px';
-      wrapper.style.borderRadius = '10px';
-      wrapper.style.fontFamily = getComputedStyle(document.body).fontFamily;
+      wrapper.style.width = '900px'; wrapper.style.background = '#fff'; wrapper.style.color = '#111'; wrapper.style.padding = '18px'; wrapper.style.borderRadius = '10px'; wrapper.style.fontFamily = getComputedStyle(document.body).fontFamily;
 
       const title = document.createElement('div'); title.style.fontSize='18px'; title.style.fontWeight='700'; title.textContent='Divisão de Despesas — Casa dos Professores';
       const sub = document.createElement('div'); sub.style.color='#6b7280'; sub.style.marginBottom='10px'; sub.textContent = 'Gerado em: ' + new Date().toLocaleString('pt-BR');
@@ -771,7 +488,7 @@
       });
       wrapper.appendChild(balGrid);
 
-      // ledger table clone (simpler HTML)
+      // ledger
       const tblTitle = document.createElement('div'); tblTitle.style.fontWeight='700'; tblTitle.style.margin='8px 0'; tblTitle.textContent='Histórico de despesas';
       wrapper.appendChild(tblTitle);
       const table = document.createElement('table'); table.style.width='100%'; table.style.borderCollapse='collapse';
@@ -797,8 +514,7 @@
         else debtors.push({name,cents:-cents});
       }
       creditors.sort((a,b)=>b.cents-a.cents); debtors.sort((a,b)=>b.cents-a.cents);
-      const settlements = [];
-      let i=0,j=0;
+      const settlements = []; let i=0,j=0;
       while(i<debtors.length && j<creditors.length){
         const debtor = debtors[i], creditor = creditors[j];
         const pay = Math.min(debtor.cents, creditor.cents);
@@ -816,7 +532,6 @@
         });
       }
 
-      // append to DOM off-screen to capture styles
       wrapper.style.position='fixed'; wrapper.style.left='-10000px'; wrapper.style.top='0';
       document.body.appendChild(wrapper);
       await new Promise(r=>setTimeout(r,60));
@@ -828,17 +543,24 @@
         document.body.removeChild(wrapper);
       }, 'image/png');
 
-    } catch(err){
-      console.error(err); showAlert('Erro ao exportar PNG: ' + (err.message || err), 'Erro');
-    }
+    } catch(err){ console.error(err); showAlert('Erro ao exportar PNG: ' + (err.message || err), 'Erro'); }
   });
+
+  // reset
+  resetBtn.addEventListener('click', async () => {
+    const ok = await showConfirm('Apagar todos os dados salvos no navegador? Esta ação não pode ser desfeita.','Resetar');
+    if (!ok) return;
+    expenses = []; saveExpenses(); renderLedger(); renderBalancesAndSettlements(); await showAlert('Dados apagados.','Resetado');
+  });
+
+  // FAB handler
+  fab.addEventListener('click', async () => { await openExpenseModal(null); });
 
   // initial render
   renderLedger(); renderBalancesAndSettlements();
 
-  // helper: open quick expense modal when double-click on empty area? (not necessary)
-  // expose to window for debugging (optional)
-  window._expenses_app = { expenses, saveExpenses, loadExpenses, openExpenseModal, showAlert, showConfirm };
+  // expose minimal helpers (opcional)
+  window._expenses_app = { expenses, saveExpenses, loadExpenses, openExpenseModal };
 
 })();
 </script>
