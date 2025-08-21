@@ -13,6 +13,7 @@
 <!-- jsPDF e autoTable -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <style>
 :root{
@@ -406,6 +407,8 @@ th{ background: linear-gradient(180deg, #fafcff, #f6f8fb); position: sticky; top
     <h2>Relatório PDF</h2>
     <p class="instrucao">Gere um PDF com as compras, saldos e sugestões de acerto.</p>
     <button class="button primary" id="btnPDF"><span class="icon">picture_as_pdf</span> Gerar Relatório PDF</button>
+    <button class="btn" onclick="exportarRelatorioImagem()">Exportar Imagem</button>
+<div id="relatorioImagem" style="padding:20px; background:white; display:none;"></div>
   </section>
 </main>
 
@@ -458,6 +461,81 @@ th{ background: linear-gradient(180deg, #fafcff, #f6f8fb); position: sticky; top
 
  
 <script>
+
+async function exportarRelatorioImagem() {
+    const relatorioDiv = document.getElementById("relatorioImagem");
+    relatorioDiv.innerHTML = ""; // limpa antes
+
+    const saldos = calcularSaldos();
+    const professores = getProfessores();
+
+    // Cria tabela
+    let tabela = document.createElement("table");
+    tabela.border = "1";
+    tabela.style.borderCollapse = "collapse";
+    tabela.style.width = "100%";
+    tabela.style.textAlign = "center";
+
+    // Cabeçalho
+    let thead = document.createElement("thead");
+    thead.innerHTML = `
+        <tr style="background:#ddd; font-weight:bold;">
+            <td>Professor</td>
+            <td>Gastou</td>
+            <td>Deveria Gastar</td>
+            <td>Saldo</td>
+        </tr>`;
+    tabela.appendChild(thead);
+
+    // Corpo
+    let tbody = document.createElement("tbody");
+    professores.forEach(p => {
+        const saldo = saldos[p.id];
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${p.nome}</td>
+            <td>R$ ${saldo.gastou.toFixed(2)}</td>
+            <td>R$ ${saldo.deveriaGastar.toFixed(2)}</td>
+            <td style="color:${saldo.saldo < 0 ? 'red' : 'green'};">
+                R$ ${saldo.saldo.toFixed(2)}
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+    tabela.appendChild(tbody);
+
+    relatorioDiv.appendChild(tabela);
+
+    // Sugestão de acertos
+    const sugestoes = sugerirAcertos(saldos);
+    if (sugestoes.length > 0) {
+        let sugestoesDiv = document.createElement("div");
+        sugestoesDiv.style.marginTop = "20px";
+        sugestoesDiv.innerHTML = "<h3>Sugestão de Acertos:</h3>";
+        sugestoes.forEach(s => {
+            let p = document.createElement("p");
+            p.textContent = `${s.devedor} deve pagar R$ ${s.valor.toFixed(2)} para ${s.creditor}`;
+            p.style.color = "red";
+            sugestoesDiv.appendChild(p);
+        });
+        relatorioDiv.appendChild(sugestoesDiv);
+    }
+
+    relatorioDiv.style.display = "block";
+
+    // Gera imagem
+    const canvas = await html2canvas(relatorioDiv);
+    const link = document.createElement("a");
+    link.download = "relatorio.png";
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+
+    relatorioDiv.style.display = "none";
+}
+
+
+
+
 /* ====== <footer class="site-footer">Desenvolvido por <strong>Professor Wanderson</strong></footer> 
 Estado e persistência ====== */
 const STORAGE_KEY = "divMantimentos_estado_v2";
