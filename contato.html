@@ -3,16 +3,15 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Divisão de Mantimentos — Versão Moderna</title>
+<title>Divisão de Mantimentos — PNG</title>
 
 <!-- Tipografia -->
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
 <!-- Icons (Material Symbols) -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,0,0" />
 
-<!-- jsPDF e autoTable -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+<!-- html2canvas para exportar PNG -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <style>
 :root{
@@ -20,10 +19,10 @@
   --card: #ffffff;
   --text: #273143;
   --muted: #6b7280;
-  --brand-1: #7dd3fc;  /* azul claro */
-  --brand-2: #a7f3d0;  /* verde água */
-  --brand-3: #c7d2fe;  /* lilás */
-  --accent: #4f46e5;   /* índigo */
+  --brand-1: #7dd3fc;
+  --brand-2: #a7f3d0;
+  --brand-3: #c7d2fe;
+  --accent: #4f46e5;
   --ok: #16a34a;
   --warn: #ef4444;
   --shadow: 0 8px 24px rgba(17, 24, 39, .08);
@@ -72,10 +71,7 @@ main{
 }
 
 /* tabs */
-.tab{
-  display:flex; flex-wrap:wrap; gap:8px;
-  margin-bottom:12px;
-}
+.tab{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; }
 .tab button{
   appearance:none; border:none; cursor:pointer;
   padding:10px 14px; font-weight:600; border-radius:999px;
@@ -90,7 +86,6 @@ main{
   box-shadow: var(--shadow);
   color:#111827;
 }
-
 .tabcontent{ display:none; }
 .tabcontent.active{ display:block; }
 
@@ -115,15 +110,11 @@ p.instrucao{
 }
 
 /* group selector */
-.group-grid{
-  display:grid; gap:10px;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-}
+.group-grid{ display:grid; gap:10px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
 .group-card{
   display:flex; gap:12px; align-items:center;
   background: linear-gradient(135deg, #ffffff, #fbfdff);
-  border:1px solid #eef2f7;
-  padding:12px; border-radius: var(--radius);
+  border:1px solid #eef2f7; padding:12px; border-radius: var(--radius);
   transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
 }
 .group-card:hover{ transform: translateY(-2px); box-shadow: var(--shadow); border-color:#e5e7eb; }
@@ -131,25 +122,17 @@ p.instrucao{
 .group-card strong{ display:block; }
 
 /* professor cards (saldos) */
-.card-grid{
-  display:grid; gap:14px;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-}
+.card-grid{ display:grid; gap:14px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
 .prof-card{
   display:flex; flex-direction:column; gap:10px;
   background: linear-gradient(160deg, #ffffff 0%, #fafcff 60%, #f8fbff 100%);
-  border:1px solid #eef2f7;
-  border-radius: var(--radius);
+  border:1px solid #eef2f7; border-radius: var(--radius);
   padding:14px;
   transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
 }
 .prof-card:hover{ transform: translateY(-3px); box-shadow: var(--shadow); border-color:#e5e7eb; }
-.prof-head{
-  display:flex; align-items:center; justify-content:space-between; gap:10px;
-}
-.prof-name{
-  display:flex; align-items:center; gap:10px; font-weight:600;
-}
+.prof-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.prof-name{ display:flex; align-items:center; gap:10px; font-weight:600; }
 .prof-name .avatar{
   width:36px; height:36px; border-radius:50%;
   background: linear-gradient(135deg, var(--brand-1), var(--brand-3));
@@ -162,12 +145,8 @@ p.instrucao{
 .badge.ok{ color:var(--ok); border-color: rgba(22,163,74,.25); background: rgba(16,185,129,.06); }
 .badge.neg{ color:var(--warn); border-color: rgba(239,68,68,.25); background: rgba(239,68,68,.06); }
 
-.prof-body{
-  display:flex; gap:12px; align-items:flex-start;
-}
-.prof-col{
-  flex:1 1 50%;
-}
+.prof-body{ display:flex; gap:12px; align-items:flex-start; }
+.prof-col{ flex:1 1 50%; }
 .prof-label{ font-size:.8rem; color:var(--muted); margin-bottom:4px; }
 .prof-amount{ font-size:1.05rem; font-weight:600; }
 
@@ -182,9 +161,7 @@ p.instrucao{
   padding:8px 10px; border-bottom:1px solid #f1f5f9;
 }
 .list-item:last-child{ border-bottom:none; }
-.list-item .left{
-  display:flex; flex-direction:column;
-}
+.list-item .left{ display:flex; flex-direction:column; }
 .list-item .title{ font-weight:600; font-size:.92rem; }
 .list-item .meta{ font-size:.8rem; color:var(--muted); }
 
@@ -206,21 +183,15 @@ th{ background: linear-gradient(180deg, #fafcff, #f6f8fb); position: sticky; top
   transition: transform var(--transition), box-shadow var(--transition), opacity var(--transition), background var(--transition);
 }
 .button:hover{ transform: translateY(-1px); box-shadow: var(--shadow); }
-.button.primary{
-  background: linear-gradient(135deg, #c7d2fe, #a7f3d0);
-}
-.button.danger{
-  background: linear-gradient(135deg, #fee2e2, #fff1f2);
-  color:#b91c1c;
-}
+.button.primary{ background: linear-gradient(135deg, #c7d2fe, #a7f3d0); }
+.button.danger{ background: linear-gradient(135deg, #fee2e2, #fff1f2); color:#b91c1c; }
 .icon{ font-family: 'Material Symbols Rounded'; font-size:20px; line-height:0; }
 
 /* FAB */
 .fab{
   position: fixed; right: 18px; bottom: 76px; z-index: 50;
   width:56px; height:56px; border-radius:50%;
-  display:grid; place-items:center;
-  border:none; cursor:pointer; color:#fff;
+  display:grid; place-items:center; border:none; cursor:pointer; color:#fff;
   background: linear-gradient(135deg, #4f46e5, #06b6d4);
   box-shadow: 0 10px 28px rgba(79,70,229,.35);
   transition: transform var(--transition), box-shadow var(--transition), opacity var(--transition);
@@ -228,9 +199,7 @@ th{ background: linear-gradient(180deg, #fafcff, #f6f8fb); position: sticky; top
 .fab:hover{ transform: translateY(-2px) scale(1.02); box-shadow: 0 12px 32px rgba(79,70,229,.45); }
 
 /* modal */
-.modal{
-  position: fixed; inset:0; display:none; place-items:center; z-index:1000;
-}
+.modal{ position: fixed; inset:0; display:none; place-items:center; z-index:1000; }
 .modal.open{ display:grid; }
 .modal-backdrop{
   position:absolute; inset:0; background: rgba(15,23,42,.45);
@@ -241,8 +210,7 @@ th{ background: linear-gradient(180deg, #fafcff, #f6f8fb); position: sticky; top
 .modal-card{
   position:relative; width:min(640px, 94vw);
   background:#fff; border-radius:16px; box-shadow: var(--shadow);
-  overflow:hidden;
-  transform: translateY(6px);
+  overflow:hidden; transform: translateY(6px);
   animation: slideUp var(--transition) forwards;
 }
 @keyframes slideUp{ to{ transform: translateY(0);} }
@@ -401,11 +369,23 @@ th{ background: linear-gradient(180deg, #fafcff, #f6f8fb); position: sticky; top
     <div id="transferencias" class="section" style="padding:10px; background:linear-gradient(180deg,#fafcff,#ffffff); border:1px dashed #e5e7eb;"></div>
   </section>
 
-  <!-- Relatório -->
+  <!-- Relatório (PNG) -->
   <section id="relatorio" class="tabcontent section">
-    <h2>Relatório PDF</h2>
-    <p class="instrucao">Gere um PDF com as compras, saldos e sugestões de acerto.</p>
-    <button class="button primary" id="btnPDF"><span class="icon">picture_as_pdf</span> Gerar Relatório PDF</button>
+    <h2>Relatório (PNG)</h2>
+    <p class="instrucao">Clique para exportar uma imagem PNG com data, grupo, totais, cards e sugestões de acerto. Dica: clique em <strong>Calcular</strong> antes.</p>
+    <button class="button primary" id="btnPNG"><span class="icon">image</span> Exportar Relatório em PNG</button>
+
+    <!-- Área que será capturada -->
+    <div id="exportArea" style="margin-top:14px;">
+      <div id="exportHeader" style="margin-bottom:10px;">
+        <div style="font-weight:700; font-size:1rem;">Relatório de Mantimentos</div>
+        <div id="exportMeta" style="color:var(--muted); font-size:.88rem; margin-top:4px;"></div>
+      </div>
+      <div id="exportResumo" style="font-weight:600; margin-bottom:8px;"></div>
+      <div id="exportCards" class="card-grid"></div>
+      <h3 style="margin-top:14px;">Sugestão de acertos</h3>
+      <div id="exportTransf" class="section" style="padding:10px; background:linear-gradient(180deg,#fafcff,#ffffff); border:1px dashed #e5e7eb;"></div>
+    </div>
   </section>
 </main>
 
@@ -439,10 +419,7 @@ th{ background: linear-gradient(180deg, #fafcff, #f6f8fb); position: sticky; top
           <label>Quem comprou</label>
           <select id="m_comprador"></select>
         </div>
-        <div>
-          <label>Consumidores (marque pelo menos 1)</label>
-          <!-- espaço vazio; abaixo a caixa com checkboxes ocupa toda a largura -->
-        </div>
+        <div><label>Consumidores (marque pelo menos 1)</label></div>
       </div>
 
       <div class="consumidores-box" id="m_consumidores"></div>
@@ -460,9 +437,9 @@ th{ background: linear-gradient(180deg, #fafcff, #f6f8fb); position: sticky; top
 
 <script>
 /* ====== Estado e persistência ====== */
-const STORAGE_KEY = "divMantimentos_estado_v2";
+const STORAGE_KEY = "divMantimentos_estado_png_v1";
 let state = { professores: [], compras: [], _lastCalc: null };
-let editIndex = null; // índice da compra em edição (modal)
+let editIndex = null;
 let currentTab = 'professores';
 
 window.addEventListener('load', init);
@@ -471,7 +448,6 @@ window.addEventListener('load', init);
 function init(){
   loadState();
 
-  // default grupo
   if(!state.professores || state.professores.length === 0){
     setGrupo('A', false);
     document.getElementById('grupoA').checked = true;
@@ -495,6 +471,7 @@ function wireUI(){
       currentTab = target;
       document.querySelectorAll('.tabcontent').forEach(sec=>sec.classList.remove('active'));
       document.getElementById(target).classList.add('active');
+      if(target==='relatorio') montarExportArea();
     });
   });
 
@@ -512,8 +489,8 @@ function wireUI(){
   // limpar compras
   document.getElementById('btnLimparCompras').addEventListener('click', limparCompras);
 
-  // PDF
-  document.getElementById('btnPDF').addEventListener('click', gerarPDF);
+  // PNG
+  document.getElementById('btnPNG').addEventListener('click', exportPNG);
 
   // Modal: fechar
   document.querySelectorAll('[data-close]').forEach(el=> el.addEventListener('click', closeModal));
@@ -525,35 +502,23 @@ function wireUI(){
 
 function onTrocarGrupo(g){
   if(state.compras?.length){
-    // modalzinho simples com confirmação elegante
-    confirmElegante(
-      "Trocar de grupo",
-      "Existem compras registradas. Deseja limpar as compras ao mudar de grupo?",
-      "Trocar e limpar", "Cancelar"
-    ).then(ok=>{
-      if(ok){
-        state.compras = [];
-        setGrupo(g, true);
-        showToast("Grupo trocado e compras limpas.");
-      } else {
-        setGrupo(g, true);
-        showToast("Grupo trocado. Compras mantidas.");
-      }
-      atualizarUI();
-      saveState();
+    confirmElegante("Trocar de grupo","Existem compras registradas. Deseja limpar as compras ao mudar de grupo?","Trocar e limpar","Cancelar")
+    .then(ok=>{
+      if(ok){ state.compras = []; showToast("Compras limpas."); }
+      setGrupo(g, true);
+      atualizarUI(); saveState();
+      showToast(`Grupo ${g} selecionado.`);
     });
   } else {
     setGrupo(g, true);
-    atualizarUI();
-    saveState();
+    atualizarUI(); saveState();
     showToast(`Grupo ${g} selecionado.`);
   }
 }
 
-function setGrupo(grupo, explicito){
+function setGrupo(grupo){
   if(grupo === 'A') state.professores = ["Wanderson", "Gu", "Cris"];
   if(grupo === 'B') state.professores = ["Gu", "Emerson", "Galeno"];
-  // atualizar selects/checks do modal
   montarFormModal();
 }
 
@@ -572,7 +537,6 @@ function openModalNova(){
   document.getElementById('m_produto').value = "";
   document.getElementById('m_valor').value = "";
   montarFormModal();
-  // marcar todos por padrão
   document.querySelectorAll('#m_consumidores input').forEach(cb=> cb.checked = true);
   openModal();
 }
@@ -584,7 +548,6 @@ function openModalEditar(index){
   document.getElementById('m_produto').value = c.produto;
   document.getElementById('m_valor').value = c.valor;
   montarFormModal();
-  // se comprador não estiver no grupo atual (caso troca de grupo), mantém
   if(!state.professores.includes(c.comprador)){
     const opt = document.createElement('option');
     opt.value = c.comprador; opt.textContent = c.comprador;
@@ -615,17 +578,10 @@ function salvarCompraModal(){
   if(consumidores.length===0) return showToast("Marque pelo menos um consumidor.");
 
   const registro = { produto, valor: Number(valor), comprador, consumidores };
-  if(editIndex!==null){
-    state.compras[editIndex] = registro;
-    showToast("Compra atualizada.");
-  } else {
-    state.compras.push(registro);
-    showToast("Compra registrada.");
-  }
-  editIndex = null;
-  saveState();
-  atualizarUI();
-  closeModal();
+  if(editIndex!==null){ state.compras[editIndex] = registro; showToast("Compra atualizada."); }
+  else { state.compras.push(registro); showToast("Compra registrada."); }
+
+  editIndex = null; saveState(); atualizarUI(); closeModal();
 }
 
 /* ====== Compras tabela / ações ====== */
@@ -673,10 +629,7 @@ function limparCompras(){
 
 /* ====== Saldos & Cards ====== */
 function calcular(){
-  if(!state.compras?.length){
-    showToast("Adicione ao menos uma compra.");
-    return;
-  }
+  if(!state.compras?.length){ showToast("Adicione ao menos uma compra."); return; }
   const profs = state.professores.slice();
   const pagou = {}; const deveria = {};
   profs.forEach(p=>{ pagou[p]=0; deveria[p]=0; });
@@ -697,7 +650,6 @@ function calcular(){
   const totalPago = saldos.reduce((s,x)=>s + x.pagou, 0);
   const totalDevido = saldos.reduce((s,x)=>s + x.deveria, 0);
 
-  // transferências
   const devs = saldos.filter(s=>s.saldo < -0.01).map(s=>({nome:s.nome, saldo:-s.saldo}));
   const creds = saldos.filter(s=>s.saldo > 0.01).map(s=>({nome:s.nome, saldo:s.saldo}));
   devs.sort((a,b)=>b.saldo - a.saldo);
@@ -734,25 +686,21 @@ function renderResumoTotais(){
 function renderCards(){
   const wrap = document.getElementById('cardsProfessores');
   const profs = state.professores||[];
-  const mapaComprasPorPessoa = {};
+  const mapa = {};
   state.compras.forEach((c, idx)=>{
-    // compras feitas pelo professor
-    (mapaComprasPorPessoa[c.comprador] ||= []).push({ ...c, idx, tipo:'comprou' });
-    // e também compras onde ele consumiu (sem duplicar referência)
+    (mapa[c.comprador] ||= []).push({ ...c, idx, tipo:'comprou' });
     c.consumidores.forEach(cons=>{
-      (mapaComprasPorPessoa[cons] ||= []).push({ ...c, idx, tipo: cons===c.comprador ? 'comprou/consumiu' : 'consumiu' });
+      (mapa[cons] ||= []).push({ ...c, idx, tipo: cons===c.comprador ? 'comprou/consumiu' : 'consumiu' });
     });
   });
 
   let saldos = {};
-  if(state._lastCalc){
-    state._lastCalc.saldos.forEach(s=> saldos[s.nome]=s);
-  }
+  if(state._lastCalc){ state._lastCalc.saldos.forEach(s=> saldos[s.nome]=s); }
 
-  wrap.innerHTML = profs.map(nome=>{
+  wrap.innerHTML = (profs||[]).map(nome=>{
     const s = saldos[nome] || {pagou:0, deveria:0, saldo:0};
     const badgeClass = s.saldo>=0 ? 'ok' : 'neg';
-    const lista = (mapaComprasPorPessoa[nome]||[]).map(item=>{
+    const lista = (mapa[nome]||[]).map(item=>{
       const meta = `${item.tipo} • R$${item.valor.toFixed(2)} • ${escapeHtml(item.consumidores.join(", "))}`;
       return `
         <div class="list-item">
@@ -763,12 +711,10 @@ function renderCards(){
           <div style="display:flex; gap:6px;">
             <button class="button" onclick="openModalEditar(${item.idx})" title="Editar"><span class="icon">edit</span></button>
           </div>
-        </div>
-      `;
+        </div>`;
     }).join('') || `<div class="list-item"><div class="left"><div class="meta">Sem compras relacionadas.</div></div></div>`;
 
     const iniciais = nome.slice(0,2).toUpperCase();
-
     return `
       <div class="prof-card">
         <div class="prof-head">
@@ -778,7 +724,6 @@ function renderCards(){
           </div>
           <div class="badge ${badgeClass}">${s.saldo>=0?'+':''}R$${s.saldo.toFixed(2)}</div>
         </div>
-
         <div class="prof-body">
           <div class="prof-col">
             <div class="prof-label">Pagou</div>
@@ -789,13 +734,11 @@ function renderCards(){
             <div class="prof-amount">R$${s.deveria.toFixed(2)}</div>
           </div>
         </div>
-
         <div class="prof-col">
           <div class="prof-label">Compras relacionadas</div>
           <div class="card-list">${lista}</div>
         </div>
-      </div>
-    `;
+      </div>`;
   }).join('');
 }
 
@@ -807,89 +750,95 @@ function renderTransferencias(){
     : "<p>Ninguém deve nada 🎉</p>";
 }
 
-/* ====== Relatório PDF ====== */
-function gerarPDF(){
-  if(!state.compras?.length){ showToast("Nada para gerar. Adicione compras."); return; }
+/* ====== ÁREA DE EXPORTAÇÃO (espelho dos cards) ====== */
+function montarExportArea(){
+  const metaEl = document.getElementById('exportMeta');
+  const hoje = new Date().toLocaleDateString('pt-BR');
+  metaEl.textContent = `Data: ${hoje} • Grupo: ${state.professores.join(', ') || '-'}`;
+
+  // Resumo
+  const resumoEl = document.getElementById('exportResumo');
+  if(state._lastCalc){
+    resumoEl.textContent = `Total pago: R$${state._lastCalc.totalPago.toFixed(2)} • Total devido: R$${state._lastCalc.totalDevido.toFixed(2)}`;
+  } else {
+    resumoEl.textContent = `Calcule para ver totais.`;
+  }
+
+  // Cards
+  const cardsEl = document.getElementById('exportCards');
+  if(!state._lastCalc){
+    cardsEl.innerHTML = `<div class="prof-card"><div class="prof-head"><div class="prof-name"><div class="avatar">OK</div><div>Sem cálculo</div></div></div><div class="prof-body"><div class="prof-col"><div class="prof-label">Pagou</div><div class="prof-amount">R$0,00</div></div><div class="prof-col"><div class="prof-label">Deveria</div><div class="prof-amount">R$0,00</div></div></div></div>`;
+  } else {
+    // Reaproveitar HTML já renderizado nos cards da aba Saldos
+    const originHTML = document.getElementById('cardsProfessores').innerHTML;
+    cardsEl.innerHTML = originHTML;
+    // Remover botões "Editar" para o relatório
+    cardsEl.querySelectorAll('.button').forEach(b=> b.remove());
+  }
+
+  // Transferências
+  const transfEl = document.getElementById('exportTransf');
+  if(state._lastCalc?.transf?.length){
+    transfEl.innerHTML = state._lastCalc.transf
+      .map(t=>`<p><strong>${escapeHtml(t.de)}</strong> paga <strong>R$${t.valor.toFixed(2)}</strong> para <strong>${escapeHtml(t.para)}</strong></p>`).join('');
+  } else {
+    transfEl.innerHTML = "<p>Ninguém deve nada 🎉</p>";
+  }
+}
+
+/* ====== Exportar PNG ====== */
+async function exportPNG(){
+  if(!state.compras?.length){
+    showToast("Nada para exportar. Adicione compras e calcule.");
+    return;
+  }
   if(!state._lastCalc) calcular();
 
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({unit:'pt', format:'a4'});
-  const pageWidth = doc.internal.pageSize.getWidth();
-  const pageHeight = doc.internal.pageSize.getHeight();
+  // Garantir que o conteúdo esteja atualizado
+  montarExportArea();
 
-  const hoje = new Date().toLocaleDateString("pt-BR");
-  doc.setFontSize(14);
-  doc.text("Relatório de Mantimentos", pageWidth/2, 40, {align:'center'});
-  doc.setFontSize(10);
-  doc.text(`Data: ${hoje}`, 40, 58);
-  doc.text(`Grupo: ${state.professores.join(", ")}`, 40, 72);
+  const area = document.getElementById('exportArea');
 
-  const blueHeader = {fillColor:[99,102,241], textColor:255};
-  const greenHeader = {fillColor:[16,185,129], textColor:255};
-  const orangeHeader = {fillColor:[245,158,11], textColor:255};
+  // Expandir listas internas para o print (remove barras de rolagem internas)
+  const scrollBoxes = area.querySelectorAll('.card-list');
+  const backups = [];
+  scrollBoxes.forEach(box=>{
+    backups.push({el:box, h:box.style.maxHeight, o:box.style.overflow});
+    box.style.maxHeight = 'none';
+    box.style.overflow = 'visible';
+  });
 
-  // Compras
-  doc.setFontSize(11);
-  doc.text("Compras:", 40, 92);
-  const comprasHead = [['Produto','Valor (R$)','Comprador','Consumidores']];
-  const comprasBody = state.compras.map(c=>[c.produto, c.valor.toFixed(2), c.comprador, c.consumidores.join(", ")]);
-  doc.autoTable({ startY: 100, head: comprasHead, body: comprasBody, styles:{fontSize:10}, headStyles: blueHeader, margin:{left:40,right:40} });
+  // Captura em alta resolução
+  const canvas = await html2canvas(area, {
+    backgroundColor: '#ffffff',
+    scale: 2,
+    useCORS: true,
+    windowWidth: document.documentElement.clientWidth
+  });
 
-  // Saldos
-  let y = doc.lastAutoTable ? doc.lastAutoTable.finalY + 18 : 160;
-  const saldos = state._lastCalc?.saldos || [];
-  doc.text("Saldos:", 40, y);
-  const saldosHead = [['Nome','Pagou (R$)','Deveria (R$)','Saldo (R$)']];
-  const saldosBody = saldos.map(s=>[s.nome, s.pagou.toFixed(2), s.deveria.toFixed(2), s.saldo.toFixed(2)]);
-  doc.autoTable({ startY: y+8, head: saldosHead, body: saldosBody, styles:{fontSize:10}, headStyles: greenHeader, margin:{left:40,right:40} });
+  // Restaurar boxes
+  backups.forEach(b=>{ b.el.style.maxHeight = b.h; b.el.style.overflow = b.o; });
 
-  // Totais & transferências
-  y = doc.lastAutoTable ? doc.lastAutoTable.finalY + 18 : 400;
-  const totalPago = state._lastCalc?.totalPago || 0;
-  const totalDevido = state._lastCalc?.totalDevido || 0;
-  doc.text(`Total pago: R$${totalPago.toFixed(2)}    Total devido: R$${totalDevido.toFixed(2)}`, 40, y);
-
-  y += 18;
-  doc.text("Sugestão de acertos:", 40, y);
-  y += 8;
-  const transf = state._lastCalc?.transf || [];
-  if(transf.length){
-    const tBody = transf.map(t=>[t.de + " → " + t.para, "R$" + t.valor.toFixed(2)]);
-    doc.autoTable({ startY: y, head: [['Transação','Valor']], body: tBody, styles:{fontSize:10}, headStyles: orangeHeader, margin:{left:40,right:40} });
-  } else {
-    doc.text("Nenhuma transferência necessária.", 40, y+6);
-  }
-
-  // rodapé
-  const pageCount = doc.internal.getNumberOfPages();
-  doc.setFontSize(9);
-  for(let i=1;i<=pageCount;i++){
-    doc.setPage(i);
-    doc.setTextColor(100);
-    doc.text("Desenvolvido por Professor Wanderson", pageWidth - 40, pageHeight - 20, {align:'right'});
-  }
-
-  doc.save("relatorio_mantimentos.pdf");
-  showToast("PDF gerado.");
+  const link = document.createElement('a');
+  link.download = 'relatorio_mantimentos.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+  showToast("PNG exportado.");
 }
 
 /* ====== Atualização geral de UI ====== */
 function atualizarUI(){
-  // lista professores (texto)
   const lista = document.getElementById('listaProfessores');
   const profs = state.professores||[];
   lista.textContent = profs.length ? profs.join(" • ") : "Nenhum selecionado";
 
-  // tabela compras
   atualizarTabelaCompras();
 
-  // se houver cálculo, atualiza cards/transfer
   if(state._lastCalc){
     renderCards();
     renderTransferencias();
     renderResumoTotais();
   } else {
-    // monta cards vazios baseados nos professores
     document.getElementById('cardsProfessores').innerHTML = (profs||[]).map(nome=>`
       <div class="prof-card">
         <div class="prof-head">
@@ -918,6 +867,9 @@ function atualizarUI(){
     document.getElementById('transferencias').innerHTML = "<p>Calcule para ver as sugestões de acerto.</p>";
     document.getElementById('resumoTotais').textContent = "";
   }
+
+  // Atualiza a área de exportação se a aba Relatório estiver ativa
+  if(document.getElementById('relatorio').classList.contains('active')) montarExportArea();
 }
 
 /* ====== Utilitários ====== */
@@ -947,7 +899,7 @@ function arraysEqual(a,b){
   return true;
 }
 
-/* Pequeno modal de confirmação elegante (resolve boolean) */
+/* Modal de confirmação simples */
 function confirmElegante(titulo, mensagem, okText="OK", cancelText="Cancelar"){
   return new Promise(resolve=>{
     const root = document.createElement('div');
