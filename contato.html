@@ -4,103 +4,207 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Consumidores e Compras</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 <style>
+/* Geral */
 body {
-  font-family: 'Arial', sans-serif;
-  background: #f7f7f7;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(to right, #f0f2f5, #ffffff);
   margin:0;
   padding:20px;
+}
+h1 {
+  text-align:center;
+  color:#333;
+  margin-bottom:30px;
 }
 
 /* Container de cards */
 .cards-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 15px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+  max-height: 500px;
+  overflow-y: auto;
+  padding-right: 10px;
 }
 
-/* Card individual */
+/* Cards */
 .card {
   background: #fff;
-  border-radius: 12px;
-  padding: 15px 20px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-  transition: transform 0.2s, box-shadow 0.2s;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+  transition: transform 0.3s, box-shadow 0.3s;
   position: relative;
 }
 .card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.12);
+  transform: translateY(-6px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.12);
 }
-
-/* Card header */
 .card h3 {
-  margin:0 0 8px 0;
-  font-size:1.1em;
-  color:#333;
+  margin:0 0 10px 0;
+  font-size:1.2em;
+  color:#222;
   font-weight:600;
 }
-
-/* Saldo */
 .card .saldo {
-  font-size:1em;
+  font-size:1.1em;
   font-weight:700;
-  margin-bottom:8px;
+  margin-bottom:12px;
 }
 .card .saldo-positivo { color:#4CAF50; }
 .card .saldo-negativo { color:#f44336; }
-
-/* Lista de compras dentro do card */
 .card ul {
   list-style:none;
   padding-left:0;
   margin:0;
-}
-.card ul li {
-  font-size:0.9em;
-  padding:4px 0;
-  border-bottom:1px dashed #eee;
-}
-.card ul li:last-child {
-  border-bottom:none;
-}
-
-/* Botões de ação no card */
-.card .btn-card {
-  position:absolute;
-  top:12px;
-  right:12px;
-  display:flex;
-  gap:6px;
-}
-.card .btn-editar { background:#ff9800; color:#fff; padding:4px 8px; font-size:0.8em; border-radius:6px; cursor:pointer; }
-.card .btn-excluir { background:#f44336; color:#fff; padding:4px 8px; font-size:0.8em; border-radius:6px; cursor:pointer; }
-
-/* Scroll do container */
-.cards-container {
-  max-height:450px;
+  max-height:140px;
   overflow-y:auto;
 }
+.card ul li {
+  font-size:0.95em;
+  padding:6px 0;
+  border-bottom:1px dashed #eee;
+}
+.card ul li:last-child { border-bottom:none; }
+
+/* Botões nos cards */
+.btn-card {
+  position:absolute;
+  top:15px;
+  right:15px;
+  display:flex;
+  gap:8px;
+}
+.btn-card button {
+  border:none;
+  cursor:pointer;
+  border-radius:8px;
+  padding:6px 12px;
+  font-size:0.85em;
+  font-weight:600;
+  transition: all 0.2s;
+}
+.btn-editar {
+  background: #ff9800;
+  color:#fff;
+}
+.btn-editar:hover {
+  background: #e68900;
+  transform: scale(1.05);
+}
+.btn-excluir {
+  background: #f44336;
+  color:#fff;
+}
+.btn-excluir:hover {
+  background: #d32f2f;
+  transform: scale(1.05);
+}
+
+/* Scroll personalizado */
 .cards-container::-webkit-scrollbar {
   width:6px;
 }
 .cards-container::-webkit-scrollbar-thumb {
-  background:#4CAF50;
+  background:#bbb;
   border-radius:3px;
 }
 .cards-container::-webkit-scrollbar-track {
   background:#f0f0f0;
 }
+
+/* Botão flutuante adicionar consumidor */
+#btnAdd {
+  position:fixed;
+  bottom:30px;
+  right:30px;
+  width:60px;
+  height:60px;
+  border-radius:50%;
+  background:#4CAF50;
+  color:white;
+  font-size:30px;
+  border:none;
+  cursor:pointer;
+  box-shadow:0 6px 15px rgba(0,0,0,0.2);
+  transition: transform 0.2s;
+}
+#btnAdd:hover { transform: scale(1.1); }
+
+/* Modal */
+.modal {
+  display:none;
+  position:fixed;
+  z-index:1000;
+  left:0; top:0;
+  width:100%; height:100%;
+  background:rgba(0,0,0,0.5);
+  justify-content:center;
+  align-items:center;
+}
+.modal-content {
+  background:#fff;
+  padding:20px 30px;
+  border-radius:12px;
+  max-width:400px;
+  width:90%;
+  position:relative;
+}
+.modal-content h2 { margin-top:0; }
+.modal-content label { display:block; margin:10px 0 5px; }
+.modal-content input { width:100%; padding:8px; border-radius:6px; border:1px solid #ccc; }
+.modal-content button {
+  margin-top:15px;
+  padding:8px 16px;
+  border:none;
+  border-radius:8px;
+  background:#4CAF50;
+  color:white;
+  font-weight:600;
+  cursor:pointer;
+}
+.modal-content button:hover { background:#43a047; }
+.close-modal {
+  position:absolute;
+  top:10px;
+  right:15px;
+  cursor:pointer;
+  font-size:20px;
+  color:#999;
+  font-weight:bold;
+}
+.close-modal:hover { color:#333; }
 </style>
 </head>
 <body>
 
 <h1>Consumidores e Compras</h1>
+
 <div id="consumidores" class="cards-container"></div>
+
+<!-- Botão adicionar consumidor -->
+<button id="btnAdd">+</button>
+
+<!-- Modal adicionar/editar consumidor -->
+<div id="modal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal">&times;</span>
+    <h2 id="modalTitle">Adicionar Consumidor</h2>
+    <label>Nome:</label>
+    <input type="text" id="nomeInput">
+    <label>Saldo:</label>
+    <input type="number" id="saldoInput">
+    <label>Compras (formato: Item:Valor, separados por vírgula):</label>
+    <input type="text" id="comprasInput" placeholder="Arroz:15,Feijão:10,Leite:20">
+    <button id="saveBtn">Salvar</button>
+  </div>
+</div>
 
 <script>
 // Dados de exemplo
-const consumidores = [
+let consumidores = [
   {
     nome: "Maria Silva",
     saldo: 45,
@@ -130,65 +234,118 @@ const consumidores = [
   }
 ];
 
+// Variável de controle para editar
+let editIndex = null;
+
 // Função para gerar cards
 function gerarCards() {
   const container = document.getElementById('consumidores');
-  container.innerHTML = ''; // Limpa antes de gerar
+  container.innerHTML = '';
 
-  consumidores.forEach((c, index) => {
+  consumidores.forEach((c,index)=>{
     const card = document.createElement('div');
-    card.className = 'card';
-    
-    // Nome
+    card.className='card';
+
     const nome = document.createElement('h3');
     nome.textContent = c.nome;
     card.appendChild(nome);
-    
-    // Saldo
+
     const saldo = document.createElement('div');
-    saldo.className = 'saldo ' + (c.saldo >=0 ? 'saldo-positivo':'saldo-negativo');
+    saldo.className = 'saldo ' + (c.saldo>=0 ? 'saldo-positivo':'saldo-negativo');
     saldo.textContent = `R$ ${c.saldo.toFixed(2)}`;
     card.appendChild(saldo);
-    
-    // Lista de compras
+
     const ul = document.createElement('ul');
-    c.compras.forEach(compra => {
+    c.compras.forEach(compra=>{
       const li = document.createElement('li');
       li.textContent = `${compra.item} - R$ ${compra.valor.toFixed(2)}`;
       ul.appendChild(li);
     });
     card.appendChild(ul);
-    
-    // Botões
+
     const btnDiv = document.createElement('div');
-    btnDiv.className = 'btn-card';
-    
+    btnDiv.className='btn-card';
+
     const btnEditar = document.createElement('button');
-    btnEditar.className = 'btn-editar';
-    btnEditar.textContent = 'Editar';
-    btnEditar.onclick = () => alert(`Editar ${c.nome}`);
-    
+    btnEditar.className='btn-editar';
+    btnEditar.textContent='Editar';
+    btnEditar.onclick = () => abrirModal('editar', index);
+
     const btnExcluir = document.createElement('button');
-    btnExcluir.className = 'btn-excluir';
-    btnExcluir.textContent = 'Excluir';
+    btnExcluir.className='btn-excluir';
+    btnExcluir.textContent='Excluir';
     btnExcluir.onclick = () => {
       if(confirm(`Deseja excluir ${c.nome}?`)){
         consumidores.splice(index,1);
         gerarCards();
       }
     };
-    
+
     btnDiv.appendChild(btnEditar);
     btnDiv.appendChild(btnExcluir);
     card.appendChild(btnDiv);
-    
+
     container.appendChild(card);
   });
 }
 
-// Gera cards ao carregar a página
+// Abrir modal
+const modal = document.getElementById('modal');
+const modalTitle = document.getElementById('modalTitle');
+const nomeInput = document.getElementById('nomeInput');
+const saldoInput = document.getElementById('saldoInput');
+const comprasInput = document.getElementById('comprasInput');
+const saveBtn = document.getElementById('saveBtn');
+
+function abrirModal(tipo, index=null){
+  modal.style.display='flex';
+  if(tipo==='editar'){
+    modalTitle.textContent='Editar Consumidor';
+    editIndex=index;
+    const c = consumidores[index];
+    nomeInput.value=c.nome;
+    saldoInput.value=c.saldo;
+    comprasInput.value=c.compras.map(comp=>`${comp.item}:${comp.valor}`).join(',');
+  } else {
+    modalTitle.textContent='Adicionar Consumidor';
+    editIndex=null;
+    nomeInput.value='';
+    saldoInput.value='';
+    comprasInput.value='';
+  }
+}
+
+// Fechar modal
+document.querySelector('.close-modal').onclick = () => modal.style.display='none';
+window.onclick = e => { if(e.target==modal) modal.style.display='none'; };
+
+// Salvar dados do modal
+saveBtn.onclick = () => {
+  const nome = nomeInput.value.trim();
+  const saldo = parseFloat(saldoInput.value);
+  const compras = comprasInput.value.split(',').map(item=>{
+    const [i,v]=item.split(':');
+    return {item:i.trim(), valor:parseFloat(v)};
+  });
+
+  if(nome && !isNaN(saldo)){
+    if(editIndex!==null){
+      consumidores[editIndex]={nome,saldo,compras};
+    } else {
+      consumidores.push({nome,saldo,compras});
+    }
+    gerarCards();
+    modal.style.display='none';
+  } else {
+    alert('Preencha todos os campos corretamente!');
+  }
+};
+
+// Botão adicionar
+document.getElementById('btnAdd').onclick = ()=> abrirModal('add');
+
+// Inicializa
 gerarCards();
 </script>
-
 </body>
 </html>
