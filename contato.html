@@ -245,4 +245,44 @@
   }
   preencherSelects();
 
-  addCompraBtn.addEventListener('
+  addCompraBtn.addEventListener('click', () => {
+    const compra = {
+      comprador: compradorSelect.value,
+      descricao: descricaoInput.value,
+      valor: parseFloat(valorInput.value),
+      participantes: Array.from(participantesSelect.selectedOptions).map(o => o.value)
+    };
+    if(editIndex!==null){ despesas[editIndex]=compra; } 
+    else { despesas.push(compra); }
+    atualizarCards();
+    atualizarRelatorio();
+    fecharModal();
+    descricaoInput.value=''; valorInput.value=''; participantesSelect.selectedIndex=-1;
+  });
+
+  window.editarCompra = function(i){
+    editIndex = i;
+    const d = despesas[i];
+    modalTitle.textContent='Editar Compra';
+    compradorSelect.value = d.comprador;
+    descricaoInput.value = d.descricao;
+    valorInput.value = d.valor;
+    Array.from(participantesSelect.options).forEach(opt => { opt.selected = d.participantes.includes(opt.value); });
+    abrirModal();
+  }
+
+  // Abas
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      if(tab.dataset.tab==='despesas'){ document.getElementById('despesasTab').style.display='block'; document.getElementById('relatorioTab').style.display='none'; }
+      else{ document.getElementById('despesasTab').style.display='none'; document.getElementById('relatorioTab').style.display='block'; atualizarRelatorio(); }
+    });
+  });
+
+  atualizarCards();
+  atualizarRelatorio();
+</script>
+</body>
+</html>
