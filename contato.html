@@ -538,54 +538,7 @@ function init(){
   
 }
 
-function atualizarRelatorioTabela() {
-    const tbody = document.querySelector("#tabelaRelatorio tbody");
-    tbody.innerHTML = "";
 
-    if (compras.length === 0) return;
-
-    const professores = grupos[grupoSelecionado];
-    const gastos = {};
-    professores.forEach(p => gastos[p] = { gastou: 0, deveria: 0, saldo: 0 });
-
-    compras.forEach(c => {
-        gastos[c.comprador].gastou += c.valor;
-        const divisao = c.valor / c.consumidores.length;
-        c.consumidores.forEach(consumidor => {
-            gastos[consumidor].deveria += divisao;
-        });
-    });
-
-    professores.forEach(p => {
-        gastos[p].saldo = gastos[p].gastou - gastos[p].deveria;
-
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-            <td>${p}</td>
-            <td>${gastos[p].deveria.toFixed(2)}</td>
-            <td>${gastos[p].gastou.toFixed(2)}</td>
-            <td class="${gastos[p].saldo < 0 ? 'saldo-negativo' : 'saldo-positivo'}">
-                ${gastos[p].saldo.toFixed(2)}
-            </td>
-        `;
-        tbody.appendChild(tr);
-    });
-}
-
-// Atualizar sempre que abrir a aba Relatório
-document.querySelector(".tabs button[onclick=\"mostrarTab('relatorio')\"]")
-    .addEventListener("click", atualizarRelatorioTabela);
-
-// Exportar tabela como imagem
-document.getElementById("exportarImagem").addEventListener("click", () => {
-    const tabela = document.getElementById("tabelaRelatorio");
-    html2canvas(tabela).then(canvas => {
-        const link = document.createElement("a");
-        link.download = "relatorio.png";
-        link.href = canvas.toDataURL("image/png");
-        link.click();
-    });
-});
 
 
 
@@ -911,6 +864,60 @@ function renderTransferencias(){
     ? transf.map(t=>`<p><strong>${escapeHtml(t.de)}</strong> paga <strong>R$${t.valor.toFixed(2)}</strong> para <strong>${escapeHtml(t.para)}</strong></p>`).join('')
     : "<p>Ninguém deve nada 🎉</p>";
 }
+
+
+
+function atualizarRelatorioTabela() {
+    const tbody = document.querySelector("#tabelaRelatorio tbody");
+    tbody.innerHTML = "";
+
+    if (compras.length === 0) return;
+
+    const professores = grupos[grupoSelecionado];
+    const gastos = {};
+    professores.forEach(p => gastos[p] = { gastou: 0, deveria: 0, saldo: 0 });
+
+    compras.forEach(c => {
+        gastos[c.comprador].gastou += c.valor;
+        const divisao = c.valor / c.consumidores.length;
+        c.consumidores.forEach(consumidor => {
+            gastos[consumidor].deveria += divisao;
+        });
+    });
+
+    professores.forEach(p => {
+        gastos[p].saldo = gastos[p].gastou - gastos[p].deveria;
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td>${p}</td>
+            <td>${gastos[p].deveria.toFixed(2)}</td>
+            <td>${gastos[p].gastou.toFixed(2)}</td>
+            <td class="${gastos[p].saldo < 0 ? 'saldo-negativo' : 'saldo-positivo'}">
+                ${gastos[p].saldo.toFixed(2)}
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+// Atualizar sempre que abrir a aba Relatório
+document.querySelector(".tabs button[onclick=\"mostrarTab('relatorio')\"]")
+    .addEventListener("click", atualizarRelatorioTabela);
+
+// Exportar tabela como imagem
+document.getElementById("exportarImagem").addEventListener("click", () => {
+    const tabela = document.getElementById("tabelaRelatorio");
+    html2canvas(tabela).then(canvas => {
+        const link = document.createElement("a");
+        link.download = "relatorio.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+    });
+});
+
+
+
 
 /* ====== Relatório PDF ====== */
 function gerarPDF(){
