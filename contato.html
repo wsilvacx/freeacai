@@ -405,6 +405,23 @@ th{ background: linear-gradient(180deg, #fafcff, #f6f8fb); position: sticky; top
   <section id="relatorio" class="tabcontent section">
     <h2>Relatório PDF</h2>
     <p class="instrucao">Gere um PDF com as compras, saldos e sugestões de acerto.</p>
+    <div id="relatorio" class="tab-content">
+    <h2>Relatório</h2>
+    <table id="tabelaRelatorio" class="styled-table">
+        <thead>
+            <tr>
+                <th>Professor</th>
+                <th>Deveria Gastar (R$)</th>
+                <th>Gastou (R$)</th>
+                <th>Saldo (R$)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Preenchido dinamicamente -->
+        </tbody>
+    </table>
+    <button id="exportarImagem" class="fab">📸 Exportar Tabela</button>
+</div>
     <button class="button primary" id="btnPDF"><span class="icon">picture_as_pdf</span> Gerar Relatório PDF</button>
   </section>
 </main>
