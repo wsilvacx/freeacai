@@ -3,455 +3,707 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Divisão de Despesas — Casa dos Professores</title>
-<style>
-  :root{font-family:Inter,Segoe UI,Roboto,Arial,sans-serif;--card:#fff;--bg:#f3f6fb;--muted:#666;}
-  body{margin:0;background:var(--bg);font-family:system-ui, "Segoe UI", Roboto, Arial, sans-serif;color:#111}
-  .wrap{max-width:1000px;margin:24px auto;padding:20px}
-  header{display:flex;align-items:center;justify-content:space-between;gap:12px}
-  h1{margin:0;font-size:20px}
-  .card{background:var(--card);border-radius:10px;padding:16px;box-shadow:0 6px 20px rgba(30,40,60,0.06);margin-top:16px}
-  label{display:block;font-size:13px;margin-top:8px;color:var(--muted)}
-  input[type=text], input[type=number], input[type=date], select{width:100%;padding:8px;border-radius:6px;border:1px solid #d7e0ef;margin-top:6px;box-sizing:border-box}
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-  button{padding:8px 12px;border-radius:8px;border:0;cursor:pointer}
-  .primary{background:#2b8cff;color:#fff}
-  .danger{background:#ff6b6b;color:#fff}
-  .table{width:100%;border-collapse:collapse;margin-top:12px}
-  .table th,.table td{padding:8px;border-bottom:1px solid #edf2f9;font-size:14px;text-align:left}
-  .participants{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-  .chip{padding:6px 8px;border-radius:999px;background:#f1f6ff;border:1px solid #e2eeff;font-size:13px}
-  .balances{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px}
-  .balance-card{flex:1;min-width:160px;padding:12px;border-radius:8px;background:linear-gradient(180deg,#fff,#fbfdff);box-shadow:0 3px 12px rgba(20,30,60,0.04)}
-  small{color:var(--muted)}
-  .ledger{max-height:260px;overflow:auto;margin-top:8px}
-  .settlements{margin-top:12px}
-  .muted{color:var(--muted);font-size:13px}
-  .controls{display:flex;gap:8px;align-items:center}
-  @media (max-width:720px){ .grid{grid-template-columns:1fr} .balances{flex-direction:column} }
+<title>Despesas — Casa dos Professores</title>
 
-  /* estilos para exportação (garante fundo branco e espaçamento) */
-  .export-wrapper { background: #fff; color: #111; padding: 18px; border-radius: 8px; width: 900px; box-sizing: border-box; font-family: inherit; }
-  .export-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
-  .export-sub { font-size: 13px; color: var(--muted); margin-bottom: 12px; }
-  .export-portion { margin-bottom: 12px; }
-  .no-scroll { overflow: visible !important; max-height: none !important; }
-  .export-balance-card { min-width:150px; padding:8px; border-radius:8px; background:#f7fafc; display:flex; flex-direction:column; gap:6px; }
+<!-- Fonte suave (fallbacks) -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:#eef4fb;
+    --card:#ffffff;
+    --muted:#6b7280;
+    --primary-600: #3b82f6;
+    --primary-500: #60a5fa;
+    --accent: linear-gradient(135deg,#fdfbfb 0%, #ebedee 100%);
+    --success: #2e7d32;
+    --danger: #c62828;
+    --glass: rgba(255,255,255,0.6);
+    font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  }
+
+  /* reset e base */
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    background: radial-gradient(1200px 600px at 10% 10%, rgba(96,165,250,0.06), transparent 6%),
+                linear-gradient(180deg, #fbfdff 0%, var(--bg) 100%);
+    color:#111;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    padding:24px;
+  }
+
+  .wrap{
+    max-width:1100px;
+    margin:0 auto;
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+  }
+
+  header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+  }
+  .title {
+    display:flex;
+    flex-direction:column;
+  }
+  h1{margin:0;font-size:20px;letter-spacing:-0.2px}
+  .subtitle{color:var(--muted);font-size:13px;margin-top:6px;}
+
+  /* top controls */
+  .controls{display:flex;gap:8px;align-items:center}
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;border:0;cursor:pointer;
+    background:linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.75));
+    box-shadow: 0 6px 18px rgba(15,23,42,0.06); color:#0b1220; font-weight:600; transition:transform .18s ease, box-shadow .18s ease;
+  }
+  .btn:hover{transform:translateY(-3px); box-shadow: 0 12px 28px rgba(15,23,42,0.08);}
+  .btn.primary{background:linear-gradient(180deg,var(--primary-500),var(--primary-600)); color:#fff;}
+  .btn.ghost{background:transparent; box-shadow:none; color:var(--muted); border:1px solid rgba(15,23,42,0.04); font-weight:600;}
+  .btn.danger{background:linear-gradient(180deg,#ff7b7b,#ff6b6b); color:#fff;}
+
+  .icon {width:16px;height:16px;display:inline-block;vertical-align:middle;opacity:0.95}
+
+  /* grid layout main */
+  .grid{
+    display:grid;
+    grid-template-columns: 1fr 380px;
+    gap:18px;
+    align-items:start;
+  }
+  @media (max-width:980px){
+    .grid{grid-template-columns:1fr}
+  }
+
+  /* card estilo */
+  .card{
+    background:var(--card);
+    border-radius:14px;
+    padding:14px;
+    box-shadow: 0 10px 30px rgba(20,30,60,0.06);
+    border: 1px solid rgba(15,23,42,0.03);
+  }
+
+  /* form inline (mantive para visualização, mas pode usar o modal) */
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .field{display:flex;flex-direction:column;gap:6px}
+  label{font-size:13px;color:var(--muted)}
+  input[type=text], input[type=number], input[type=date], select{
+    padding:10px;border-radius:10px;border:1px solid rgba(15,23,42,0.06);
+    background:linear-gradient(180deg, #fff, #fbfdff);
+    transition:box-shadow .12s ease, transform .12s ease;
+  }
+  input:focus, select:focus{outline:none; box-shadow:0 6px 20px rgba(59,130,246,0.12); transform:translateY(-1px)}
+  .small-muted{font-size:13px;color:var(--muted);margin-top:8px}
+
+  /* participants chips */
+  .participants{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .chip{
+    display:inline-flex;gap:8px;align-items:center;padding:8px 10px;border-radius:999px;background:linear-gradient(180deg,#f8fbff,#f1f6ff);
+    border:1px solid rgba(96,165,250,0.12); font-weight:600; font-size:13px;
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .chip input{margin-right:6px}
+
+  /* ledger table */
+  .ledger{max-height:320px;overflow:auto;border-radius:10px;padding:6px}
+  table{width:100%;border-collapse:collapse}
+  th,td{padding:10px;text-align:left;font-size:14px;border-bottom:1px solid rgba(15,23,42,0.04)}
+  thead th{font-weight:700;color:var(--muted);background:transparent}
+  tr:hover td{background:linear-gradient(90deg, rgba(96,165,250,0.02), transparent)}
+
+  /* balances flex */
+  .balances{display:flex;gap:10px;flex-wrap:wrap}
+  .balance-card{
+    flex:1;min-width:160px;padding:12px;border-radius:12px;background:linear-gradient(180deg,#fff,#fbfdff);
+    box-shadow: 0 6px 20px rgba(20,30,60,0.04);display:flex;flex-direction:column;gap:6px;
+  }
+  .balance-amt{font-size:16px;font-weight:700}
+
+  /* settlement list */
+  .settlement-list{display:flex;flex-direction:column;gap:8px}
+  .sett-row{display:flex;justify-content:space-between;align-items:center;padding:8px;border-radius:10px;background:#fff;border:1px solid rgba(15,23,42,0.03); box-shadow: 0 6px 16px rgba(10,15,30,0.02)}
+
+  /* floating action button (+) */
+  .fab{
+    position:fixed;right:22px;bottom:22px;width:60px;height:60px;border-radius:999px;
+    display:flex;align-items:center;justify-content:center;box-shadow: 0 16px 34px rgba(59,130,246,0.18);
+    background:linear-gradient(135deg,#60a5fa,#3b82f6);color:#fff;border:0;cursor:pointer;z-index:1200;
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .fab:hover{transform:translateY(-6px); box-shadow: 0 26px 58px rgba(59,130,246,0.22)}
+
+  /* modal base */
+  .modal-backdrop{position:fixed;inset:0;background:rgba(8,12,20,0.45);display:flex;align-items:center;justify-content:center;z-index:1300;opacity:0;pointer-events:none;transition:opacity .16s ease}
+  .modal-backdrop.open{opacity:1;pointer-events:auto}
+  .modal{background:var(--card);border-radius:12px;min-width:320px;max-width:760px;padding:18px;box-shadow: 0 24px 60px rgba(10,20,50,0.32);transform:translateY(12px);transition:transform .18s ease,opacity .18s ease}
+  .modal-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}
+  .modal-body{max-height:60vh;overflow:auto;padding-right:6px}
+  .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
+
+  /* minimal scrollbar */
+  .ledger::-webkit-scrollbar, .modal-body::-webkit-scrollbar {height:8px;width:8px}
+  .ledger::-webkit-scrollbar-thumb, .modal-body::-webkit-scrollbar-thumb {background:rgba(15,23,42,0.06);border-radius:999px}
+  .ledger::-webkit-scrollbar-track, .modal-body::-webkit-scrollbar-track {background:transparent}
+
+  /* subtle transitions */
+  button, .chip, input, select {transition:all .12s ease}
+  a{color:inherit}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <div>
+    <div class="title">
       <h1>Divisão de Despesas — Casa dos Professores</h1>
-      <small class="muted">Grupos configurados: A (Wanderson, Gu, Cris) — B (Gu, Galeno, Emerson)</small>
+      <div class="subtitle">Grupos: A (Wanderson, Gu, Cris) • B (Gu, Galeno, Emerson) — dados locais no navegador</div>
     </div>
+
     <div class="controls">
-      <button id="exportJsonBtn" title="Exportar histórico (.json)">Exportar JSON</button>
-      <button id="importBtn" title="Importar histórico (.json)">Importar</button>
-      <button id="exportPngBtn" title="Exportar tabela + acerto como PNG">Exportar PNG</button>
-      <button id="resetBtn" class="danger" title="Apagar todos os dados">Resetar dados</button>
+      <button id="exportJsonBtn" class="btn ghost" title="Exportar JSON">
+        <svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M12 3v12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 7l4-4 4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><rect x="3" y="13" width="18" height="8" rx="2" stroke="currentColor" stroke-width="1.2"/></svg>
+        Exportar JSON
+      </button>
+
+      <button id="importBtn" class="btn ghost" title="Importar JSON">
+        <svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M12 3v12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 7l4-4 4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Importar
+      </button>
+
+      <button id="exportPngBtn" class="btn" title="Exportar PNG">
+        <svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M4 7h16v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7z" stroke="white" stroke-width="1.2"/><path d="M9 3h6v4H9z" stroke="white" stroke-width="1.2"/></svg>
+        Exportar PNG
+      </button>
+
+      <button id="resetBtn" class="btn danger" title="Resetar dados">
+        <svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M3 6h18" stroke="white" stroke-width="1.4"/><path d="M8 6v12a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V6" stroke="white" stroke-width="1.4"/></svg>
+        Resetar
+      </button>
     </div>
   </header>
 
-  <div class="card" id="formCard">
-    <div class="grid">
-      <div>
-        <label>Data</label>
-        <input type="date" id="dateInput" />
-      </div>
-      <div>
-        <label>Descrição</label>
-        <input type="text" id="descInput" placeholder="Ex: Arroz, Gás, Supermercado..." />
-      </div>
-      <div>
-        <label>Grupo (base)</label>
-        <select id="groupSelect">
-          <option value="A">Grupo A (Wanderson, Gu, Cris)</option>
-          <option value="B">Grupo B (Gu, Galeno, Emerson)</option>
-          <option value="manual">Manual (mostrar todos)</option>
-        </select>
-      </div>
-      <div>
-        <label>Quem pagou</label>
-        <select id="payerSelect"></select>
-      </div>
-      <div>
-        <label>Valor (R$)</label>
-        <input type="number" id="amountInput" placeholder="0.00" step="0.01" min="0" />
-      </div>
-      <div>
-        <label>&nbsp;</label>
-        <div style="display:flex;gap:8px">
-          <button class="primary" id="addExpenseBtn">Adicionar despesa</button>
-          <button id="toggleAllBtn" title="Selecionar / Desselecionar todos participantes">Selecionar todos</button>
+  <main class="grid">
+    <!-- esquerda: histórico -->
+    <section>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <h3 style="margin:0">Histórico de despesas</h3>
+          <div class="small-muted">Registre despesas e edite quando precisar</div>
+        </div>
+
+        <div class="ledger card" style="margin-top:12px;padding:8px">
+          <table id="ledgerTable">
+            <thead>
+              <tr><th>Data</th><th>Descrição</th><th>Pago por</th><th>Valor</th><th>Participantes</th><th>Valor/pessoa</th><th></th></tr>
+            </thead>
+            <tbody id="ledgerBody"></tbody>
+          </table>
         </div>
       </div>
-    </div>
 
-    <label>Participantes (marque quem consumiu)</label>
-    <div class="participants" id="participantsContainer"></div>
-    <small class="muted">Você pode escolher um grupo como base, mas marque somente quem consumiu realmente.</small>
-  </div>
+      <div style="height:10px"></div>
 
-  <div class="card">
-    <h3>Resumo — Saldos</h3>
-    <div class="balances" id="balancesContainer"></div>
+      <div class="card">
+        <h3 style="margin:0 0 8px 0">Sugestão de acerto</h3>
+        <div id="settlementList" class="settlement-list">
+          <div class="small-muted" id="noSettlements">Ainda sem despesas.</div>
+        </div>
+      </div>
+    </section>
 
-    <h3 style="margin-top:12px">Sugestão de acerto</h3>
-    <div class="card settlements" id="settlementsContainer">
-      <div class="muted" id="noSettlements">Ainda sem despesas.</div>
-      <div id="settlementList"></div>
-    </div>
-  </div>
+    <!-- direita: saldos e formulário resumido -->
+    <aside>
+      <div class="card">
+        <h3 style="margin:0 0 8px 0">Saldos</h3>
+        <div id="balancesContainer" class="balances"></div>
+        <div class="small-muted" style="margin-top:12px">Valores positivos: <strong style="color:var(--success)">a receber</strong> • negativos: <strong style="color:var(--danger)">a pagar</strong></div>
+      </div>
 
-  <div class="card">
-    <h3>Histórico de despesas</h3>
-    <div class="ledger">
-      <table class="table" id="ledgerTable">
-        <thead>
-          <tr><th>Data</th><th>Descrição</th><th>Pago por</th><th>Valor</th><th>Participantes</th><th>Valor/pessoa</th><th></th></tr>
-        </thead>
-        <tbody id="ledgerBody"></tbody>
-      </table>
-    </div>
-  </div>
+      <div style="height:12px"></div>
 
-  <footer style="margin-top:12px" class="muted">Sistema local — dados armazenados no seu navegador. Feito para uso prático — ajuste os nomes e grupos se precisar.</footer>
+      <div class="card">
+        <h3 style="margin:0 0 8px 0">Adicionar rápido</h3>
+        <div class="form-row">
+          <div class="field">
+            <label>Data</label>
+            <input type="date" id="dateInline">
+          </div>
+          <div class="field">
+            <label>Valor (R$)</label>
+            <input type="number" id="amountInline" step="0.01" min="0">
+          </div>
+        </div>
+        <div style="height:10px"></div>
+        <div class="field">
+          <label>Descrição</label>
+          <input type="text" id="descInline" placeholder="Ex: Arroz, Gás...">
+        </div>
+        <div style="height:10px"></div>
+        <div style="display:flex;gap:8px">
+          <button id="openAddModalBtn" class="btn primary" style="flex:1">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="white" stroke-width="1.6" stroke-linecap="round"/></svg>
+            Abrir modal
+          </button>
+          <button id="quickAddBtn" class="btn ghost" style="width:110px">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            Adicionar
+          </button>
+        </div>
+        <div class="small-muted" style="margin-top:10px">Use o botão <strong>+</strong> no canto para adicionar pelo modal completo.</div>
+      </div>
+    </aside>
+  </main>
 </div>
 
-<!-- html2canvas CDN (usado para gerar PNG) -->
+<!-- Floating action button -->
+<button id="fab" class="fab" title="Adicionar despesa (modal)">
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M12 5v14" stroke="white" stroke-width="1.8" stroke-linecap="round"/><path d="M5 12h14" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>
+</button>
+
+<!-- MODAIS -->
+<!-- generic backdrop -->
+<div id="modalBackdrop" class="modal-backdrop" aria-hidden="true" style="display:none">
+  <div id="modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <!-- content is injected by JS -->
+  </div>
+</div>
+
+<!-- html2canvas CDN -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <script>
 (() => {
-  // CONFIGURAÇÃO INICIAL: nomes e grupos
+  // === Configuração de nomes e grupos ===
   const groupA = ['Wanderson','Gu','Cris'];
   const groupB = ['Gu','Galeno','Emerson'];
-  // lista única de pessoas (mantém ordem)
   const uniquePeople = Array.from(new Set([...groupA, ...groupB]));
 
-  // DOM
-  const participantsContainer = document.getElementById('participantsContainer');
-  const groupSelect = document.getElementById('groupSelect');
-  const payerSelect = document.getElementById('payerSelect');
-  const addExpenseBtn = document.getElementById('addExpenseBtn');
-  const amountInput = document.getElementById('amountInput');
-  const descInput = document.getElementById('descInput');
-  const dateInput = document.getElementById('dateInput');
+  // DOM refs
   const ledgerBody = document.getElementById('ledgerBody');
   const balancesContainer = document.getElementById('balancesContainer');
   const settlementList = document.getElementById('settlementList');
   const noSettlements = document.getElementById('noSettlements');
-  const toggleAllBtn = document.getElementById('toggleAllBtn');
   const exportJsonBtn = document.getElementById('exportJsonBtn');
   const importBtn = document.getElementById('importBtn');
-  const resetBtn = document.getElementById('resetBtn');
   const exportPngBtn = document.getElementById('exportPngBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const fab = document.getElementById('fab');
+  const openAddModalBtn = document.getElementById('openAddModalBtn');
+  const quickAddBtn = document.getElementById('quickAddBtn');
 
-  // Local storage key
-  const STORAGE_KEY = 'despesas_casa_professores_v1';
+  const dateInline = document.getElementById('dateInline');
+  const amountInline = document.getElementById('amountInline');
+  const descInline = document.getElementById('descInline');
 
-  // Dados: lista de despesas
+  // modal elements
+  const modalBackdrop = document.getElementById('modalBackdrop');
+  const modal = document.getElementById('modal');
+
+  // storage key
+  const STORAGE_KEY = 'despesas_casa_professores_v2';
+
+  // load data
   let expenses = loadExpenses();
 
-  // inicializa selects e participantes
-  function init() {
-    dateInput.valueAsDate = new Date();
-    renderPayerOptions();
-    renderParticipants();
-    renderLedger();
-    renderBalancesAndSettlements();
+  // init small inline date default
+  dateInline.valueAsDate = new Date();
+
+  // ==== Modal utilities (Promise-based) ====
+  function openModal(contentHtml, opts = {}) {
+    // contentHtml can be an Element or HTML string
+    modal.innerHTML = '';
+    if (typeof contentHtml === 'string') modal.innerHTML = contentHtml;
+    else modal.appendChild(contentHtml);
+
+    // show backdrop
+    modalBackdrop.style.display = 'flex';
+    // small delay to animate class
+    requestAnimationFrame(() => modalBackdrop.classList.add('open'));
+    // focus first input if exists
+    const fi = modal.querySelector('input,select,button,textarea');
+    if (fi) setTimeout(()=>fi.focus(), 80);
+
+    return {
+      close: (cleanup) => {
+        modalBackdrop.classList.remove('open');
+        setTimeout(()=> { modalBackdrop.style.display = 'none'; if (cleanup) cleanup(); }, 180);
+      }
+    };
   }
 
-  // carregar do localStorage
+  // confirm modal -> returns Promise<boolean>
+  function showConfirm(message, title = 'Confirmação') {
+    return new Promise(resolve => {
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = `
+        <div class="modal-head"><div><strong id="modalTitle">${escapeHtml(title)}</strong></div>
+          <div style="opacity:.6;font-size:13px">${escapeHtml(message)}</div></div>
+        <div class="modal-actions" style="margin-top:16px;">
+          <button id="noBtn" class="btn ghost">Cancelar</button>
+          <button id="yesBtn" class="btn primary">Confirmar</button>
+        </div>
+      `;
+      const m = openModal(wrapper);
+      wrapper.querySelector('#yesBtn').addEventListener('click', () => { m.close(); resolve(true); });
+      wrapper.querySelector('#noBtn').addEventListener('click', () => { m.close(); resolve(false); });
+      // backdrop click closes as cancel
+      modalBackdrop.onclick = (e) => { if(e.target === modalBackdrop){ m.close(); resolve(false); } };
+    });
+  }
+
+  // alert/info modal
+  function showAlert(message, title = 'Info') {
+    return new Promise(resolve => {
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = `
+        <div class="modal-head"><div><strong id="modalTitle">${escapeHtml(title)}</strong></div></div>
+        <div style="margin-top:8px">${escapeHtml(message)}</div>
+        <div class="modal-actions" style="margin-top:16px;">
+          <button id="okBtn" class="btn primary">OK</button>
+        </div>
+      `;
+      const m = openModal(wrapper);
+      wrapper.querySelector('#okBtn').addEventListener('click', () => { m.close(); resolve(); });
+      modalBackdrop.onclick = (e) => { if(e.target === modalBackdrop){ m.close(); resolve(); } };
+    });
+  }
+
+  // open add/edit expense modal; if expense passed -> edit
+  function openExpenseModal(expense) {
+    return new Promise(resolve => {
+      // construct modal DOM
+      const isEdit = !!expense;
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = `
+        <div class="modal-head">
+          <div><strong id="modalTitle">${isEdit ? 'Editar despesa' : 'Nova despesa'}</strong></div>
+        </div>
+        <div class="modal-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div class="field">
+              <label>Data</label>
+              <input id="m-date" type="date">
+            </div>
+            <div class="field">
+              <label>Valor (R$)</label>
+              <input id="m-amount" type="number" step="0.01" min="0">
+            </div>
+            <div class="field" style="grid-column:1 / -1">
+              <label>Descrição</label>
+              <input id="m-desc" type="text" placeholder="Ex: Arroz, gás...">
+            </div>
+            <div class="field">
+              <label>Grupo base</label>
+              <select id="m-group">
+                <option value="A">Grupo A (Wanderson, Gu, Cris)</option>
+                <option value="B">Grupo B (Gu, Galeno, Emerson)</option>
+                <option value="manual">Manual (todos)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Quem pagou</label>
+              <select id="m-payer"></select>
+            </div>
+          </div>
+
+          <div style="margin-top:12px">
+            <label style="display:block;margin-bottom:8px">Participantes (marque quem consumiu)</label>
+            <div id="m-participants" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+            <div style="margin-top:8px"><button id="m-toggleAll" class="btn ghost">Selecionar todos</button></div>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button id="m-cancel" class="btn ghost">Cancelar</button>
+          <button id="m-save" class="btn primary">${isEdit ? 'Salvar' : 'Adicionar'}</button>
+        </div>
+      `;
+
+      // open and populate
+      const m = openModal(wrapper);
+      const elDate = wrapper.querySelector('#m-date');
+      const elAmount = wrapper.querySelector('#m-amount');
+      const elDesc = wrapper.querySelector('#m-desc');
+      const elGroup = wrapper.querySelector('#m-group');
+      const elPayer = wrapper.querySelector('#m-payer');
+      const elParticipants = wrapper.querySelector('#m-participants');
+      const elToggleAll = wrapper.querySelector('#m-toggleAll');
+
+      // render payers options
+      uniquePeople.forEach(n => {
+        const opt = document.createElement('option'); opt.value = n; opt.textContent = n; elPayer.appendChild(opt);
+      });
+
+      // set initial values
+      if (isEdit) {
+        elDate.value = expense.date;
+        elAmount.value = (expense.amount_cents/100).toFixed(2);
+        elDesc.value = expense.desc;
+        // choose group initially based on participants if subset of A or B
+        const inA = expense.participants.every(p => groupA.includes(p));
+        const inB = expense.participants.every(p => groupB.includes(p));
+        if (expense.participants.length === 0) elGroup.value = 'manual';
+        else if (inA && expense.participants.length === groupA.length) elGroup.value = 'A';
+        else if (inB && expense.participants.length === groupB.length) elGroup.value = 'B';
+        else elGroup.value = 'manual';
+        elPayer.value = expense.payer;
+      } else {
+        elDate.valueAsDate = new Date();
+        elAmount.value = '';
+        elDesc.value = '';
+        elGroup.value = 'A';
+        elPayer.value = uniquePeople[0];
+      }
+
+      function renderParticipantsForGroup() {
+        elParticipants.innerHTML = '';
+        let people = [];
+        if (elGroup.value === 'A') people = groupA;
+        else if (elGroup.value === 'B') people = groupB;
+        else people = uniquePeople;
+        people.forEach(name => {
+          const lab = document.createElement('label');
+          lab.className = 'chip';
+          lab.style.cursor = 'pointer';
+          lab.innerHTML = `<input type="checkbox" value="${escapeHtml(name)}"> ${escapeHtml(name)}`;
+          elParticipants.appendChild(lab);
+        });
+
+        // if editing, mark participants selected
+        if (isEdit && expense.participants && expense.participants.length) {
+          elParticipants.querySelectorAll('input[type=checkbox]').forEach(cb => {
+            if (expense.participants.includes(cb.value)) cb.checked = true;
+          });
+        }
+      }
+
+      elGroup.addEventListener('change', renderParticipantsForGroup);
+      elToggleAll.addEventListener('click', () => {
+        const cbs = elParticipants.querySelectorAll('input[type=checkbox]');
+        const anyUnchecked = Array.from(cbs).some(cb => !cb.checked);
+        cbs.forEach(cb => cb.checked = anyUnchecked);
+      });
+
+      renderParticipantsForGroup();
+
+      // handlers
+      wrapper.querySelector('#m-cancel').addEventListener('click', () => { m.close(); resolve(null); });
+      wrapper.querySelector('#m-save').addEventListener('click', async () => {
+        const date = elDate.value || new Date().toISOString().slice(0,10);
+        const desc = elDesc.value.trim() || '(sem descrição)';
+        const payer = elPayer.value;
+        const amount = parseFloat(elAmount.value);
+        if (isNaN(amount) || amount <= 0) {
+          await showAlert('Digite um valor válido maior que 0.', 'Valor inválido');
+          return;
+        }
+        const participants = Array.from(elParticipants.querySelectorAll('input[type=checkbox]'))
+                                .filter(cb => cb.checked).map(cb => cb.value);
+        if (participants.length === 0) {
+          const cont = await showConfirm('Nenhum participante selecionado. Deseja registrar a despesa sem dividir (somente o pagador)?', 'Sem participantes');
+          if (!cont) return;
+        }
+        const cents = Math.round(amount*100);
+        if (isEdit) {
+          // update object
+          expense.date = date;
+          expense.desc = desc;
+          expense.payer = payer;
+          expense.amount_cents = cents;
+          expense.participants = participants;
+          saveExpenses();
+          renderLedger();
+          renderBalancesAndSettlements();
+          m.close();
+          resolve(expense);
+        } else {
+          const newExp = {
+            id: 'e-' + Date.now(),
+            date, desc, payer, amount_cents: cents, participants
+          };
+          expenses.push(newExp);
+          saveExpenses();
+          renderLedger();
+          renderBalancesAndSettlements();
+          m.close();
+          resolve(newExp);
+        }
+      });
+
+      // backdrop click to close
+      modalBackdrop.onclick = (e) => { if(e.target === modalBackdrop){ m.close(); resolve(null); } };
+    });
+  }
+
+  // escape simple
+  function escapeHtml(str){ return String(str).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[s]); }
+
+  // load/save
   function loadExpenses(){
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if(!raw) return [];
+      if (!raw) return [];
       return JSON.parse(raw);
-    } catch(e){
-      console.error('Erro ao carregar dados:', e);
-      return [];
+    } catch(e) {
+      console.error('erro load', e); return [];
     }
   }
   function saveExpenses(){
     localStorage.setItem(STORAGE_KEY, JSON.stringify(expenses));
   }
 
-  // Payer options: lista única de pessoas
-  function renderPayerOptions(){
-    payerSelect.innerHTML = '';
-    uniquePeople.forEach(name => {
-      const opt = document.createElement('option');
-      opt.value = name;
-      opt.textContent = name;
-      payerSelect.appendChild(opt);
-    });
-  }
-
-  // Renderizar participantes dependendo do grupo
-  function renderParticipants(){
-    participantsContainer.innerHTML = '';
-    let people;
-    if(groupSelect.value === 'A') people = groupA;
-    else if(groupSelect.value === 'B') people = groupB;
-    else people = uniquePeople; // manual mostra todos
-
-    people.forEach(name => {
-      const id = 'p-' + name.replace(/\s+/g,'_');
-      const wrapper = document.createElement('label');
-      wrapper.style.display = 'flex';
-      wrapper.style.alignItems = 'center';
-      wrapper.style.gap = '8px';
-      const cb = document.createElement('input');
-      cb.type = 'checkbox';
-      cb.id = id;
-      cb.value = name;
-      const span = document.createElement('span');
-      span.textContent = name;
-      wrapper.appendChild(cb);
-      wrapper.appendChild(span);
-      participantsContainer.appendChild(wrapper);
-    });
-  }
-
-  groupSelect.addEventListener('change', () => {
-    renderParticipants();
-  });
-
-  toggleAllBtn.addEventListener('click', () => {
-    const cbs = participantsContainer.querySelectorAll('input[type=checkbox]');
-    const anyUnchecked = Array.from(cbs).some(cb => !cb.checked);
-    cbs.forEach(cb => cb.checked = anyUnchecked);
-  });
-
-  addExpenseBtn.addEventListener('click', () => {
-    const date = dateInput.value || new Date().toISOString().slice(0,10);
-    const desc = descInput.value.trim() || '(sem descrição)';
-    const payer = payerSelect.value;
-    const amount = parseFloat(amountInput.value);
-    if(isNaN(amount) || amount <= 0){
-      alert('Digite um valor válido maior que 0.');
-      return;
-    }
-    const cbs = participantsContainer.querySelectorAll('input[type=checkbox]');
-    const participants = Array.from(cbs).filter(cb => cb.checked).map(cb => cb.value);
-    if(participants.length === 0){
-      if(!confirm('Nenhum participante selecionado. Deseja registrar a despesa sem dividir (somente o pagador)?')) {
-        return;
-      }
-    }
-    // armazena em centavos para evitar erros de float
-    const cents = Math.round(amount * 100);
-    const expense = {
-      id: 'e-' + Date.now(),
-      date,
-      desc,
-      payer,
-      amount_cents: cents,
-      participants // pode estar vazia => nenhum participante (então todo valor fica com pagador)
-    };
-    expenses.push(expense);
-    saveExpenses();
-    // limpar formulário parcialmente
-    descInput.value = '';
-    amountInput.value = '';
-    // atualiza UI
-    renderLedger();
-    renderBalancesAndSettlements();
-  });
-
-  // Renderiza histórico
-  function renderLedger(){
-    ledgerBody.innerHTML = '';
-    if(expenses.length === 0){
-      const tr = document.createElement('tr');
-      const td = document.createElement('td');
-      td.colSpan = 7;
-      td.className = 'muted';
-      td.textContent = 'Nenhuma despesa registrada.';
-      tr.appendChild(td);
-      ledgerBody.appendChild(tr);
-      return;
-    }
-    // ordenar por data descendente
-    const sorted = expenses.slice().sort((a,b) => new Date(b.date) - new Date(a.date) || b.id.localeCompare(a.id));
-    sorted.forEach(exp => {
-      const tr = document.createElement('tr');
-      const fmt = new Intl.NumberFormat('pt-BR', {style:'currency', currency:'BRL'});
-      const amount = fmt.format(exp.amount_cents/100);
-      const participantsText = exp.participants.length ? exp.participants.join(', ') : '(nenhum - não dividido)';
-      const perPerson = exp.participants.length ? fmt.format((exp.amount_cents/100) / exp.participants.length) : '-';
-      tr.innerHTML = `<td>${exp.date}</td>
-                      <td>${escapeHtml(exp.desc)}</td>
-                      <td>${escapeHtml(exp.payer)}</td>
-                      <td>${amount}</td>
-                      <td>${escapeHtml(participantsText)}</td>
-                      <td>${perPerson}</td>
-                      <td><button data-id="${exp.id}" class="removeBtn">Remover</button></td>`;
-      ledgerBody.appendChild(tr);
-    });
-    // attach remove handlers
-    ledgerBody.querySelectorAll('.removeBtn').forEach(btn => {
-      btn.addEventListener('click', (ev) => {
-        const id = ev.currentTarget.getAttribute('data-id');
-        if(!confirm('Remover esta despesa?')) return;
-        expenses = expenses.filter(e => e.id !== id);
-        saveExpenses();
-        renderLedger();
-        renderBalancesAndSettlements();
-      });
-    });
-  }
-
-  // Escapar HTML simples
-  function escapeHtml(str){ return String(str).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[s]); }
-
-  // Calcular saldos por pessoa (em centavos)
+  // calculation (same lógica robusta em centavos)
   function calculateNetBalances(){
-    // iniciar zeros
     const net = {};
     uniquePeople.forEach(p => net[p]=0);
-    // para cada despesa:
-    // - pagador: recebe valor inteiro (crédito)
-    // - cada participante: debita sua parte (se participantes vazios => ninguém debita)
     expenses.forEach(e => {
       net[e.payer] += e.amount_cents;
       const n = e.participants.length;
-      if(n > 0){
-        const baseShare = Math.floor(e.amount_cents / n); // divisão inteira em centavos
-        // para cobrir centavos restantes (resto), atribuímos +1 cent ao primeiro R participantes
+      if (n > 0){
+        const baseShare = Math.floor(e.amount_cents / n);
         const remainder = e.amount_cents - baseShare * n;
         e.participants.forEach((p, idx) => {
           net[p] -= (baseShare + (idx < remainder ? 1 : 0));
         });
       }
-      // se n==0, ninguém arca: pagador pagou e ninguém foi debitado => pagador está com crédito total (os outros não têm débito)
     });
     return net;
   }
 
-  // Renderiza balances e settlement
-  function renderBalancesAndSettlements(){
-    const fmt = new Intl.NumberFormat('pt-BR', {style:'currency', currency:'BRL'});
-    const net = calculateNetBalances(); // em centavos
-    balancesContainer.innerHTML = '';
-    // mostra cada pessoa com saldo (positivo = receber)
-    uniquePeople.forEach(name => {
-      const div = document.createElement('div');
-      div.className = 'balance-card';
-      const balance = net[name] || 0;
-      const balFmt = fmt.format(balance/100);
-      const small = document.createElement('small');
-      small.textContent = balance >= 0 ? 'A receber' : 'A pagar';
-      const h4 = document.createElement('div');
-      h4.style.fontWeight = '600';
-      h4.style.marginBottom = '6px';
-      h4.textContent = name;
-      const p = document.createElement('div');
-      p.style.fontSize = '16px';
-      p.style.marginBottom = '6px';
-      p.textContent = balFmt;
-      p.style.color = balance > 0 ? '#2e7d32' : (balance < 0 ? '#c62828' : '#333');
-      div.appendChild(h4);
-      div.appendChild(p);
-      div.appendChild(small);
-      balancesContainer.appendChild(div);
+  // render ledger
+  function renderLedger(){
+    ledgerBody.innerHTML = '';
+    if (expenses.length === 0){
+      const tr = document.createElement('tr');
+      const td = document.createElement('td');
+      td.colSpan = 7; td.className = 'small-muted'; td.textContent = 'Nenhuma despesa registrada.';
+      tr.appendChild(td); ledgerBody.appendChild(tr); return;
+    }
+    const sorted = expenses.slice().sort((a,b) => new Date(b.date) - new Date(a.date) || b.id.localeCompare(a.id));
+    const fmt = new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'});
+    sorted.forEach(exp => {
+      const tr = document.createElement('tr');
+      const amount = fmt.format(exp.amount_cents/100);
+      const participantsText = exp.participants.length ? exp.participants.join(', ') : '(nenhum)';
+      const perPerson = exp.participants.length ? fmt.format((exp.amount_cents/100) / exp.participants.length) : '-';
+      tr.innerHTML = `
+        <td>${exp.date}</td>
+        <td>${escapeHtml(exp.desc)}</td>
+        <td>${escapeHtml(exp.payer)}</td>
+        <td>${amount}</td>
+        <td>${escapeHtml(participantsText)}</td>
+        <td>${perPerson}</td>
+        <td style="white-space:nowrap">
+          <button data-id="${exp.id}" class="btn ghost btn-edit" title="Editar" style="margin-right:6px">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M3 21l3-1 11-11 2-3-3 2L6 19 3 21z" stroke="currentColor" stroke-width="1.1" fill="none"/></svg>
+            Editar
+          </button>
+          <button data-id="${exp.id}" class="btn btn-remove" title="Remover" style="background:linear-gradient(180deg,#ff7b7b,#ff6b6b);color:#fff;">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M3 6h18M8 6v12a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V6" stroke="white" stroke-width="1.2" fill="none"/></svg>
+            Remover
+          </button>
+        </td>
+      `;
+      ledgerBody.appendChild(tr);
     });
 
-    // calcular sugestões de acerto
-    // transformar em arrays de {name, cents}
-    const creditors = [];
-    const debtors = [];
-    for(const [name, cents] of Object.entries(net)){
-      if(Math.abs(cents) < 1) continue; // ignorar centavos zero
-      if(cents > 0) creditors.push({name, cents});
-      else if(cents < 0) debtors.push({name, cents: -cents}); // guardar como positivo o quanto deve
-    }
+    // attach edit/remove handlers
+    ledgerBody.querySelectorAll('.btn-remove').forEach(btn => btn.addEventListener('click', async (ev) => {
+      const id = ev.currentTarget.getAttribute('data-id');
+      const ok = await showConfirm('Remover esta despesa?','Remover');
+      if (!ok) return;
+      expenses = expenses.filter(e => e.id !== id);
+      saveExpenses(); renderLedger(); renderBalancesAndSettlements();
+    }));
 
-    // se nada, mensagem
-    settlementList.innerHTML = '';
-    if(creditors.length === 0 && debtors.length === 0){
-      noSettlements.style.display = 'block';
-      return;
-    } else {
-      noSettlements.style.display = 'none';
-    }
-
-    // ordenar para algoritmo guloso
-    creditors.sort((a,b) => b.cents - a.cents);
-    debtors.sort((a,b) => b.cents - a.cents);
-
-    const settlements = [];
-    let i = 0, j = 0;
-    while(i < debtors.length && j < creditors.length){
-      const debtor = debtors[i];
-      const creditor = creditors[j];
-      const pay = Math.min(debtor.cents, creditor.cents);
-      settlements.push({from: debtor.name, to: creditor.name, amount_cents: pay});
-      debtor.cents -= pay;
-      creditor.cents -= pay;
-      if(debtor.cents === 0) i++;
-      if(creditor.cents === 0) j++;
-    }
-
-    // render settlements
-    const ul = document.createElement('div');
-    ul.style.display = 'grid';
-    ul.style.gap = '6px';
-    settlements.forEach(s => {
-      const row = document.createElement('div');
-      row.style.padding = '8px';
-      row.style.borderRadius = '8px';
-      row.style.background = '#fff';
-      row.style.display = 'flex';
-      row.style.justifyContent = 'space-between';
-      row.style.alignItems = 'center';
-      row.innerHTML = `<div>${escapeHtml(s.from)} → ${escapeHtml(s.to)}</div><div style="font-weight:600">${fmt.format(s.amount_cents/100)}</div>`;
-      ul.appendChild(row);
-    });
-    settlementList.appendChild(ul);
+    ledgerBody.querySelectorAll('.btn-edit').forEach(btn => btn.addEventListener('click', async (ev) => {
+      const id = ev.currentTarget.getAttribute('data-id');
+      const exp = expenses.find(e => e.id === id);
+      if (!exp) return;
+      await openExpenseModal(exp);
+    }));
   }
 
-  // Export JSON
+  // render balances & settlements
+  function renderBalancesAndSettlements(){
+    const fmt = new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'});
+    const net = calculateNetBalances();
+    balancesContainer.innerHTML = '';
+    uniquePeople.forEach(name => {
+      const balance = net[name] || 0;
+      const card = document.createElement('div'); card.className = 'balance-card';
+      const nm = document.createElement('div'); nm.style.fontWeight='700'; nm.textContent = name;
+      const amt = document.createElement('div'); amt.className = 'balance-amt'; amt.textContent = fmt.format(balance/100);
+      amt.style.color = balance > 0 ? getComputedStyle(document.documentElement).getPropertyValue('--success') || '#2e7d32'
+                      : (balance < 0 ? getComputedStyle(document.documentElement).getPropertyValue('--danger') || '#c62828' : '#333');
+      const small = document.createElement('div'); small.className='small-muted'; small.textContent = balance>=0 ? 'A receber':'A pagar';
+      card.appendChild(nm); card.appendChild(amt); card.appendChild(small);
+      balancesContainer.appendChild(card);
+    });
+
+    // settlements (greedy)
+    settlementList.innerHTML = '';
+    const creditors = [], debtors = [];
+    for(const [name,cents] of Object.entries(net)){
+      if (Math.abs(cents) < 1) continue;
+      if (cents > 0) creditors.push({name,cents});
+      else debtors.push({name,cents: -cents});
+    }
+    if (creditors.length === 0 && debtors.length === 0){
+      noSettlements.style.display = 'block';
+      return;
+    } else noSettlements.style.display = 'none';
+    creditors.sort((a,b)=>b.cents-a.cents); debtors.sort((a,b)=>b.cents-a.cents);
+    const settlements = [];
+    let i=0,j=0;
+    while(i<debtors.length && j<creditors.length){
+      const debtor = debtors[i], creditor = creditors[j];
+      const pay = Math.min(debtor.cents, creditor.cents);
+      settlements.push({from:debtor.name,to:creditor.name,amount_cents:pay});
+      debtor.cents -= pay; creditor.cents -= pay;
+      if (debtor.cents === 0) i++; if (creditor.cents === 0) j++;
+    }
+    const fmtEl = document.createElement('div');
+    settlements.forEach(s => {
+      const row = document.createElement('div'); row.className='sett-row';
+      row.innerHTML = `<div>${escapeHtml(s.from)} → ${escapeHtml(s.to)}</div><div style="font-weight:700">${new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(s.amount_cents/100)}</div>`;
+      settlementList.appendChild(row);
+    });
+  }
+
+  // export JSON
   exportJsonBtn.addEventListener('click', () => {
-    const data = {
-      generated_at: new Date().toISOString(),
-      expenses,
-      groups: {A: groupA, B: groupB, people: uniquePeople}
-    };
-    const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+    const data = { generated_at: new Date().toISOString(), expenses, groups:{A:groupA,B:groupB,people:uniquePeople} };
+    const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'despesas_casa_professores.json';
-    a.click();
-    URL.revokeObjectURL(url);
+    const a = document.createElement('a'); a.href = url; a.download = 'despesas_casa_professores.json'; a.click(); URL.revokeObjectURL(url);
   });
 
-  // Import
+  // import JSON -> ask confirm before replacing (modal)
   importBtn.addEventListener('click', () => {
     const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.json,application/json';
-    input.onchange = () => {
-      const file = input.files[0];
-      if(!file) return;
+    input.type='file'; input.accept='.json,application/json';
+    input.onchange = async () => {
+      const file = input.files[0]; if(!file) return;
       const reader = new FileReader();
-      reader.onload = (e) => {
+      reader.onload = async (e) => {
         try {
           const parsed = JSON.parse(e.target.result);
-          if(!parsed.expenses) throw new Error('Arquivo inválido (formato diferente).');
-          if(!confirm('Importar esse arquivo substituirá o histórico atual. Continuar?')) return;
+          if (!parsed.expenses) throw new Error('Arquivo inválido (formato diferente).');
+          const ok = await showConfirm('Importar esse arquivo substituirá o histórico atual. Continuar?','Importar');
+          if (!ok) return;
           expenses = parsed.expenses;
           saveExpenses();
-          renderLedger();
-          renderBalancesAndSettlements();
-          alert('Importação concluída.');
-        } catch(err){
-          alert('Erro ao importar: ' + err.message);
+          renderLedger(); renderBalancesAndSettlements();
+          await showAlert('Importação concluída.', 'Importado');
+        } catch(err) {
+          await showAlert('Erro ao importar: '+ (err.message || err), 'Erro');
         }
       };
       reader.readAsText(file);
@@ -459,140 +711,134 @@
     input.click();
   });
 
-  // reset data
-  resetBtn.addEventListener('click', () => {
-    if(!confirm('Apagar todos os dados salvos no navegador? Esta ação não pode ser desfeita.')) return;
-    expenses = [];
-    saveExpenses();
-    renderLedger();
-    renderBalancesAndSettlements();
+  // reset
+  resetBtn.addEventListener('click', async () => {
+    const ok = await showConfirm('Apagar todos os dados salvos no navegador? Esta ação não pode ser desfeita.','Resetar');
+    if (!ok) return;
+    expenses = []; saveExpenses(); renderLedger(); renderBalancesAndSettlements();
+    await showAlert('Dados apagados.', 'Resetado');
   });
 
-  // === EXPORTAR PNG: incluir saldos (coloridos), tabela + sugestão de acerto ===
+  // FAB and open add modal
+  fab.addEventListener('click', async () => { await openExpenseModal(null); });
+  openAddModalBtn.addEventListener('click', async () => { await openExpenseModal(null); });
+
+  // quick inline add (no modal) - keep but uses modal confirmations
+  quickAddBtn.addEventListener('click', async () => {
+    const date = dateInline.value || new Date().toISOString().slice(0,10);
+    const desc = descInline.value.trim() || '(sem descrição)';
+    const amount = parseFloat(amountInline.value);
+    if (isNaN(amount) || amount <= 0) { await showAlert('Digite um valor válido maior que 0.','Valor inválido'); return; }
+    // default: group A and all selected = groupA
+    const participants = groupA.slice();
+    const payer = groupA[0];
+    const cents = Math.round(amount*100);
+    const newExp = { id:'e-'+Date.now(), date, desc, payer, amount_cents:cents, participants };
+    expenses.push(newExp); saveExpenses(); renderLedger(); renderBalancesAndSettlements();
+    descInline.value=''; amountInline.value=''; dateInline.valueAsDate = new Date();
+    await showAlert('Despesa adicionada (rápida). Use o modal para editar detalhes.','Adicionado');
+  });
+
+  // export PNG (inclui saldos coloridos, tabela e acerto)
   exportPngBtn.addEventListener('click', async () => {
     try {
-      const fmt = new Intl.NumberFormat('pt-BR', {style:'currency', currency:'BRL'});
-      // montar um wrapper limpo com conteúdo que queremos exportar
+      const fmt = new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'});
+      // build wrapper
       const wrapper = document.createElement('div');
-      wrapper.className = 'export-wrapper';
-      // título e metadata
-      const title = document.createElement('div');
-      title.className = 'export-title';
-      title.textContent = 'Divisão de Despesas — Casa dos Professores';
-      const sub = document.createElement('div');
-      sub.className = 'export-sub';
-      const now = new Date();
-      sub.textContent = 'Gerado em: ' + now.toLocaleString('pt-BR');
+      wrapper.style.width = '900px';
+      wrapper.style.background = '#fff';
+      wrapper.style.color = '#111';
+      wrapper.style.padding = '18px';
+      wrapper.style.borderRadius = '10px';
+      wrapper.style.fontFamily = getComputedStyle(document.body).fontFamily;
 
-      wrapper.appendChild(title);
-      wrapper.appendChild(sub);
+      const title = document.createElement('div'); title.style.fontSize='18px'; title.style.fontWeight='700'; title.textContent='Divisão de Despesas — Casa dos Professores';
+      const sub = document.createElement('div'); sub.style.color='#6b7280'; sub.style.marginBottom='10px'; sub.textContent = 'Gerado em: ' + new Date().toLocaleString('pt-BR');
+      wrapper.appendChild(title); wrapper.appendChild(sub);
 
-      // SALDOS (coloridos) - construir manualmente a partir do cálculo atual
-      const net = calculateNetBalances(); // em centavos
-      const balancesPortion = document.createElement('div');
-      balancesPortion.className = 'export-portion';
-      const hBal = document.createElement('div'); hBal.style.fontWeight='600'; hBal.style.marginBottom='6px'; hBal.textContent='Saldos';
-      balancesPortion.appendChild(hBal);
-      const balGrid = document.createElement('div');
-      balGrid.style.display = 'flex';
-      balGrid.style.gap = '8px';
-      balGrid.style.flexWrap = 'wrap';
+      // balances
+      const net = calculateNetBalances();
+      const balTitle = document.createElement('div'); balTitle.style.fontWeight='700'; balTitle.style.margin='8px 0'; balTitle.textContent='Saldos';
+      wrapper.appendChild(balTitle);
+      const balGrid = document.createElement('div'); balGrid.style.display='flex'; balGrid.style.gap='8px'; balGrid.style.flexWrap='wrap'; balGrid.style.marginBottom='10px';
       uniquePeople.forEach(name => {
-        const balance = net[name] || 0;
-        const card = document.createElement('div');
-        card.className = 'export-balance-card';
-        card.style.minWidth = '140px';
-        card.style.padding = '8px';
-        card.style.borderRadius = '8px';
-        card.style.background = '#f7fafc';
-        card.style.display = 'flex';
-        card.style.flexDirection = 'column';
-        card.style.alignItems = 'flex-start';
-        const nm = document.createElement('div');
-        nm.style.fontWeight = '700';
-        nm.textContent = name;
-        const amt = document.createElement('div');
-        amt.style.fontSize = '16px';
-        amt.style.marginTop = '6px';
-        amt.textContent = fmt.format(balance / 100);
-        // cores: verde para positivo, vermelho para negativo, cinza para zero
-        if(balance > 0) amt.style.color = '#2e7d32';
-        else if(balance < 0) amt.style.color = '#c62828';
-        else amt.style.color = '#333';
-        card.appendChild(nm);
-        card.appendChild(amt);
-        balGrid.appendChild(card);
+        const card = document.createElement('div'); card.style.minWidth='140px'; card.style.padding='8px'; card.style.borderRadius='8px'; card.style.background='#f7fafc';
+        const nm = document.createElement('div'); nm.style.fontWeight='700'; nm.textContent = name;
+        const amt = document.createElement('div'); amt.style.fontSize='16px'; amt.style.fontWeight='700'; amt.style.marginTop='6px';
+        const balance = net[name] || 0; amt.textContent = fmt.format(balance/100);
+        if (balance > 0) amt.style.color = '#2e7d32'; else if (balance < 0) amt.style.color = '#c62828';
+        card.appendChild(nm); card.appendChild(amt); balGrid.appendChild(card);
       });
-      balancesPortion.appendChild(balGrid);
-      wrapper.appendChild(balancesPortion);
+      wrapper.appendChild(balGrid);
 
-      // clonar a tabela inteira (sem barras de rolagem)
-      const ledgerTable = document.getElementById('ledgerTable');
-      const ledgerClone = ledgerTable.cloneNode(true);
-      ledgerClone.classList.add('no-scroll');
-      // remover botões "Remover" da cópia
-      ledgerClone.querySelectorAll('button').forEach(b => b.remove());
-      const ledgerPortion = document.createElement('div');
-      ledgerPortion.className = 'export-portion';
-      const hLedger = document.createElement('div'); hLedger.style.fontWeight='600'; hLedger.style.marginBottom='6px'; hLedger.textContent='Histórico de despesas';
-      ledgerPortion.appendChild(hLedger);
-      ledgerPortion.appendChild(ledgerClone);
-      wrapper.appendChild(ledgerPortion);
+      // ledger table clone (simpler HTML)
+      const tblTitle = document.createElement('div'); tblTitle.style.fontWeight='700'; tblTitle.style.margin='8px 0'; tblTitle.textContent='Histórico de despesas';
+      wrapper.appendChild(tblTitle);
+      const table = document.createElement('table'); table.style.width='100%'; table.style.borderCollapse='collapse';
+      const thead = document.createElement('thead'); thead.innerHTML = '<tr><th style="text-align:left;padding:8px">Data</th><th style="text-align:left;padding:8px">Descrição</th><th style="text-align:left;padding:8px">Pago por</th><th style="text-align:left;padding:8px">Valor</th><th style="text-align:left;padding:8px">Participantes</th></tr>';
+      table.appendChild(thead);
+      const tbody = document.createElement('tbody');
+      const sorted = expenses.slice().sort((a,b)=> new Date(b.date) - new Date(a.date) || b.id.localeCompare(a.id));
+      sorted.forEach(e => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td style="padding:6px">${e.date}</td><td style="padding:6px">${escapeHtml(e.desc)}</td><td style="padding:6px">${escapeHtml(e.payer)}</td><td style="padding:6px">${fmt.format(e.amount_cents/100)}</td><td style="padding:6px">${escapeHtml(e.participants.join(', '))}</td>`;
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+      wrapper.appendChild(table);
 
-      // clonar settlements (sugestão de acerto)
-      const settlementsOrig = document.getElementById('settlementsContainer');
-      const settlementsClone = settlementsOrig.cloneNode(true);
-      settlementsClone.classList.add('no-scroll');
-      const settlePortion = document.createElement('div');
-      settlePortion.className = 'export-portion';
-      const hSettle = document.createElement('div'); hSettle.style.fontWeight='600'; hSettle.style.marginBottom='6px'; hSettle.textContent='Sugestão de acerto';
-      settlePortion.appendChild(hSettle);
-      settlePortion.appendChild(settlementsClone);
-      wrapper.appendChild(settlePortion);
+      // settlements
+      const settleTitle = document.createElement('div'); settleTitle.style.fontWeight='700'; settleTitle.style.margin='8px 0'; settleTitle.textContent='Sugestão de acerto';
+      wrapper.appendChild(settleTitle);
+      const creditors = [], debtors = [];
+      for(const [name,cents] of Object.entries(net)){
+        if (Math.abs(cents) < 1) continue;
+        if (cents > 0) creditors.push({name,cents});
+        else debtors.push({name,cents:-cents});
+      }
+      creditors.sort((a,b)=>b.cents-a.cents); debtors.sort((a,b)=>b.cents-a.cents);
+      const settlements = [];
+      let i=0,j=0;
+      while(i<debtors.length && j<creditors.length){
+        const debtor = debtors[i], creditor = creditors[j];
+        const pay = Math.min(debtor.cents, creditor.cents);
+        settlements.push({from:debtor.name,to:creditor.name,amount_cents:pay});
+        debtor.cents -= pay; creditor.cents -= pay;
+        if (debtor.cents === 0) i++; if (creditor.cents === 0) j++;
+      }
+      if (settlements.length === 0){
+        const p = document.createElement('div'); p.style.color='#6b7280'; p.textContent = 'Nenhuma transação necessária.'; wrapper.appendChild(p);
+      } else {
+        settlements.forEach(s => {
+          const r = document.createElement('div'); r.style.display='flex'; r.style.justifyContent='space-between'; r.style.padding='6px'; r.style.background='#fff'; r.style.borderRadius='6px'; r.style.marginBottom='6px';
+          r.innerHTML = `<div>${escapeHtml(s.from)} → ${escapeHtml(s.to)}</div><div style="font-weight:700">${fmt.format(s.amount_cents/100)}</div>`;
+          wrapper.appendChild(r);
+        });
+      }
 
-      // renderizar em um container invisível no documento para capturar estilos
-      wrapper.style.position = 'fixed';
-      wrapper.style.left = '-10000px';
-      wrapper.style.top = '0';
+      // append to DOM off-screen to capture styles
+      wrapper.style.position='fixed'; wrapper.style.left='-10000px'; wrapper.style.top='0';
       document.body.appendChild(wrapper);
-
-      // Esperar um momento para o layout se estabilizar (rápido)
-      await new Promise(r => setTimeout(r, 50));
-
-      // usar html2canvas para capturar (scale 2 para melhor resolução)
-      const canvas = await html2canvas(wrapper, {
-        backgroundColor: '#ffffff',
-        scale: 2,
-        useCORS: true,
-        logging: false
-      });
-
-      // converter para blob e disparar download
+      await new Promise(r=>setTimeout(r,60));
+      const canvas = await html2canvas(wrapper, {backgroundColor:'#ffffff',scale:2,useCORS:true,logging:false});
       canvas.toBlob(blob => {
-        if(!blob) {
-          alert('Falha ao gerar imagem.');
-          document.body.removeChild(wrapper);
-          return;
-        }
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        const ts = now.toISOString().slice(0,19).replace(/[:T]/g,'-');
-        a.download = `despesas_acerto_${ts}.png`;
-        a.click();
-        URL.revokeObjectURL(url);
-        // remover wrapper
+        if (!blob) { showAlert('Falha ao gerar imagem.','Erro'); document.body.removeChild(wrapper); return; }
+        const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url;
+        a.download = `despesas_acerto_${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.png`; a.click(); URL.revokeObjectURL(url);
         document.body.removeChild(wrapper);
       }, 'image/png');
 
-    } catch (err) {
-      alert('Erro ao exportar PNG: ' + (err && err.message ? err.message : err));
-      console.error(err);
+    } catch(err){
+      console.error(err); showAlert('Erro ao exportar PNG: ' + (err.message || err), 'Erro');
     }
   });
 
-  // iniciar
-  init();
+  // initial render
+  renderLedger(); renderBalancesAndSettlements();
+
+  // helper: open quick expense modal when double-click on empty area? (not necessary)
+  // expose to window for debugging (optional)
+  window._expenses_app = { expenses, saveExpenses, loadExpenses, openExpenseModal, showAlert, showConfirm };
 
 })();
 </script>
