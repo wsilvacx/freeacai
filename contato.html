@@ -15,15 +15,15 @@
     align-items: center;
     padding: 2rem;
   }
-  h1 { margin-bottom: 2rem; color: #333; }
+  h1 { margin-bottom: 1rem; color: #333; }
+  /* Abas */
+  .tabs { display: flex; gap: 1rem; margin-bottom: 1rem; }
+  .tab { padding: 0.5rem 1rem; border-radius: 8px; background: #ddd; cursor: pointer; transition: 0.3s; }
+  .tab.active { background: #6c63ff; color: #fff; }
 
-  .cards-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    width: 100%;
-    max-width: 1000px;
-  }
+  .tab-content { width: 100%; max-width: 1000px; }
+
+  .cards-container { display: flex; flex-wrap: wrap; gap: 1rem; }
 
   .card {
     background: #fff;
@@ -48,7 +48,9 @@
   .compras { flex: 1; overflow-y: auto; padding-right: 0.5rem; }
   .compras::-webkit-scrollbar { width: 6px; }
   .compras::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 3px; }
-  .compra-item { padding: 0.5rem; margin-bottom: 0.5rem; background: #f0f0f0; border-radius: 8px; font-size: 0.9rem; }
+  .compra-item { padding: 0.5rem; margin-bottom: 0.5rem; background: #f0f0f0; border-radius: 8px; font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; }
+  .compra-item button { background:#6c63ff; border:none; color:#fff; padding:0.2rem 0.5rem; border-radius:6px; cursor:pointer; transition:0.3s; }
+  .compra-item button:hover { background:#574fd6; }
 
   /* Botão flutuante */
   .btn-add {
@@ -118,9 +120,6 @@
     border-radius: 12px;
     box-shadow: 0 8px 20px rgba(0,0,0,0.1);
     padding: 1rem;
-    margin-top: 2rem;
-    width: 100%;
-    max-width: 1000px;
   }
   .relatorio-card h2 { margin-bottom: 1rem; color: #333; }
   #relatorio div { padding: 0.5rem; border-bottom: 1px solid #eee; font-size: 0.95rem; color: #555; }
@@ -129,16 +128,31 @@
 <body>
 <h1>Divisão de Despesas</h1>
 
-<div class="cards-container" id="cardsContainer"></div>
+<div class="tabs">
+  <div class="tab active" data-tab="despesas">Despesas</div>
+  <div class="tab" data-tab="relatorio">Relatório</div>
+</div>
+
+<div class="tab-content">
+  <div id="despesasTab">
+    <div class="cards-container" id="cardsContainer"></div>
+  </div>
+  <div id="relatorioTab" style="display:none;">
+    <div class="relatorio-card">
+      <h2>Resumo Final</h2>
+      <div id="relatorio"></div>
+    </div>
+  </div>
+</div>
 
 <!-- Botão flutuante -->
 <button class="btn-add" id="btnAdd">+</button>
 
-<!-- Modal de Adicionar Compra -->
+<!-- Modal de Adicionar/Editar Compra -->
 <div class="modal" id="modal">
   <div class="modal-content">
     <span class="close-modal" id="closeModal">&times;</span>
-    <h3>Adicionar Compra</h3>
+    <h3 id="modalTitle">Adicionar Compra</h3>
     <label for="comprador">Quem comprou:</label>
     <select id="comprador"></select>
     <label for="descricao">Descrição:</label>
@@ -147,19 +161,14 @@
     <input type="number" id="valor" step="0.01">
     <label for="participantes">Participantes (Ctrl+Clique para múltiplos):</label>
     <select id="participantes" multiple></select>
-    <button id="addCompra">Adicionar</button>
+    <button id="addCompra">Salvar</button>
   </div>
-</div>
-
-<!-- Relatório Geral -->
-<div class="relatorio-card">
-  <h2>Relatório Geral</h2>
-  <div id="relatorio"></div>
 </div>
 
 <script>
   const professores = ['Alice','Bruno','Carla','Daniel']; 
   let despesas = [];
+  let editIndex = null;
 
   const cardsContainer = document.getElementById('cardsContainer');
   const modal = document.getElementById('modal');
@@ -171,6 +180,7 @@
   const valorInput = document.getElementById('valor');
   const addCompraBtn = document.getElementById('addCompra');
   const relatorioDiv = document.getElementById('relatorio');
+  const modalTitle = document.getElementById('modalTitle');
 
   function atualizarCards() {
     cardsContainer.innerHTML = '';
@@ -188,8 +198,11 @@
         <h2>${prof}</h2>
         <div class="saldo">Saldo: R$ ${saldo.toFixed(2)}</div>
         <div class="compras">
-          ${despesas.filter(d => d.participantes.includes(prof)).map(d => `
-            <div class="compra-item">${d.comprador} comprou ${d.descricao} - R$ ${d.valor.toFixed(2)}</div>
+          ${despesas.filter(d => d.participantes.includes(prof)).map((d,i) => `
+            <div class="compra-item">
+              <span>${d.comprador} comprou ${d.descricao} - R$ ${d.valor.toFixed(2)}</span>
+              <button onclick="editarCompra(${i})">Editar</button>
+            </div>
           `).join('')}
         </div>
       `;
@@ -217,7 +230,7 @@
   function abrirModal() { modal.style.display = 'flex'; }
   function fecharModal() { modal.style.display = 'none'; }
 
-  btnAdd.addEventListener('click', abrirModal);
+  btnAdd.addEventListener('click', () => { abrirModal(); modalTitle.textContent='Adicionar Compra'; editIndex=null; });
   closeModal.addEventListener('click', fecharModal);
   window.addEventListener('click', e => { if(e.target===modal) fecharModal(); });
 
@@ -230,26 +243,6 @@
       participantesSelect.innerHTML += option;
     });
   }
-
   preencherSelects();
 
-  addCompraBtn.addEventListener('click', () => {
-    const comprador = compradorSelect.value;
-    const descricao = descricaoInput.value;
-    const valor = parseFloat(valorInput.value);
-    const participantes = Array.from(participantesSelect.selectedOptions).map(opt => opt.value);
-    if(!comprador || !descricao || !valor || participantes.length===0) return alert('Preencha todos os campos!');
-    despesas.push({comprador, descricao, valor, participantes});
-    atualizarCards();
-    atualizarRelatorio();
-    descricaoInput.value = '';
-    valorInput.value = '';
-    participantesSelect.selectedIndex = -1;
-    fecharModal();
-  });
-
-  atualizarCards();
-  atualizarRelatorio();
-</script>
-</body>
-</html>
+  addCompraBtn.addEventListener('
