@@ -1,218 +1,371 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Divisão de Mantimentos</title>
-  <link href="https:                                                                         
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Controle de Compras</title>
   <style>
     body {
-      font-family: 'Roboto', sans-serif;
-      background:         
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
       padding: 0;
+      background: #f5f7fa;
+      color: #333;
     }
-
-    header {
-      text-align: center;
-      padding: 15px;
-      background:         
-      color:      
-      font-size: 1.4em;
-    }
-
-    main {
-      max-width: 800px;
-      margin: 20px auto;
-      background:      
-      border-radius: 10px;
-      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-      padding: 20px;
-    }
-
     .tab {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      margin-bottom: 20px;
+      overflow: hidden;
+      background-color: #2f3e46;
     }
-
     .tab button {
-      flex: 1;
-      padding: 10px;
-      font-size: 1em;
-      cursor: pointer;
-      background:         
+      background-color: inherit;
       border: none;
-      font-weight: 600;
-      transition: background-color 0.3s ease-in-out;
+      outline: none;
+      cursor: pointer;
+      padding: 14px 16px;
+      transition: 0.3s;
+      color: #fff;
+      font-weight: bold;
     }
-
-    .tab button.active {
-      background:         
-      color:      
-    }
-
     .tab button:hover {
-      background:      
+      background-color: #3f4e56;
     }
-
+    .tab button.active {
+      background-color: #007bff;
+      color: #fff;
+    }
     .tabcontent {
       display: none;
       padding: 20px;
+      animation: fadeEffect 0.5s;
     }
-
+    @keyframes fadeEffect {
+      from {opacity: 0;}
+      to {opacity: 1;}
+    }
+    h2 {
+      color: #007bff;
+    }
     label {
       display: block;
-      margin-bottom: 10px;
-      font-weight: 500;
+      margin: 10px 0 5px;
     }
-
-    input, select, button {
-      padding: 10px;
-      margin-bottom: 20px;
-      font-size: 1em;
-      border-radius: 5px;
-      border: 1px solid      
+    input[type="text"], input[type="number"], select {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 8px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 4px;
     }
-
-    button {
-      background:         
-      color:      
+    input[type="checkbox"] {
+      margin-right: 5px;
+    }
+    .btn {
+      padding: 8px 16px;
+      margin-right: 8px;
       border: none;
+      border-radius: 4px;
       cursor: pointer;
-    }
-
-    button:hover {
-      background:         
-    }
-
-    .saldo-positivo {
-      color:         
       font-weight: bold;
     }
-
-    .saldo-negativo {
-      color:         
-      font-weight: bold;
+    .btn-adicionar { background-color: #28a745; color: white; }
+    .btn-cancelar { background-color: #6c757d; color: white; }
+    .btn-editar { background-color: #ffc107; color: black; }
+    .btn-excluir { background-color: #dc3545; color: white; }
+    .grupo-selector {
+      margin: 20px 0;
     }
-
-    @media (max-width: 768px) {
-      main {
-        margin: 10px;
-      }
-      .tab {
-        flex-direction: column;
-      }
-      .tab button {
-        margin-bottom: 10px;
-      }
+    .grupo-selector input {
+      margin-right: 5px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    th, td {
+      border: 1px solid #dee2e6;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #007bff;
+      color: white;
+    }
+    .toast {
+      visibility: hidden;
+      min-width: 250px;
+      margin-left: -125px;
+      background-color: #333;
+      color: white;
+      text-align: center;
+      border-radius: 2px;
+      padding: 12px;
+      position: fixed;
+      z-index: 1;
+      left: 50%;
+      bottom: 30px;
+      font-size: 14px;
+    }
+    .toast.show {
+      visibility: visible;
+      animation: fadein 0.5s, fadeout 0.5s 2.5s;
+    }
+    @keyframes fadein {
+      from {bottom: 0; opacity: 0;}
+      to {bottom: 30px; opacity: 1;}
+    }
+    @keyframes fadeout {
+      from {bottom: 30px; opacity: 1;}
+      to {bottom: 0; opacity: 0;}
+    }
+    .erro {
+      color: red;
+      font-size: 13px;
+      margin-top: -6px;
+      margin-bottom: 10px;
     }
   </style>
 </head>
 <body>
-  <header>Divisão de Mantimentos</header>
-  <main>
-    <div class="tab">
-      <button class="tablinks active" onclick="openTab(event,'professores')">Professores</button>
-      <button class="tablinks" onclick="openTab(event,'compras')">Compras</button>
-      <button class="tablinks" onclick="openTab(event,'saldos')">Saldos</button>
-      <button class="tablinks" onclick="openTab(event,'relatorio')">Relatório</button>
+
+  <div class="tab">
+    <button class="tablinks active" onclick="openTab(event, 'grupo')">Grupo</button>
+    <button class="tablinks" onclick="openTab(event, 'compras')">Compras</button>
+  </div>
+
+  <div id="grupo" class="tabcontent" style="display: block;">
+    <h2>Selecionar Grupo</h2>
+    <div class="grupo-selector">
+      <label><input type="radio" name="grupo" id="grupoA" onchange="selecionarGrupo('A')"> Grupo A</label>
+      <label><input type="radio" name="grupo" id="grupoB" onchange="selecionarGrupo('B')"> Grupo B</label>
     </div>
-    <!-- Aba Professores -->
-    <div id="professores" class="tabcontent" style="display:block;">
-      <h2>Escolher Grupo</h2>
-      <p>Escolha um grupo para começar. Os professores do grupo serão usados em todas as divisões.</p>
-      <label>
-        <input id="grupoA" type="radio" name="grupo" value="A" onclick="selecionarGrupo('A')"> Grupo A (Wanderson, Gu, Cris)
-      </label><br>
-      <label>
-        <input id="grupoB" type="radio" name="grupo" value="B" onclick="selecionarGrupo('B')"> Grupo B (Gu, Emerson, Galeno)
-      </label>
-      <h3>Professores selecionados:</h3>
-      <ul id="listaProfessores"></ul>
-    </div>
-    <!-- Aba Compras -->
-    <div id="compras" class="tabcontent">
-      <h2>Registrar Compra</h2>
-      <p>Preencha todos os campos antes de salvar. O valor deve ser numérico e selecione pelo menos um consumidor.</p>
-      <label>Produto: <input id="produto" required placeholder="Ex: Ar
-<label>Valor: <input id="valor" type="number" step="0.01" required placeholder="Ex: 10.50"></label>
-      <label>Consumidores:
-        <select id="consumidores" multiple size="4">
-          <option value="Wanderson">Wanderson</option>
-          <option value="Gu">Gu</option>
-          <option value="Cris">Cris</option>
-          <option value="Emerson">Emerson</option>
-          <option value="Galeno">Galeno</option>
-        </select>
-      </label>
-      <button onclick="registrarCompra()">Salvar Compra</button>
-      <h3>Compras registradas:</h3>
-      <ul id="listaCompras"></ul>
-    </div>
-    <!-- Aba Sldos -->
-    <div id="saldos" class="tabcontent">
-      <h2>Saldos</h2>
-      <p>Verifique os saldos atuais de cada professor.</p>
-      <ul id="listaSaldos"></ul>
-    </div>
-    <!-- Aba Relatrio -->
-    <div id="relatorio" class="tabcontent">
-      <h2>Relatório</h2>
-      <p>Gere um relatório detalhado das compras e saldos.</p>
-      <button onclick="gerarRelatorio()">Gerar Relatório em PDF</button>
-    </div>
-  </main>
+    <h3>Professores</h3>
+    <ul id="listaProfessores"></ul>
+  </div>
+
+  <div id="compras" class="tabcontent">
+    <h2>Registrar Compra</h2>
+
+    <label for="produto">Produto:</label>
+    <input type="text" id="produto">
+    <div class="erro" id="erro-produto"></div>
+
+    <label for="valor">Valor (R$):</label>
+    <input type="number" id="valor" step="0.01">
+    <div class="erro" id="erro-valor"></div>
+
+    <label for="comprador">Comprador:</label>
+    <select id="comprador"></select>
+    <div class="erro" id="erro-comprador"></div>
+
+    <label>Consumidores:</label>
+    <div id="consumidores"></div>
+    <div class="erro" id="erro-consumidores"></div>
+
+    <br>
+    <button class="btn btn-adicionar" onclick="addCompra()">Salvar</button>
+    <button class="btn btn-cancelar" onclick="cancelEdit()">Cancelar</button>
+
+    <h2>Compras Registradas</h2>
+    <table id="tabelaCompras">
+      <thead>
+        <tr>
+          <th>Produto</th>
+          <th>Valor</th>
+          <th>Comprador</th>
+          <th>Consumidores</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
   <script>
-    // Funo para abrir as abas
-    function openTab(evt, tabName) {
-      var i, tabcontent, tablinks;
-      tabcontent = document.getElementsByClassName("tabcontent");
-      for (i = 0; i < tabcontent.length; i++) {
-        tabcontent[i].style.display = "none";
+    const STORAGE_KEY = "divMantimentos_estado_v1";
+    let state = { professores: [], compras: [] };
+    let editIndex = null;
+
+    window.addEventListener('load', init);
+
+    function init() {
+      loadState();
+      if (!state.professores || state.professores.length === 0) {
+        selecionarGrupo('A', false);
+        document.getElementById("grupoA").checked = true;
+      } else {
+        atualizarUI();
+        if (arraysEqual(state.professores, ["Wanderson", "Gu", "Cris"])) document.getElementById("grupoA").checked = true;
+        else if (arraysEqual(state.professores, ["Gu", "Emerson", "Galeno"])) document.getElementById("grupoB").checked = true;
       }
-      tablinks = document.getElementsByClassName("tablinks");
-      for (i = 0; i < tablinks.length; i++) {
-        tablinks[i].className = tablinks[i].className.replace(" active", "");
-      }
-      document.getElementById(tabName).style.display = "block";
-      evt.currentTarget.className += " active";
+      atualizarUI();
     }
 
-    // Funo para selecionar o grupo
-    function selecionarGrupo(grupo) {
-      var professores = [];
-      if (grupo === 'A') {
-        professores = ['Wanderson', 'Gu', 'Cris'];
-      } else if (grupo === 'B') {
-        professores = ['Gu', 'Emerson', 'Galeno'];
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function loadState() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        state = JSON.parse(raw);
+        state.professores ??= [];
+        state.compras ??= [];
       }
-      document.getElementById('listaProfessores').innerHTML = '';
-      professores.forEach(function(professor) {
-        var li = document.createElement('li');
-        li.textContent = professor;
-        document.getElementById('listaProfessores').appendChild(li);
+    }
+
+    function openTab(evt, tabName) {
+      document.querySelectorAll(".tabcontent").forEach(tc => tc.style.display = "none");
+      document.querySelectorAll(".tab button").forEach(tb => tb.classList.remove("active"));
+      document.getElementById(tabName).style.display = "block";
+      if (evt?.currentTarget) evt.currentTarget.classList.add("active");
+    }
+
+    function selecionarGrupo(grupo, perguntar = true) {
+      if (state.compras.length > 0 && perguntar) {
+        const ok = confirm("Existem compras registradas. Deseja limpar as compras ao mudar de grupo?");
+        if (ok) {
+          state.compras = [];
+          showToast("Compras limpas.");
+        }
+      }
+      state.professores = grupo === "A" ? ["Wanderson", "Gu", "Cris"] : ["Gu", "Emerson", "Galeno"];
+      document.getElementById("grupo" + grupo).checked = true;
+      saveState();
+      atualizarUI();
+      showToast(`Grupo ${grupo} selecionado.`);
+    }
+
+    function atualizarUI() {
+      const professores = state.professores || [];
+      document.getElementById("listaProfessores").innerHTML =
+        professores.map(p => `<li>${p}</li>`).join("") || "<li><em>Nenhum</em></li>";
+      const comprador = document.getElementById("comprador");
+      comprador.innerHTML = professores.map(p => `<option value="${p}">${p}</option>`).join("");
+      document.getElementById("consumidores").innerHTML =
+        professores.map(p => `<label><input type="checkbox" value="${p}">${p}</label>`).join("<br>");
+      atualizarTabelaCompras();
+    }
+
+    function atualizarTabelaCompras() {
+      const tbody = document.querySelector("#tabelaCompras tbody");
+      tbody.innerHTML = state.compras.map((c, i) => `
+        <tr>
+          <td>${escapeHtml(c.produto)}</td>
+          <td>R$${Number(c.valor).toFixed(2)}</td>
+          <td>${escapeHtml(c.comprador)}</td>
+          <td>${c.consumidores.map(escapeHtml).join(", ")}</td>
+          <td>
+            <button class="btn btn-editar" onclick="editarCompra(${i})">Editar</button>
+            <button class="btn btn-excluir" onclick="excluirCompra(${i})">Apagar</button>
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    function clearValidationErrors() {
+      ["produto", "valor", "comprador", "consumidores"].forEach(id => {
+        document.getElementById("erro-" + id).innerText = "";
       });
     }
 
-    // Funo para registrar compra
-    function registrarCompra() {
-      var produto = document.getElementById('produto').value;
-      var valor = parseFloat(document.getElementById('valor').value);
-      var consumidores = Array.from(document.getElementById('consumidores').selectedOptions).map(option => option.value);
-      // Lógica para registrar a compra
-      console.log('Compra registrada:', produto, valor, consumidores);
-      // Atualizar lista de compras
-      var li = document.createElement('li');
-      li.textContent = `${produto} - R$ ${valor.toFixed(2)} - ${consumidores.join(', ')}`;
-      document.getElementById('listaCompras').appendChild(li);
+    function addCompra() {
+      clearValidationErrors();
+      const produto = document.getElementById("produto").value.trim();
+      const valor = parseFloat(document.getElementById("valor").value);
+      const comprador = document.getElementById("comprador").value;
+      const consumidores = Array.from(document.querySelectorAll("#consumidores input:checked")).map(cb => cb.value);
+
+      let hasError = false;
+
+      if (!produto) {
+        document.getElementById("erro-produto").innerText = "Informe o produto.";
+        hasError = true;
+      }
+      if (isNaN(valor) || valor <= 0) {
+        document.getElementById("erro-valor").innerText = "Informe um valor válido.";
+        hasError = true;
+      }
+      if (!comprador) {
+        document.getElementById("erro-comprador").innerText = "Selecione o comprador.";
+        hasError = true;
+      }
+      if (consumidores.length === 0) {
+        document.getElementById("erro-consumidores").innerText = "Selecione pelo menos um consumidor.";
+        hasError = true;
+      }
+
+      if (hasError) return;
+
+      const novaCompra = { produto, valor: Number(valor), comprador, consumidores };
+
+      if (editIndex !== null) {
+        state.compras[editIndex] = novaCompra;
+        editIndex = null;
+        showToast("Compra atualizada.");
+      } else {
+        state.compras.push(novaCompra);
+        showToast("Compra registrada.");
+      }
+
+      document.getElementById("produto").value = "";
+      document.getElementById("valor").value = "";
+      document.querySelectorAll("#consumidores input").forEach(cb => cb.checked = false);
+      saveState();
+      atualizarUI();
     }
 
-    // Funo para gerar relatrio
-    function gerarRelatorio() {
-      // Lógica para gerar o relatrio em PDF
-      console.log('Relatório gerado');
+    function editarCompra(i) {
+      const c = state.compras[i];
+      if (!c) return;
+      document.getElementById("produto").value = c.produto;
+      document.getElementById("valor").value = c.valor;
+      if (!state.professores.includes(c.comprador)) {
+        const opt = document.createElement('option');
+        opt.value = c.comprador;
+        opt.text = c.comprador;
+        document.getElementById('comprador').appendChild(opt);
+      }
+      document.getElementById("comprador").value = c.comprador;
+      document.querySelectorAll("#consumidores input").forEach(cb => cb.checked = c.consumidores.includes(cb.value));
+      editIndex = i;
+      showToast("Modo edição ativado.");
+      openTab({ currentTarget: document.querySelector("button[onclick*='compras']") }, 'compras');
+    }
+
+    function cancelEdit() {
+      editIndex = null;
+      document.getElementById("produto").value = "";
+      document.getElementById("valor").value = "";
+      document.querySelectorAll("#consumidores input").forEach(cb => cb.checked = false);
+      showToast("Edição cancelada.");
+    }
+
+    function excluirCompra(i) {
+      if (!confirm("Deseja remover esta compra?")) return;
+      state.compras.splice(i, 1);
+      saveState();
+      atualizarUI();
+      showToast("Compra removida.");
+    }
+
+    function escapeHtml(text) {
+      return String(text || "").replace(/&/g, "&amp;").replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+    function arraysEqual(a, b) {
+      return a?.length === b?.length && a.every((v, i) => v === b[i]);
+    }
+
+    function showToast(msg, time = 3000) {
+      const el = document.getElementById("toast");
+      el.innerText = msg;
+      el.classList.add("show");
+      clearTimeout(el._timeout);
+      el._timeout = setTimeout(() => el.classList.remove("show"), time);
     }
   </script>
 </body>
