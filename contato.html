@@ -1,351 +1,259 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Consumidores e Compras</title>
+<title>Divisão de Despesas</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 <style>
-/* Geral */
-body {
-  font-family: 'Poppins', sans-serif;
-  background: linear-gradient(to right, #f0f2f5, #ffffff);
-  margin:0;
-  padding:20px;
-}
-h1 {
-  text-align:center;
-  color:#333;
-  margin-bottom:30px;
-}
+  /* Reset básico */
+  * { margin:0; padding:0; box-sizing:border-box; font-family: 'Poppins', sans-serif; }
 
-/* Container de cards */
-.cards-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 20px;
-  max-height: 500px;
-  overflow-y: auto;
-  padding-right: 10px;
-}
+  body {
+    background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+  }
 
-/* Cards */
-.card {
-  background: #fff;
-  border-radius: 16px;
-  padding: 20px;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-  transition: transform 0.3s, box-shadow 0.3s;
-  position: relative;
-}
-.card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 12px 30px rgba(0,0,0,0.12);
-}
-.card h3 {
-  margin:0 0 10px 0;
-  font-size:1.2em;
-  color:#222;
-  font-weight:600;
-}
-.card .saldo {
-  font-size:1.1em;
-  font-weight:700;
-  margin-bottom:12px;
-}
-.card .saldo-positivo { color:#4CAF50; }
-.card .saldo-negativo { color:#f44336; }
-.card ul {
-  list-style:none;
-  padding-left:0;
-  margin:0;
-  max-height:140px;
-  overflow-y:auto;
-}
-.card ul li {
-  font-size:0.95em;
-  padding:6px 0;
-  border-bottom:1px dashed #eee;
-}
-.card ul li:last-child { border-bottom:none; }
+  h1 {
+    margin-bottom: 2rem;
+    color: #333;
+  }
 
-/* Botões nos cards */
-.btn-card {
-  position:absolute;
-  top:15px;
-  right:15px;
-  display:flex;
-  gap:8px;
-}
-.btn-card button {
-  border:none;
-  cursor:pointer;
-  border-radius:8px;
-  padding:6px 12px;
-  font-size:0.85em;
-  font-weight:600;
-  transition: all 0.2s;
-}
-.btn-editar {
-  background: #ff9800;
-  color:#fff;
-}
-.btn-editar:hover {
-  background: #e68900;
-  transform: scale(1.05);
-}
-.btn-excluir {
-  background: #f44336;
-  color:#fff;
-}
-.btn-excluir:hover {
-  background: #d32f2f;
-  transform: scale(1.05);
-}
+  .cards-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    width: 100%;
+    max-width: 1000px;
+  }
 
-/* Scroll personalizado */
-.cards-container::-webkit-scrollbar {
-  width:6px;
-}
-.cards-container::-webkit-scrollbar-thumb {
-  background:#bbb;
-  border-radius:3px;
-}
-.cards-container::-webkit-scrollbar-track {
-  background:#f0f0f0;
-}
+  .card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    padding: 1rem;
+    flex: 1 1 200px;
+    min-width: 220px;
+    transition: transform 0.3s, box-shadow 0.3s;
+    display: flex;
+    flex-direction: column;
+    max-height: 350px;
+  }
 
-/* Botão flutuante adicionar consumidor */
-#btnAdd {
-  position:fixed;
-  bottom:30px;
-  right:30px;
-  width:60px;
-  height:60px;
-  border-radius:50%;
-  background:#4CAF50;
-  color:white;
-  font-size:30px;
-  border:none;
-  cursor:pointer;
-  box-shadow:0 6px 15px rgba(0,0,0,0.2);
-  transition: transform 0.2s;
-}
-#btnAdd:hover { transform: scale(1.1); }
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+  }
 
-/* Modal */
-.modal {
-  display:none;
-  position:fixed;
-  z-index:1000;
-  left:0; top:0;
-  width:100%; height:100%;
-  background:rgba(0,0,0,0.5);
-  justify-content:center;
-  align-items:center;
-}
-.modal-content {
-  background:#fff;
-  padding:20px 30px;
-  border-radius:12px;
-  max-width:400px;
-  width:90%;
-  position:relative;
-}
-.modal-content h2 { margin-top:0; }
-.modal-content label { display:block; margin:10px 0 5px; }
-.modal-content input { width:100%; padding:8px; border-radius:6px; border:1px solid #ccc; }
-.modal-content button {
-  margin-top:15px;
-  padding:8px 16px;
-  border:none;
-  border-radius:8px;
-  background:#4CAF50;
-  color:white;
-  font-weight:600;
-  cursor:pointer;
-}
-.modal-content button:hover { background:#43a047; }
-.close-modal {
-  position:absolute;
-  top:10px;
-  right:15px;
-  cursor:pointer;
-  font-size:20px;
-  color:#999;
-  font-weight:bold;
-}
-.close-modal:hover { color:#333; }
+  .card h2 {
+    margin-bottom: 0.5rem;
+    color: #444;
+  }
+
+  .saldo {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #666;
+  }
+
+  .compras {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+  }
+
+  .compras::-webkit-scrollbar { width: 6px; }
+  .compras::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 3px; }
+
+  .compra-item {
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    background: #f0f0f0;
+    border-radius: 8px;
+    font-size: 0.9rem;
+  }
+
+  /* Botão flutuante */
+  .btn-add {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: #6c63ff;
+    color: #fff;
+    border: none;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    font-size: 2rem;
+    cursor: pointer;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+    transition: background 0.3s;
+  }
+
+  .btn-add:hover { background: #574fd6; }
+
+  /* Modal */
+  .modal {
+    display: none;
+    position: fixed;
+    top:0; left:0;
+    width:100%; height:100%;
+    background: rgba(0,0,0,0.5);
+    justify-content: center; align-items: center;
+    z-index: 100;
+  }
+
+  .modal-content {
+    background: #fff;
+    border-radius: 12px;
+    padding: 2rem;
+    width: 90%;
+    max-width: 400px;
+    position: relative;
+  }
+
+  .modal-content h3 { margin-bottom: 1rem; color:#333; }
+  .modal-content label { display:block; margin-top:1rem; color:#555; }
+  .modal-content input, .modal-content select {
+    width: 100%; padding:0.5rem; margin-top:0.3rem; border-radius: 6px; border:1px solid #ccc;
+  }
+
+  .modal-content button {
+    margin-top:1.5rem;
+    padding:0.7rem 1rem;
+    border:none;
+    border-radius:8px;
+    background:#6c63ff;
+    color:#fff;
+    cursor:pointer;
+    transition: background 0.3s;
+  }
+
+  .modal-content button:hover { background:#574fd6; }
+
+  .close-modal {
+    position:absolute;
+    top:10px; right:15px;
+    cursor:pointer;
+    font-size:1.5rem;
+    color:#666;
+  }
+
 </style>
 </head>
 <body>
+<h1>Divisão de Despesas</h1>
 
-<h1>Consumidores e Compras</h1>
+<div class="cards-container" id="cardsContainer">
+  <!-- Cards dos professores serão inseridos aqui -->
+</div>
 
-<div id="consumidores" class="cards-container"></div>
+<!-- Botão flutuante -->
+<button class="btn-add" id="btnAdd">+</button>
 
-<!-- Botão adicionar consumidor -->
-<button id="btnAdd">+</button>
-
-<!-- Modal adicionar/editar consumidor -->
-<div id="modal" class="modal">
+<!-- Modal de Adicionar Compra -->
+<div class="modal" id="modal">
   <div class="modal-content">
-    <span class="close-modal">&times;</span>
-    <h2 id="modalTitle">Adicionar Consumidor</h2>
-    <label>Nome:</label>
-    <input type="text" id="nomeInput">
-    <label>Saldo:</label>
-    <input type="number" id="saldoInput">
-    <label>Compras (formato: Item:Valor, separados por vírgula):</label>
-    <input type="text" id="comprasInput" placeholder="Arroz:15,Feijão:10,Leite:20">
-    <button id="saveBtn">Salvar</button>
+    <span class="close-modal" id="closeModal">&times;</span>
+    <h3>Adicionar Compra</h3>
+    <label for="comprador">Quem comprou:</label>
+    <select id="comprador"></select>
+
+    <label for="descricao">Descrição:</label>
+    <input type="text" id="descricao">
+
+    <label for="valor">Valor:</label>
+    <input type="number" id="valor" step="0.01">
+
+    <label for="participantes">Participantes (Ctrl+Clique para múltiplos):</label>
+    <select id="participantes" multiple></select>
+
+    <button id="addCompra">Adicionar</button>
   </div>
 </div>
 
 <script>
-// Dados de exemplo
-let consumidores = [
-  {
-    nome: "Maria Silva",
-    saldo: 45,
-    compras: [
-      {item:"Arroz", valor:15},
-      {item:"Feijão", valor:10},
-      {item:"Leite", valor:20}
-    ]
-  },
-  {
-    nome: "João Souza",
-    saldo: -30,
-    compras: [
-      {item:"Pão", valor:5},
-      {item:"Manteiga", valor:10},
-      {item:"Café", valor:15}
-    ]
-  },
-  {
-    nome: "Ana Costa",
-    saldo: 120,
-    compras: [
-      {item:"Frutas", valor:50},
-      {item:"Verduras", valor:30},
-      {item:"Carnes", valor:40}
-    ]
-  }
-];
+  const professores = ['Alice','Bruno','Carla','Daniel']; // nomes de exemplo
+  let despesas = [];
 
-// Variável de controle para editar
-let editIndex = null;
+  const cardsContainer = document.getElementById('cardsContainer');
+  const modal = document.getElementById('modal');
+  const btnAdd = document.getElementById('btnAdd');
+  const closeModal = document.getElementById('closeModal');
+  const compradorSelect = document.getElementById('comprador');
+  const participantesSelect = document.getElementById('participantes');
+  const descricaoInput = document.getElementById('descricao');
+  const valorInput = document.getElementById('valor');
+  const addCompraBtn = document.getElementById('addCompra');
 
-// Função para gerar cards
-function gerarCards() {
-  const container = document.getElementById('consumidores');
-  container.innerHTML = '';
+  function atualizarCards() {
+    cardsContainer.innerHTML = '';
+    professores.forEach(prof => {
+      const professorDespesas = despesas.filter(d => d.participantes.includes(prof));
+      let saldo = 0;
+      professorDespesas.forEach(d => {
+        const div = d.valor / d.participantes.length;
+        if (d.comprador === prof) saldo += d.valor - div;
+        else saldo -= div;
+      });
 
-  consumidores.forEach((c,index)=>{
-    const card = document.createElement('div');
-    card.className='card';
-
-    const nome = document.createElement('h3');
-    nome.textContent = c.nome;
-    card.appendChild(nome);
-
-    const saldo = document.createElement('div');
-    saldo.className = 'saldo ' + (c.saldo>=0 ? 'saldo-positivo':'saldo-negativo');
-    saldo.textContent = `R$ ${c.saldo.toFixed(2)}`;
-    card.appendChild(saldo);
-
-    const ul = document.createElement('ul');
-    c.compras.forEach(compra=>{
-      const li = document.createElement('li');
-      li.textContent = `${compra.item} - R$ ${compra.valor.toFixed(2)}`;
-      ul.appendChild(li);
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <h2>${prof}</h2>
+        <div class="saldo">Saldo: R$ ${saldo.toFixed(2)}</div>
+        <div class="compras">
+          ${despesas.filter(d => d.participantes.includes(prof)).map(d => `
+            <div class="compra-item">${d.comprador} comprou ${d.descricao} - R$ ${d.valor.toFixed(2)}</div>
+          `).join('')}
+        </div>
+      `;
+      cardsContainer.appendChild(card);
     });
-    card.appendChild(ul);
-
-    const btnDiv = document.createElement('div');
-    btnDiv.className='btn-card';
-
-    const btnEditar = document.createElement('button');
-    btnEditar.className='btn-editar';
-    btnEditar.textContent='Editar';
-    btnEditar.onclick = () => abrirModal('editar', index);
-
-    const btnExcluir = document.createElement('button');
-    btnExcluir.className='btn-excluir';
-    btnExcluir.textContent='Excluir';
-    btnExcluir.onclick = () => {
-      if(confirm(`Deseja excluir ${c.nome}?`)){
-        consumidores.splice(index,1);
-        gerarCards();
-      }
-    };
-
-    btnDiv.appendChild(btnEditar);
-    btnDiv.appendChild(btnExcluir);
-    card.appendChild(btnDiv);
-
-    container.appendChild(card);
-  });
-}
-
-// Abrir modal
-const modal = document.getElementById('modal');
-const modalTitle = document.getElementById('modalTitle');
-const nomeInput = document.getElementById('nomeInput');
-const saldoInput = document.getElementById('saldoInput');
-const comprasInput = document.getElementById('comprasInput');
-const saveBtn = document.getElementById('saveBtn');
-
-function abrirModal(tipo, index=null){
-  modal.style.display='flex';
-  if(tipo==='editar'){
-    modalTitle.textContent='Editar Consumidor';
-    editIndex=index;
-    const c = consumidores[index];
-    nomeInput.value=c.nome;
-    saldoInput.value=c.saldo;
-    comprasInput.value=c.compras.map(comp=>`${comp.item}:${comp.valor}`).join(',');
-  } else {
-    modalTitle.textContent='Adicionar Consumidor';
-    editIndex=null;
-    nomeInput.value='';
-    saldoInput.value='';
-    comprasInput.value='';
   }
-}
 
-// Fechar modal
-document.querySelector('.close-modal').onclick = () => modal.style.display='none';
-window.onclick = e => { if(e.target==modal) modal.style.display='none'; };
+  function abrirModal() { modal.style.display = 'flex'; }
+  function fecharModal() { modal.style.display = 'none'; }
 
-// Salvar dados do modal
-saveBtn.onclick = () => {
-  const nome = nomeInput.value.trim();
-  const saldo = parseFloat(saldoInput.value);
-  const compras = comprasInput.value.split(',').map(item=>{
-    const [i,v]=item.split(':');
-    return {item:i.trim(), valor:parseFloat(v)};
+  btnAdd.addEventListener('click', abrirModal);
+  closeModal.addEventListener('click', fecharModal);
+
+  window.addEventListener('click', e => { if(e.target===modal) fecharModal(); });
+
+  // Preencher selects
+  function preencherSelects() {
+    compradorSelect.innerHTML = '';
+    participantesSelect.innerHTML = '';
+    professores.forEach(p => {
+      const option = `<option value="${p}">${p}</option>`;
+      compradorSelect.innerHTML += option;
+      participantesSelect.innerHTML += option;
+    });
+  }
+
+  preencherSelects();
+
+  addCompraBtn.addEventListener('click', () => {
+    const comprador = compradorSelect.value;
+    const descricao = descricaoInput.value;
+    const valor = parseFloat(valorInput.value);
+    const participantes = Array.from(participantesSelect.selectedOptions).map(opt => opt.value);
+
+    if(!comprador || !descricao || !valor || participantes.length===0) return alert('Preencha todos os campos!');
+
+    despesas.push({comprador, descricao, valor, participantes});
+    atualizarCards();
+    descricaoInput.value = '';
+    valorInput.value = '';
+    participantesSelect.selectedIndex = -1;
+    fecharModal();
   });
 
-  if(nome && !isNaN(saldo)){
-    if(editIndex!==null){
-      consumidores[editIndex]={nome,saldo,compras};
-    } else {
-      consumidores.push({nome,saldo,compras});
-    }
-    gerarCards();
-    modal.style.display='none';
-  } else {
-    alert('Preencha todos os campos corretamente!');
-  }
-};
-
-// Botão adicionar
-document.getElementById('btnAdd').onclick = ()=> abrirModal('add');
-
-// Inicializa
-gerarCards();
+  atualizarCards();
 </script>
 </body>
 </html>
