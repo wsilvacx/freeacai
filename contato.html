@@ -2,372 +2,507 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Controle de Mantimentos</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Divisão de Mantimentos</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+<!-- jsPDF e autoTable -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
 <style>
-/* Fonte e background geral */
-body { 
-  font-family: 'Roboto', sans-serif; 
-  background: #e3f2fd; 
-  margin:0; 
-  padding:0 0 60px 0; 
-  font-size:14px; 
-  color:#333;
-  transition: all 0.3s ease;
-}
-
-/* Cabeçalho */
-header { 
-  text-align:center; 
-  padding:20px; 
-  background: linear-gradient(90deg, #42a5f5, #1e88e5); 
-  color:white; 
-  font-size:1.6em; 
-  font-weight:700;
-  box-shadow:0 3px 8px rgba(0,0,0,0.2);
-}
-
-/* Container principal */
-main { 
-  max-width: 700px; 
-  margin: 20px auto; 
-  background:#fff; 
-  border-radius:12px; 
-  box-shadow:0 6px 18px rgba(0,0,0,0.15); 
-  padding:20px; 
-  transition: all 0.3s ease;
-}
-
-/* Abas */
-.tab { 
-  display:flex; 
-  flex-wrap: wrap; 
-  margin-bottom:10px; 
-  border-bottom:2px solid #1e88e5;
-}
-.tab button { 
-  flex:1; 
-  padding:12px; 
-  font-size:1em; 
-  cursor:pointer; 
-  background:#f1f3f6; 
-  border:none; 
-  font-weight:600; 
-  transition:.3s; 
-  border-radius:10px 10px 0 0; 
-  margin-right:4px;
-  color:#555;
-}
-.tab button.active { 
-  background:#1e88e5; 
-  color:white; 
-  box-shadow:0 4px 12px rgba(0,0,0,0.2); 
-}
-
-/* Conteúdo da aba */
-.tabcontent { 
-  display:none; 
-  padding:15px 5px; 
-  animation: fadeIn 0.3s;
-}
-@keyframes fadeIn { 
-  from {opacity:0;} 
-  to {opacity:1;} 
-}
-
-/* Labels e inputs */
-label { 
-  display:block; 
-  margin:8px 0 4px; 
-  font-weight:500; 
-}
-input, select, button { 
-  padding:8px 10px; 
-  margin-top:3px; 
-  font-size:0.95em; 
-  border-radius:6px; 
-  border:1px solid #ccc; 
-  width:100%;
-  box-sizing:border-box;
-}
-input:focus, select:focus { 
-  border-color:#42a5f5; 
-  outline:none; 
-  box-shadow:0 0 5px rgba(66,165,245,0.4);
-}
-
-/* Botões */
-button { 
-  transition: all 0.2s; 
-}
-button:hover { 
-  opacity:0.9; 
-  transform: translateY(-2px);
-}
-.btn { 
-  font-size:0.85em; 
-  padding:6px 10px; 
-  margin-right:4px; 
-  border:none; 
-  border-radius:6px; 
-  cursor:pointer; 
-  font-weight:600;
-  box-shadow:0 2px 5px rgba(0,0,0,0.15);
-}
-.btn-editar { 
-  background:#ffb74d; 
-  color:#fff; 
-}
-.btn-excluir { 
-  background:#e57373; 
-  color:#fff; 
-}
-.btn-gerar { 
-  background:#42a5f5; 
-  color:white; 
-  margin-top:10px; 
-  padding:8px 14px; 
-  font-size:0.95em; 
-}
-
-/* Lista de professores / consumidores */
+body { font-family: 'Roboto', sans-serif; background: #f0f2f5; margin:0; padding:0 0 50px 0; font-size:14px; }
+header { text-align:center; padding:15px; background:#4CAF50; color:white; font-size:1.4em; }
+main { max-width: 600px; margin: 10px auto; background:#fff; border-radius:8px; box-shadow:0 3px 8px rgba(0,0,0,0.1); padding:12px; }
+.tab { display:flex; flex-wrap: wrap; margin-bottom:5px; }
+.tab button { flex:1; padding:10px; font-size:1em; cursor:pointer; background:#eee; border:none; font-weight:600; transition:.3s; border-radius:5px 5px 0 0; margin-right:2px; }
+.tab button.active { background:#4CAF50; color:white; box-shadow:0 2px 5px rgba(0,0,0,0.2); }
+.tabcontent { display:none; padding:10px; }
+label { display:block; margin:5px 0 3px; font-weight:500; }
+input, select, button { padding:6px 8px; margin-top:3px; font-size:0.9em; border-radius:5px; border:1px solid #ccc; }
+button:hover { opacity:.9; }
+.btn { font-size:0.7em; padding:3px 6px; margin-right:2px; border:none; border-radius:4px; cursor:pointer; }
+.btn-editar { background:#ffb74d; color:#fff; }
+.btn-excluir { background:#e57373; color:#fff; }
+.btn-gerar { background:#2196F3; color:white; margin-top:5px; padding:6px 10px; font-size:0.9em; }
 ul { list-style:none; padding-left:0; margin:0; }
 li { margin-bottom:5px; }
+.saldo-positivo { color:green; font-weight:bold; }
+.saldo-negativo { color:red; font-weight:bold; }
+table { width:100%; border-collapse: collapse; font-size:0.85em; margin-top:6px;}
+table th, table td { border:1px solid #ccc; padding:6px; text-align:left; }
+table th { background:#eee; }
+h2,h3 { font-size:1em; margin:5px 0; }
+#consumidores { max-height:120px; overflow-y:auto; border:1px solid #ccc; padding:5px; border-radius:5px; }
+.instrucao { font-size:0.85em; color:#555; margin:5px 0; padding:6px; background:#f9f9f9; border-left:3px solid #4CAF50; border-radius:4px; }
 
-/* Tabela */
-table { 
-  width:100%; 
-  border-collapse: collapse; 
-  font-size:0.9em; 
-  margin-top:10px;
-  transition: all 0.3s;
-}
-table th, table td { 
-  border:1px solid #ddd; 
-  padding:8px; 
-  text-align:left; 
-}
-table th { 
-  background:#42a5f5; 
-  color:white; 
-  font-weight:600; 
-}
-table tr:nth-child(even) { 
-  background:#f9f9f9; 
-}
-table tr:hover { 
-  background:#e1f5fe; 
-}
-
-/* Saldos */
-.saldo-positivo { color:#2e7d32; font-weight:bold; }
-.saldo-negativo { color:#c62828; font-weight:bold; }
-
-/* Scroll em listas pequenas */
-#consumidores { 
-  max-height:140px; 
-  overflow-y:auto; 
-  border:1px solid #ccc; 
-  padding:8px; 
-  border-radius:8px; 
-  background:#f9f9f9;
-}
-
-/* Caixa de instrução */
-.instrucao { 
-  font-size:0.85em; 
-  color:#555; 
-  margin:6px 0; 
-  padding:8px; 
-  background:#e3f2fd; 
-  border-left:4px solid #1e88e5; 
-  border-radius:6px; 
-}
-
-/* Cards dinâmicos para Compras e Saldos */
-.card {
-  background:#f9f9f9;
-  border-radius:10px;
-  padding:12px;
-  margin-bottom:12px;
-  box-shadow:0 4px 12px rgba(0,0,0,0.1);
-  transition: all 0.2s;
-}
-.card:hover {
-  transform: translateY(-2px);
-  box-shadow:0 6px 18px rgba(0,0,0,0.15);
-}
-
-/* Toast animado */
+/* Toast */
 .toast {
   position: fixed;
   right: 20px;
   bottom: 60px;
-  background: rgba(33,150,243,0.95);
+  background: rgba(0,0,0,0.85);
   color: #fff;
-  padding: 12px 16px;
-  border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  padding: 10px 14px;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
   opacity: 0;
   transform: translateY(10px);
   transition: opacity .25s, transform .25s;
   z-index: 9999;
 }
-.toast.show { 
-  opacity: 1; 
-  transform: translateY(0); 
-}
+.toast.show { opacity: 1; transform: translateY(0); }
 
-/* Rodapé */
+/* Rodapé do sistema (desenvolvedor) */
 .site-footer {
   position: fixed;
   left: 0;
   right: 0;
   bottom: 0;
-  height: 50px;
-  background: #1e88e5;
+  height: 40px;
+  background: #263238;
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size:0.95em;
-  font-weight:500;
-  box-shadow: 0 -2px 8px rgba(0,0,0,0.2);
+  font-size:0.9em;
+  box-shadow: 0 -2px 6px rgba(0,0,0,0.15);
+  z-index: 999;
 }
 
-/* Responsivo */
-@media (max-width:600px){
-  main{margin:10px;}
-  .tab button{font-size:0.9em; padding:10px;}
-  .toast{right:10px; left:10px;}
-}
+/* Small responsive tweak */
+@media (max-width:520px){ main{margin:6px;} .tab button{font-size:0.9em; padding:8px;} .toast{right:10px; left:10px;} }
 </style>
 </head>
 <body>
-
-<header>Controle de Mantimentos</header>
-
+<header>Divisão de Mantimentos</header>
 <main>
+
   <div class="tab">
-    <button class="tablinks active" onclick="openTab(event, 'Consumidores')">Consumidores</button>
-    <button class="tablinks" onclick="openTab(event, 'Compras')">Compras</button>
-    <button class="tablinks" onclick="openTab(event, 'Saldos')">Saldos</button>
+    <button class="tablinks active" onclick="openTab(event,'professores')">Professores</button>
+    <button class="tablinks" onclick="openTab(event,'compras')">Compras</button>
+    <button class="tablinks" onclick="openTab(event,'saldos')">Saldos</button>
+    <button class="tablinks" onclick="openTab(event,'relatorio')">Relatório</button>
   </div>
 
-  <!-- Aba Consumidores -->
-  <div id="Consumidores" class="tabcontent" style="display:block;">
-    <div class="card">
-      <label for="nomeConsumidor">Adicionar Consumidor</label>
-      <input type="text" id="nomeConsumidor" placeholder="Digite o nome">
-      <button class="btn btn-gerar" onclick="adicionarConsumidor()">Adicionar</button>
-      <ul id="consumidores"></ul>
-    </div>
+  <!-- Aba Professores -->
+  <div id="professores" class="tabcontent" style="display:block;">
+    <h2>Escolher Grupo</h2>
+    <p class="instrucao">Escolha um grupo para começar. Os professores do grupo serão usados em todas as divisões.</p>
+    <label>
+      <input id="grupoA" type="radio" name="grupo" value="A" onclick="selecionarGrupo('A')"> Grupo A (Wanderson, Gu, Cris)
+    </label><br>
+    <label>
+      <input id="grupoB" type="radio" name="grupo" value="B" onclick="selecionarGrupo('B')"> Grupo B (Gu, Emerson, Galeno)
+    </label>
+
+    <h3>Professores selecionados:</h3>
+    <ul id="listaProfessores"></ul>
   </div>
 
   <!-- Aba Compras -->
-  <div id="Compras" class="tabcontent">
-    <div class="card">
-      <label for="item">Item</label>
-      <input type="text" id="item" placeholder="Nome do item">
-      <label for="quantidade">Quantidade</label>
-      <input type="number" id="quantidade" placeholder="Quantidade">
-      <label for="consumidorCompra">Consumidor</label>
-      <select id="consumidorCompra"></select>
-      <button class="btn btn-gerar" onclick="registrarCompra()">Registrar Compra</button>
-      <div id="listaCompras"></div>
+  <div id="compras" class="tabcontent">
+    <h2>Registrar Compra</h2>
+    <p class="instrucao">Preencha todos os campos antes de salvar. O valor deve ser numérico e selecione pelo menos um consumidor.</p>
+    <label>Produto: <input id="produto" required placeholder="Ex: Arroz"/></label>
+    <label>Valor: <input id="valor" type="number" step="0.01" required placeholder="Ex: 25.50"/></label>
+    <label>Quem comprou:
+      <select id="comprador" required></select>
+    </label>
+    <label>Quem consumiu:</label>
+    <div id="consumidores"></div>
+    <div style="margin-top:8px;">
+      <button class="btn btn-gerar" onclick="addCompra()">Salvar Compra</button>
+      <button class="btn" onclick="cancelEdit()" style="background:#ddd">Cancelar Edição</button>
+    </div>
+
+    <h3 style="margin-top:10px">Compras Registradas</h3>
+    <div class="list">
+      <table id="tabelaCompras">
+        <thead>
+          <tr>
+            <th>Produto</th>
+            <th>Valor (R$)</th>
+            <th>Comprador</th>
+            <th>Consumidores</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
     </div>
   </div>
 
   <!-- Aba Saldos -->
-  <div id="Saldos" class="tabcontent">
-    <div class="card">
-      <h3>Saldos dos Consumidores</h3>
-      <div id="listaSaldos"></div>
-    </div>
+  <div id="saldos" class="tabcontent">
+    <h2>Saldos</h2>
+    <p class="instrucao">Clique em "Calcular" para ver quanto cada professor pagou, deveria pagar e qual o saldo final.</p>
+    <button class="btn btn-gerar" onclick="calcular()">Calcular</button>
+    <div id="saldosLista"></div>
+    <h3>Sugestão de Acertos</h3>
+    <div id="transferencias"></div>
   </div>
+
+  <!-- Aba Relatório -->
+  <div id="relatorio" class="tabcontent">
+    <h2>Relatório PDF</h2>
+    <p class="instrucao">Clique no botão abaixo para gerar um relatório em PDF com todas as compras, saldos e sugestões de acertos.</p>
+    <button class="btn btn-gerar" onclick="gerarPDF()">Gerar Relatório PDF</button>
+  </div>
+
 </main>
 
-<div class="site-footer">Sistema de Controle de Mantimentos</div>
+<div id="toast" class="toast"></div>
+
+<footer class="site-footer">Desenvolvido por <strong>Professor Wanderson</strong></footer>
 
 <script>
-let consumidores = [];
-let compras = [];
+/* ====== Estado e persistência ====== */
+const STORAGE_KEY = "divMantimentos_estado_v1";
+let state = {professores: [], compras: []};
+let editIndex = null;
 
-// Função de abas
-function openTab(evt, tabName) {
-  let tabcontent = document.getElementsByClassName("tabcontent");
-  for (let i = 0; i < tabcontent.length; i++) { tabcontent[i].style.display = "none"; }
-  let tablinks = document.getElementsByClassName("tablinks");
-  for (let i = 0; i < tablinks.length; i++) { tablinks[i].className = tablinks[i].className.replace(" active", ""); }
-  document.getElementById(tabName).style.display = "block";
-  evt.currentTarget.className += " active";
+// Inicialização
+window.addEventListener('load', init);
+
+function init(){
+  loadState();
+  // Se não houver professores salvos, pré-seleciona Grupo A
+  if(!state.professores || state.professores.length === 0){
+    selecionarGrupo('A', false); // false: não perguntar sobre limpeza
+    document.getElementById("grupoA").checked = true;
+  } else {
+    // Se houver professores salvos: preencher UI e garantir radio marcado
+    atualizarUI();
+    if(arraysEqual(state.professores, ["Wanderson","Gu","Cris"])) document.getElementById("grupoA").checked = true;
+    else if(arraysEqual(state.professores, ["Gu","Emerson","Galeno"])) document.getElementById("grupoB").checked = true;
+  }
+  atualizarUI();
 }
 
-// Consumidores
-function adicionarConsumidor() {
-  let nome = document.getElementById("nomeConsumidor").value.trim();
-  if(nome && !consumidores.includes(nome)) {
-    consumidores.push(nome);
-    atualizarListaConsumidores();
-    document.getElementById("nomeConsumidor").value = '';
-    showToast("Consumidor adicionado!");
-  } else {
-    showToast("Nome inválido ou já existente!");
+// Salva state no localStorage
+function saveState(){
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch(e){
+    console.error("Erro salvando localStorage", e);
   }
 }
-function atualizarListaConsumidores() {
-  let ul = document.getElementById("consumidores");
-  let select = document.getElementById("consumidorCompra");
-  ul.innerHTML = '';
-  select.innerHTML = '<option value="">Selecione</option>';
-  consumidores.forEach(c => {
-    ul.innerHTML += `<li>${c}</li>`;
-    select.innerHTML += `<option value="${c}">${c}</option>`;
+function loadState(){
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){
+      state = JSON.parse(raw);
+      if(!state.professores) state.professores = [];
+      if(!state.compras) state.compras = [];
+    }
+  } catch(e){
+    console.error("Erro carregando localStorage", e);
+  }
+}
+
+/* ====== UI / abas ====== */
+function openTab(evt, tabName){
+  document.querySelectorAll(".tabcontent").forEach(tc=>tc.style.display="none");
+  document.querySelectorAll(".tab button").forEach(tb=>tb.classList.remove("active"));
+  document.getElementById(tabName).style.display="block";
+  if(evt && evt.currentTarget) evt.currentTarget.classList.add("active");
+}
+
+/* ====== Grupos / Professores ====== */
+function selecionarGrupo(grupo, perguntar=true){
+  if(state.compras && state.compras.length > 0 && perguntar){
+    const ok = confirm("Existem compras registradas. Deseja limpar as compras ao mudar de grupo? (Cancelar mantém as compras)");
+    if(ok){
+      state.compras = [];
+      showToast("Compras limpas.");
+    }
+  }
+  if(grupo === "A"){
+    state.professores = ["Wanderson", "Gu", "Cris"];
+    document.getElementById("grupoA").checked = true;
+  } else if(grupo === "B"){
+    state.professores = ["Gu", "Emerson", "Galeno"];
+    document.getElementById("grupoB").checked = true;
+  }
+  saveState();
+  atualizarUI();
+  showToast(`Grupo ${grupo} selecionado.`);
+}
+
+/* ====== Atualizar interface ====== */
+function atualizarUI(){
+  const professores = state.professores || [];
+  const lista=document.getElementById("listaProfessores");
+  lista.innerHTML=professores.map(p=>`<li>${p}</li>`).join("") || "<li><em>Nenhum</em></li>";
+
+  // comprador select
+  const comprador = document.getElementById("comprador");
+  comprador.innerHTML = professores.map(p=>`<option value="${p}">${p}</option>`).join("");
+
+  // consumidores checkboxes
+  document.getElementById("consumidores").innerHTML = professores.map(p=>`<label><input type="checkbox" value="${p}">${p}</label>`).join("<br>");
+
+  // Compras tabela
+  const tbody=document.querySelector("#tabelaCompras tbody");
+  tbody.innerHTML=state.compras.map((c,i)=>`
+    <tr>
+      <td>${escapeHtml(c.produto)}</td>
+      <td>R$${Number(c.valor).toFixed(2)}</td>
+      <td>${escapeHtml(c.comprador)}</td>
+      <td>${c.consumidores.map(escapeHtml).join(", ")}</td>
+      <td>
+        <button class="btn btn-editar" onclick="editarCompra(${i})">Editar</button>
+        <button class="btn btn-excluir" onclick="excluirCompra(${i})">Apagar</button>
+      </td>
+    </tr>
+  `).join("");
+}
+
+/* ====== Compras: adicionar/editar/excluir ====== */
+function addCompra(){
+  const produto=document.getElementById("produto").value.trim();
+  const valor=parseFloat(document.getElementById("valor").value);
+  const comprador=document.getElementById("comprador").value;
+  const consumidores=Array.from(document.querySelectorAll("#consumidores input:checked")).map(c=>c.value);
+
+  if(!produto){ alert("Erro: informe o nome do produto."); return; }
+  if(isNaN(valor) || valor <= 0){ alert("Erro: o valor deve ser numérico e maior que zero."); return; }
+  if(!comprador){ alert("Erro: selecione quem comprou."); return; }
+  if(consumidores.length === 0){ alert("Erro: selecione pelo menos um consumidor."); return; }
+
+  if(editIndex!==null){
+    state.compras[editIndex] = {produto, valor: Number(valor), comprador, consumidores};
+    showToast("Compra atualizada.");
+    editIndex = null;
+  } else {
+    state.compras.push({produto, valor: Number(valor), comprador, consumidores});
+    showToast("Compra registrada.");
+  }
+
+  // limpar inputs
+  document.getElementById("produto").value="";
+  document.getElementById("valor").value="";
+  document.querySelectorAll("#consumidores input").forEach(cb=>cb.checked=false);
+
+  saveState();
+  atualizarUI();
+}
+
+function editarCompra(i){
+  const c = state.compras[i];
+  if(!c) return;
+  document.getElementById("produto").value = c.produto;
+  document.getElementById("valor").value = c.valor;
+  if(!state.professores.includes(c.comprador)){
+    const opt = document.createElement('option');
+    opt.value = c.comprador;
+    opt.text = c.comprador;
+    document.getElementById('comprador').appendChild(opt);
+  }
+  document.getElementById("comprador").value = c.comprador;
+  document.querySelectorAll("#consumidores input").forEach(cb=>cb.checked = c.consumidores.includes(cb.value));
+  editIndex = i;
+  showToast("Modo edição ativado.");
+  // abrir aba compras
+  const tabBtns = document.querySelectorAll(".tab button");
+  tabBtns.forEach(b=>{ if(b.textContent.includes("Compras")) { openTab({currentTarget:b}, 'compras'); }});
+}
+
+function cancelEdit(){
+  editIndex = null;
+  document.getElementById("produto").value="";
+  document.getElementById("valor").value="";
+  document.querySelectorAll("#consumidores input").forEach(cb=>cb.checked=false);
+  showToast("Edição cancelada.");
+}
+
+function excluirCompra(i){
+  if(!confirm("Confirma apagar esta compra?")) return;
+  state.compras.splice(i,1);
+  saveState();
+  atualizarUI();
+  showToast("Compra removida.");
+}
+
+/* ====== Cálculo de saldos e transferências ====== */
+function calcular(){
+  if(!state.compras || state.compras.length === 0){
+    alert("Não há compras registradas. Adicione pelo menos uma compra.");
+    return;
+  }
+  const professores = state.professores.slice();
+  let pagou = {}, deveria = {};
+  professores.forEach(p=>{ pagou[p]=0; deveria[p]=0; });
+
+  state.compras.forEach(c=>{
+    if(!pagou[c.comprador]) pagou[c.comprador] = 0;
+    pagou[c.comprador] += Number(c.valor);
+    const parte = Number(c.valor) / c.consumidores.length;
+    c.consumidores.forEach(cons=>{
+      if(!deveria[cons]) deveria[cons] = 0;
+      deveria[cons] += parte;
+    });
   });
+
+  const nomes = new Set([...Object.keys(pagou), ...Object.keys(deveria)]);
+  const saldos = Array.from(nomes).map(n=>{
+    const p = Number(pagou[n]||0), d = Number(deveria[n]||0);
+    return {nome:n, pagou:p, deveria:d, saldo: +(p-d)};
+  });
+
+  const totalPago = saldos.reduce((s,x)=>s + x.pagou, 0);
+  const totalDevido = saldos.reduce((s,x)=>s + x.deveria, 0);
+
+  saldos.sort((a,b)=>b.saldo - a.saldo);
+
+  const sList = document.getElementById("saldosLista");
+  let html = `<p><strong>Total pago:</strong> R$${totalPago.toFixed(2)} &nbsp;&nbsp; <strong>Total devido:</strong> R$${totalDevido.toFixed(2)}</p>`;
+  html += `<table><thead><tr><th>Nome</th><th>Pagou (R$)</th><th>Deveria (R$)</th><th>Saldo (R$)</th></tr></thead><tbody>`;
+  saldos.forEach(s=>{
+    html += `<tr><td>${escapeHtml(s.nome)}</td><td>R$${s.pagou.toFixed(2)}</td><td>R$${s.deveria.toFixed(2)}</td>
+             <td><span class="${s.saldo>=0?'saldo-positivo':'saldo-negativo'}">R$${s.saldo.toFixed(2)}</span></td></tr>`;
+  });
+  html += `</tbody></table>`;
+  sList.innerHTML = html;
+
+  let devedores = saldos.filter(s=>s.saldo < -0.01).map(s=>({nome:s.nome, saldo: -s.saldo}));
+  let credores = saldos.filter(s=>s.saldo > 0.01).map(s=>({nome:s.nome, saldo: s.saldo}));
+  devedores.sort((a,b)=>b.saldo - a.saldo);
+  credores.sort((a,b)=>b.saldo - a.saldo);
+
+  const transfDiv = document.getElementById("transferencias");
+  let transf = [];
+  let i=0, j=0;
+  while(i<devedores.length && j<credores.length){
+    let val = Math.min(devedores[i].saldo, credores[j].saldo);
+    val = Math.round(val*100)/100;
+    if(val > 0.009){
+      transf.push({de:devedores[i].nome, para:credores[j].nome, valor: val});
+      devedores[i].saldo = +(devedores[i].saldo - val).toFixed(2);
+      credores[j].saldo = +(credores[j].saldo - val).toFixed(2);
+      if(devedores[i].saldo < 0.01) i++;
+      if(credores[j].saldo < 0.01) j++;
+    } else break;
+  }
+
+  transfDiv.innerHTML = transf.length ? transf.map(t=>`<p>${escapeHtml(t.de)} paga R$${t.valor.toFixed(2)} para ${escapeHtml(t.para)}</p>`).join("") : "<p>Ninguém deve nada 🎉</p>";
+
+  showToast("Cálculo concluído.");
+  state._lastCalc = {saldos, totalPago, totalDevido, transf};
+  saveState();
 }
 
-// Compras
-function registrarCompra() {
-  let item = document.getElementById("item").value.trim();
-  let quantidade = parseInt(document.getElementById("quantidade").value);
-  let consumidor = document.getElementById("consumidorCompra").value;
-  if(item && quantidade > 0 && consumidor) {
-    compras.push({item, quantidade, consumidor});
-    document.getElementById("item").value = '';
-    document.getElementById("quantidade").value = '';
-    document.getElementById("consumidorCompra").value = '';
-    atualizarListaCompras();
-    showToast("Compra registrada!");
+/* ====== PDF (usando jsPDF + autoTable) ====== */
+function gerarPDF(){
+  if(!state.compras || state.compras.length === 0){
+    alert("Não há dados para gerar o relatório. Registre pelo menos uma compra.");
+    return;
+  }
+  if(!state._lastCalc) calcular();
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({unit:'pt', format:'a4'});
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+
+  doc.setFontSize(14);
+  doc.text("Relatório de Mantimentos", pageWidth/2, 40, {align:'center'});
+
+  // cores mais vivas para cabeçalhos
+  const blueHeader = {fillColor:[33,150,243], textColor:255};    // azul vivo
+  const greenHeader = {fillColor:[76,175,80], textColor:255};    // verde vivo
+  const orangeHeader = {fillColor:[255,152,0], textColor:255};   // laranja
+
+  // Compras tabela (azul)
+  const comprasHead = [['Produto','Valor (R$)','Comprador','Consumidores']];
+  const comprasBody = state.compras.map(c=>[c.produto, c.valor.toFixed(2), c.comprador, c.consumidores.join(", ")]);
+  doc.setFontSize(11);
+  doc.text("Compras:", 40, 70);
+  doc.autoTable({
+    startY: 80,
+    head: comprasHead,
+    body: comprasBody,
+    styles: {fontSize:10},
+    headStyles: blueHeader,
+    margin: {left:40, right:40}
+  });
+
+  // Saldos tabela (verde)
+  let y = doc.lastAutoTable ? doc.lastAutoTable.finalY + 18 : 160;
+  doc.text("Saldos:", 40, y);
+  const saldos = state._lastCalc ? state._lastCalc.saldos : [];
+  const saldosHead = [['Nome','Pagou (R$)','Deveria (R$)','Saldo (R$)']];
+  const saldosBody = saldos.map(s=>[s.nome, s.pagou.toFixed(2), s.deveria.toFixed(2), s.saldo.toFixed(2)]);
+  doc.autoTable({
+    startY: y+8,
+    head: saldosHead,
+    body: saldosBody,
+    styles: {fontSize:10},
+    headStyles: greenHeader,
+    margin: {left:40, right:40}
+  });
+
+  // Totais e transferências (laranja)
+  y = doc.lastAutoTable ? doc.lastAutoTable.finalY + 18 : 400;
+  const totalPago = state._lastCalc ? state._lastCalc.totalPago : 0;
+  const totalDevido = state._lastCalc ? state._lastCalc.totalDevido : 0;
+  doc.text(`Total pago: R$${totalPago.toFixed(2)}    Total devido: R$${totalDevido.toFixed(2)}`, 40, y);
+
+  y += 18;
+  doc.text("Sugestão de Acertos:", 40, y);
+  y += 8;
+  const transf = state._lastCalc ? state._lastCalc.transf : [];
+  if(transf && transf.length){
+    const transfBody = transf.map(t=>[t.de + " → " + t.para, "R$" + t.valor.toFixed(2)]);
+    doc.autoTable({
+      startY: y,
+      head: [['Transação','Valor']],
+      body: transfBody,
+      styles: {fontSize:10},
+      headStyles: orangeHeader,
+      margin: {left:40, right:40}
+    });
   } else {
-    showToast("Preencha todos os campos corretamente!");
+    doc.text("Nenhuma transferência necessária.", 40, y+6);
   }
-}
-function atualizarListaCompras() {
-  let lista = document.getElementById("listaCompras");
-  lista.innerHTML = compras.map(c => `<div class="card">${c.consumidor} comprou ${c.quantidade} x ${c.item}</div>`).join('');
-  atualizarSaldos();
+
+  // Rodapé em todas as páginas: "Desenvolvido por Professor Wanderson"
+  const pageCount = doc.internal.getNumberOfPages();
+  doc.setFontSize(9);
+  for(let i=1;i<=pageCount;i++){
+    doc.setPage(i);
+    doc.setTextColor(100);
+    doc.text("Desenvolvido por Professor Wanderson", pageWidth - 40, pageHeight - 20, {align:'right'});
+  }
+
+  doc.save("relatorio_mantimentos.pdf");
+  showToast("PDF gerado.");
 }
 
-// Saldos
-function atualizarSaldos() {
-  let lista = document.getElementById("listaSaldos");
-  let saldos = {};
-  consumidores.forEach(c => saldos[c] = 0);
-  compras.forEach(c => saldos[c.consumidor] += c.quantidade);
-  lista.innerHTML = '';
-  for(let c in saldos) {
-    let classe = saldos[c]>=0 ? 'saldo-positivo' : 'saldo-negativo';
-    lista.innerHTML += `<div class="card">${c}: <span class="${classe}">${saldos[c]}</span></div>`;
-  }
+/* ====== Utilitários ====== */
+function showToast(msg, time=2000){
+  const el = document.getElementById("toast");
+  el.innerText = msg;
+  el.classList.add("show");
+  clearTimeout(el._timeout);
+  el._timeout = setTimeout(()=>{ el.classList.remove("show"); }, time);
 }
 
-// Toast
-function showToast(msg) {
-  let toast = document.createElement('div');
-  toast.className = 'toast';
-  toast.innerText = msg;
-  document.body.appendChild(toast);
-  setTimeout(()=>{ toast.classList.add('show'); }, 100);
-  setTimeout(()=>{ toast.classList.remove('show'); setTimeout(()=>toast.remove(),300); }, 2000);
+// Escape simples para evitar injeção ao renderizar texto
+function escapeHtml(text){
+  if(text === undefined || text === null) return "";
+  return String(text)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function arraysEqual(a,b){
+  if(!a || !b) return false;
+  if(a.length !== b.length) return false;
+  for(let i=0;i<a.length;i++) if(a[i] !== b[i]) return false;
+  return true;
 }
 </script>
 </body>
