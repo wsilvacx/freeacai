@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Divisão de Despesas — Casa dos Professores</title>
+<style>
+  :root{font-family:Inter,Segoe UI,Roboto,Arial,sans-serif;--card:#fff;--bg:#f3f6fb;--muted:#666;}
+  body{margin:0;background:var(--bg);font-family:system-ui, "Segoe UI", Roboto, Arial, sans-serif;color:#111}
+  .wrap{max-width:1000px;margin:24px auto;padding:20px}
+  header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  h1{margin:0;font-size:20px}
+  .card{background:var(--card);border-radius:10px;padding:16px;box-shadow:0 6px 20px rgba(30,40,60,0.06);margin-top:16px}
+  label{display:block;font-size:13px;margin-top:8px;color:var(--muted)}
+  input[type=text], input[type=number], input[type=date], select{width:100%;padding:8px;border-radius:6px;border:1px solid #d7e0ef;margin-top:6px;box-sizing:border-box}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  button{padding:8px 12px;border-radius:8px;border:0;cursor:pointer}
+  .primary{background:#2b8cff;color:#fff}
+  .danger{background:#ff6b6b;color:#fff}
+  .table{width:100%;border-collapse:collapse;margin-top:12px}
+  .table th,.table td{padding:8px;border-bottom:1px solid #edf2f9;font-size:14px;text-align:left}
+  .participants{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .chip{padding:6px 8px;border-radius:999px;background:#f1f6ff;border:1px solid #e2eeff;font-size:13px}
+  .balances{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px}
+  .balance-card{flex:1;min-width:160px;padding:12px;border-radius:8px;background:linear-gradient(180deg,#fff,#fbfdff);box-shadow:0 3px 12px rgba(20,30,60,0.04)}
+  small{color:var(--muted)}
+  .ledger{max-height:260px;overflow:auto;margin-top:8px}
+  .settlements{margin-top:12px}
+  .muted{color:var(--muted);font-size:13px}
+  .controls{display:flex;gap:8px;align-items:center}
+  @media (max-width:720px){ .grid{grid-template-columns:1fr} .balances{flex-direction:column} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Divisão de Despesas — Casa dos Professores</h1>
+      <small class="muted">Grupos configurados: A (Wanderson, Gu, Cris) — B (Gu, Galeno, Emerson)</small>
+    </div>
+    <div class="controls">
+      <button id="exportBtn" title="Exportar histórico (.json)">Exportar</button>
+      <button id="importBtn" title="Importar histórico (.json)">Importar</button>
+      <button id="resetBtn" class="danger" title="Apagar todos os dados">Resetar dados</button>
+    </div>
+  </header>
+
+  <div class="card" id="formCard">
+    <div class="grid">
+      <div>
+        <label>Data</label>
+        <input type="date" id="dateInput" />
+      </div>
+      <div>
+        <label>Descrição</label>
+        <input type="text" id="descInput" placeholder="Ex: Arroz, Gás, Supermercado..." />
+      </div>
+      <div>
+        <label>Grupo (base)</label>
+        <select id="groupSelect">
+          <option value="A">Grupo A (Wanderson, Gu, Cris)</option>
+          <option value="B">Grupo B (Gu, Galeno, Emerson)</option>
+          <option value="manual">Manual (mostrar todos)</option>
+        </select>
+      </div>
+      <div>
+        <label>Quem pagou</label>
+        <select id="payerSelect"></select>
+      </div>
+      <div>
+        <label>Valor (R$)</label>
+        <input type="number" id="amountInput" placeholder="0.00" step="0.01" min="0" />
+      </div>
+      <div>
+        <label>&nbsp;</label>
+        <div style="display:flex;gap:8px">
+          <button class="primary" id="addExpenseBtn">Adicionar despesa</button>
+          <button id="toggleAllBtn" title="Selecionar / Desselecionar todos participantes">Selecionar todos</button>
+        </div>
+      </div>
+    </div>
+
+    <label>Participantes (marque quem consumiu)</label>
+    <div class="participants" id="participantsContainer"></div>
+    <small class="muted">Você pode escolher um grupo como base, mas marque somente quem consumiu realmente.</small>
+  </div>
+
+  <div class="card">
+    <h3>Resumo — Saldos</h3>
+    <div class="balances" id="balancesContainer"></div>
+
+    <h3 style="margin-top:12px">Sugestão de acerto</h3>
+    <div class="card settlements" id="settlementsContainer">
+      <div class="muted" id="noSettlements">Ainda sem despesas.</div>
+      <div id="settlementList"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Histórico de despesas</h3>
+    <div class="ledger">
+      <table class="table" id="ledgerTable">
+        <thead>
+          <tr><th>Data</th><th>Descrição</th><th>Pago por</th><th>Valor</th><th>Participantes</th><th>Valor/pessoa</th><th></th></tr>
+        </thead>
+        <tbody id="ledgerBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <footer style="margin-top:12px" class="muted">Sistema local — dados armazenados no seu navegador. Feito para uso prático — ajuste os nomes e grupos se precisar.</footer>
+</div>
+
+<script>
+(() => {
+  // CONFIGURAÇÃO INICIAL: nomes e grupos
+  const groupA = ['Wanderson','Gu','Cris'];
+  const groupB = ['Gu','Galeno','Emerson'];
+  // lista única de pessoas (mantém ordem)
+  const uniquePeople = Array.from(new Set([...groupA, ...groupB]));
+
+  // DOM
+  const participantsContainer = document.getElementById('participantsContainer');
+  const groupSelect = document.getElementById('groupSelect');
+  const payerSelect = document.getElementById('payerSelect');
+  const addExpenseBtn = document.getElementById('addExpenseBtn');
+  const amountInput = document.getElementById('amountInput');
+  const descInput = document.getElementById('descInput');
+  const dateInput = document.getElementById('dateInput');
+  const ledgerBody = document.getElementById('ledgerBody');
+  const balancesContainer = document.getElementById('balancesContainer');
+  const settlementList = document.getElementById('settlementList');
+  const noSettlements = document.getElementById('noSettlements');
+  const toggleAllBtn = document.getElementById('toggleAllBtn');
+  const exportBtn = document.getElementById('exportBtn');
+  const importBtn = document.getElementById('importBtn');
+  const resetBtn = document.getElementById('resetBtn');
+
+  // Local storage key
+  const STORAGE_KEY = 'despesas_casa_professores_v1';
+
+  // Dados: lista de despesas
+  let expenses = loadExpenses();
+
+  // inicializa selects e participantes
+  function init() {
+    dateInput.valueAsDate = new Date();
+    renderPayerOptions();
+    renderParticipants();
+    renderLedger();
+    renderBalancesAndSettlements();
+  }
+
+  // carregar do localStorage
+  function loadExpenses(){
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return [];
+      return JSON.parse(raw);
+    } catch(e){
+      console.error('Erro ao carregar dados:', e);
+      return [];
+    }
+  }
+  function saveExpenses(){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(expenses));
+  }
+
+  // Payer options: lista única de pessoas
+  function renderPayerOptions(){
+    payerSelect.innerHTML = '';
+    uniquePeople.forEach(name => {
+      const opt = document.createElement('option');
+      opt.value = name;
+      opt.textContent = name;
+      payerSelect.appendChild(opt);
+    });
+  }
+
+  // Renderizar participantes dependendo do grupo
+  function renderParticipants(){
+    participantsContainer.innerHTML = '';
+    let people;
+    if(groupSelect.value === 'A') people = groupA;
+    else if(groupSelect.value === 'B') people = groupB;
+    else people = uniquePeople; // manual mostra todos
+
+    people.forEach(name => {
+      const id = 'p-' + name.replace(/\s+/g,'_');
+      const wrapper = document.createElement('label');
+      wrapper.style.display = 'flex';
+      wrapper.style.alignItems = 'center';
+      wrapper.style.gap = '8px';
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.id = id;
+      cb.value = name;
+      const span = document.createElement('span');
+      span.textContent = name;
+      wrapper.appendChild(cb);
+      wrapper.appendChild(span);
+      participantsContainer.appendChild(wrapper);
+    });
+  }
+
+  groupSelect.addEventListener('change', () => {
+    renderParticipants();
+  });
+
+  toggleAllBtn.addEventListener('click', () => {
+    const cbs = participantsContainer.querySelectorAll('input[type=checkbox]');
+    const anyUnchecked = Array.from(cbs).some(cb => !cb.checked);
+    cbs.forEach(cb => cb.checked = anyUnchecked);
+  });
+
+  addExpenseBtn.addEventListener('click', () => {
+    const date = dateInput.value || new Date().toISOString().slice(0,10);
+    const desc = descInput.value.trim() || '(sem descrição)';
+    const payer = payerSelect.value;
+    const amount = parseFloat(amountInput.value);
+    if(isNaN(amount) || amount <= 0){
+      alert('Digite um valor válido maior que 0.');
+      return;
+    }
+    const cbs = participantsContainer.querySelectorAll('input[type=checkbox]');
+    const participants = Array.from(cbs).filter(cb => cb.checked).map(cb => cb.value);
+    if(participants.length === 0){
+      if(!confirm('Nenhum participante selecionado. Deseja registrar a despesa sem dividir (somente o pagador)?')) {
+        return;
+      }
+    }
+    // armazena em centavos para evitar erros de float
+    const cents = Math.round(amount * 100);
+    const expense = {
+      id: 'e-' + Date.now(),
+      date,
+      desc,
+      payer,
+      amount_cents: cents,
+      participants // pode estar vazia => nenhum participante (então todo valor fica com pagador)
+    };
+    expenses.push(expense);
+    saveExpenses();
+    // limpar formulário parcialmente
+    descInput.value = '';
+    amountInput.value = '';
+    // atualiza UI
+    renderLedger();
+    renderBalancesAndSettlements();
+  });
+
+  // Renderiza histórico
+  function renderLedger(){
+    ledgerBody.innerHTML = '';
+    if(expenses.length === 0){
+      const tr = document.createElement('tr');
+      const td = document.createElement('td');
+      td.colSpan = 7;
+      td.className = 'muted';
+      td.textContent = 'Nenhuma despesa registrada.';
+      tr.appendChild(td);
+      ledgerBody.appendChild(tr);
+      return;
+    }
+    // ordenar por data descendente
+    const sorted = expenses.slice().sort((a,b) => new Date(b.date) - new Date(a.date) || b.id.localeCompare(a.id));
+    sorted.forEach(exp => {
+      const tr = document.createElement('tr');
+      const fmt = new Intl.NumberFormat('pt-BR', {style:'currency', currency:'BRL'});
+      const amount = fmt.format(exp.amount_cents/100);
+      const participantsText = exp.participants.length ? exp.participants.join(', ') : '(nenhum - não dividido)';
+      const perPerson = exp.participants.length ? fmt.format((exp.amount_cents/100) / exp.participants.length) : '-';
+      tr.innerHTML = `<td>${exp.date}</td>
+                      <td>${escapeHtml(exp.desc)}</td>
+                      <td>${escapeHtml(exp.payer)}</td>
+                      <td>${amount}</td>
+                      <td>${escapeHtml(participantsText)}</td>
+                      <td>${perPerson}</td>
+                      <td><button data-id="${exp.id}" class="removeBtn">Remover</button></td>`;
+      ledgerBody.appendChild(tr);
+    });
+    // attach remove handlers
+    ledgerBody.querySelectorAll('.removeBtn').forEach(btn => {
+      btn.addEventListener('click', (ev) => {
+        const id = ev.currentTarget.getAttribute('data-id');
+        if(!confirm('Remover esta despesa?')) return;
+        expenses = expenses.filter(e => e.id !== id);
+        saveExpenses();
+        renderLedger();
+        renderBalancesAndSettlements();
+      });
+    });
+  }
+
+  // Escapar HTML simples
+  function escapeHtml(str){ return String(str).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[s]); }
+
+  // Calcular saldos por pessoa (em centavos)
+  function calculateNetBalances(){
+    // iniciar zeros
+    const net = {};
+    uniquePeople.forEach(p => net[p]=0);
+    // para cada despesa:
+    // - pagador: recebe valor inteiro (crédito)
+    // - cada participante: debita sua parte (se participantes vazios => ninguém debita)
+    expenses.forEach(e => {
+      net[e.payer] += e.amount_cents;
+      const n = e.participants.length;
+      if(n > 0){
+        const baseShare = Math.floor(e.amount_cents / n); // divisão inteira em centavos
+        // para cobrir centavos restantes (resto), atribuímos +1 cent ao primeiro R participantes
+        const remainder = e.amount_cents - baseShare * n;
+        e.participants.forEach((p, idx) => {
+          net[p] -= (baseShare + (idx < remainder ? 1 : 0));
+        });
+      }
+      // se n==0, ninguém arca: pagador pagou e ninguém foi debitado => pagador está com crédito total (os outros não têm débito)
+    });
+    return net;
+  }
+
+  // Renderiza balances e settlement
+  function renderBalancesAndSettlements(){
+    const fmt = new Intl.NumberFormat('pt-BR', {style:'currency', currency:'BRL'});
+    const net = calculateNetBalances(); // em centavos
+    balancesContainer.innerHTML = '';
+    // mostra cada pessoa com saldo (positivo = receber)
+    uniquePeople.forEach(name => {
+      const div = document.createElement('div');
+      div.className = 'balance-card';
+      const balance = net[name] || 0;
+      const balFmt = fmt.format(balance/100);
+      const small = document.createElement('small');
+      small.textContent = balance >= 0 ? 'A receber' : 'A pagar';
+      const h4 = document.createElement('div');
+      h4.style.fontWeight = '600';
+      h4.style.marginBottom = '6px';
+      h4.textContent = name;
+      const p = document.createElement('div');
+      p.style.fontSize = '16px';
+      p.style.marginBottom = '6px';
+      p.textContent = balFmt;
+      div.appendChild(h4);
+      div.appendChild(p);
+      div.appendChild(small);
+      balancesContainer.appendChild(div);
+    });
+
+    // calcular sugestões de acerto
+    // transformar em arrays de {name, cents}
+    const creditors = [];
+    const debtors = [];
+    for(const [name, cents] of Object.entries(net)){
+      if(Math.abs(cents) < 1) continue; // ignorar centavos zero
+      if(cents > 0) creditors.push({name, cents});
+      else if(cents < 0) debtors.push({name, cents: -cents}); // guardar como positivo o quanto deve
+    }
+
+    // se nada, mensagem
+    settlementList.innerHTML = '';
+    if(creditors.length === 0 && debtors.length === 0){
+      noSettlements.style.display = 'block';
+      return;
+    } else {
+      noSettlements.style.display = 'none';
+    }
+
+    // ordenar para algoritmo guloso
+    creditors.sort((a,b) => b.cents - a.cents);
+    debtors.sort((a,b) => b.cents - a.cents);
+
+    const settlements = [];
+    let i = 0, j = 0;
+    while(i < debtors.length && j < creditors.length){
+      const debtor = debtors[i];
+      const creditor = creditors[j];
+      const pay = Math.min(debtor.cents, creditor.cents);
+      settlements.push({from: debtor.name, to: creditor.name, amount_cents: pay});
+      debtor.cents -= pay;
+      creditor.cents -= pay;
+      if(debtor.cents === 0) i++;
+      if(creditor.cents === 0) j++;
+    }
+
+    // render settlements
+    const ul = document.createElement('div');
+    ul.style.display = 'grid';
+    ul.style.gap = '6px';
+    settlements.forEach(s => {
+      const row = document.createElement('div');
+      row.style.padding = '8px';
+      row.style.borderRadius = '8px';
+      row.style.background = '#fff';
+      row.style.display = 'flex';
+      row.style.justifyContent = 'space-between';
+      row.style.alignItems = 'center';
+      row.innerHTML = `<div>${escapeHtml(s.from)} → ${escapeHtml(s.to)}</div><div style="font-weight:600">${fmt.format(s.amount_cents/100)}</div>`;
+      ul.appendChild(row);
+    });
+    settlementList.appendChild(ul);
+  }
+
+  // Export / Import
+  exportBtn.addEventListener('click', () => {
+    const data = {
+      generated_at: new Date().toISOString(),
+      expenses,
+      groups: {A: groupA, B: groupB, people: uniquePeople}
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'despesas_casa_professores.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  importBtn.addEventListener('click', () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json,application/json';
+    input.onchange = () => {
+      const file = input.files[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          if(!parsed.expenses) throw new Error('Arquivo inválido (formato diferente).');
+          if(!confirm('Importar esse arquivo substituirá o histórico atual. Continuar?')) return;
+          expenses = parsed.expenses;
+          saveExpenses();
+          renderLedger();
+          renderBalancesAndSettlements();
+          alert('Importação concluída.');
+        } catch(err){
+          alert('Erro ao importar: ' + err.message);
+        }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
+  });
+
+  // reset data
+  resetBtn.addEventListener('click', () => {
+    if(!confirm('Apagar todos os dados salvos no navegador? Esta ação não pode ser desfeita.')) return;
+    expenses = [];
+    saveExpenses();
+    renderLedger();
+    renderBalancesAndSettlements();
+  });
+
+  // iniciar
+  init();
+
+})();
+</script>
+</body>
+</html>
