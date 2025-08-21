@@ -226,7 +226,43 @@ th{ background: linear-gradient(180deg, #fafcff, #f6f8fb); position: sticky; top
   transition: transform var(--transition), box-shadow var(--transition), opacity var(--transition);
 }
 .fab:hover{ transform: translateY(-2px) scale(1.02); box-shadow: 0 12px 32px rgba(79,70,229,.45); }
+/* Tabela do Relatório */
+#tabelaRelatorio {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+}
 
+#tabelaRelatorio th, #tabelaRelatorio td {
+    padding: 10px 14px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+}
+
+#tabelaRelatorio th {
+    background: var(--primary-color);
+    color: white;
+    text-transform: uppercase;
+    font-size: 14px;
+}
+
+#tabelaRelatorio tr:hover {
+    background: #f9f9f9;
+}
+
+#tabelaRelatorio td.saldo-positivo {
+    color: green;
+    font-weight: bold;
+}
+
+#tabelaRelatorio td.saldo-negativo {
+    color: red;
+    font-weight: bold;
+}
 /* modal */
 .modal{
   position: fixed; inset:0; display:none; place-items:center; z-index:1000;
