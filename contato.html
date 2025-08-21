@@ -226,43 +226,7 @@ th{ background: linear-gradient(180deg, #fafcff, #f6f8fb); position: sticky; top
   transition: transform var(--transition), box-shadow var(--transition), opacity var(--transition);
 }
 .fab:hover{ transform: translateY(-2px) scale(1.02); box-shadow: 0 12px 32px rgba(79,70,229,.45); }
-/* Tabela do Relatório */
-#tabelaRelatorio {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
-    background: white;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.08);
-}
 
-#tabelaRelatorio th, #tabelaRelatorio td {
-    padding: 10px 14px;
-    text-align: center;
-    border-bottom: 1px solid #eee;
-}
-
-#tabelaRelatorio th {
-    background: var(--primary-color);
-    color: white;
-    text-transform: uppercase;
-    font-size: 14px;
-}
-
-#tabelaRelatorio tr:hover {
-    background: #f9f9f9;
-}
-
-#tabelaRelatorio td.saldo-positivo {
-    color: green;
-    font-weight: bold;
-}
-
-#tabelaRelatorio td.saldo-negativo {
-    color: red;
-    font-weight: bold;
-}
 /* modal */
 .modal{
   position: fixed; inset:0; display:none; place-items:center; z-index:1000;
@@ -441,23 +405,6 @@ th{ background: linear-gradient(180deg, #fafcff, #f6f8fb); position: sticky; top
   <section id="relatorio" class="tabcontent section">
     <h2>Relatório PDF</h2>
     <p class="instrucao">Gere um PDF com as compras, saldos e sugestões de acerto.</p>
-    <div id="relatorio" class="tab-content">
-    <h2>Relatório</h2>
-    <table id="tabelaRelatorio" class="styled-table">
-        <thead>
-            <tr>
-                <th>Professor</th>
-                <th>Deveria Gastar (R$)</th>
-                <th>Gastou (R$)</th>
-                <th>Saldo (R$)</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Preenchido dinamicamente -->
-        </tbody>
-    </table>
-    <button id="exportarImagem" class="fab">📸 Exportar Tabela</button>
-</div>
     <button class="button primary" id="btnPDF"><span class="icon">picture_as_pdf</span> Gerar Relatório PDF</button>
   </section>
 </main>
@@ -535,12 +482,7 @@ function init(){
 
   wireUI();
   atualizarUI();
-  
 }
-
-
-
-
 
 /* ====== UI Handlers ====== */
 function wireUI(){
@@ -864,60 +806,6 @@ function renderTransferencias(){
     ? transf.map(t=>`<p><strong>${escapeHtml(t.de)}</strong> paga <strong>R$${t.valor.toFixed(2)}</strong> para <strong>${escapeHtml(t.para)}</strong></p>`).join('')
     : "<p>Ninguém deve nada 🎉</p>";
 }
-
-
-
-function atualizarRelatorioTabela() {
-    const tbody = document.querySelector("#tabelaRelatorio tbody");
-    tbody.innerHTML = "";
-
-    if (compras.length === 0) return;
-
-    const professores = grupos[grupoSelecionado];
-    const gastos = {};
-    professores.forEach(p => gastos[p] = { gastou: 0, deveria: 0, saldo: 0 });
-
-    compras.forEach(c => {
-        gastos[c.comprador].gastou += c.valor;
-        const divisao = c.valor / c.consumidores.length;
-        c.consumidores.forEach(consumidor => {
-            gastos[consumidor].deveria += divisao;
-        });
-    });
-
-    professores.forEach(p => {
-        gastos[p].saldo = gastos[p].gastou - gastos[p].deveria;
-
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-            <td>${p}</td>
-            <td>${gastos[p].deveria.toFixed(2)}</td>
-            <td>${gastos[p].gastou.toFixed(2)}</td>
-            <td class="${gastos[p].saldo < 0 ? 'saldo-negativo' : 'saldo-positivo'}">
-                ${gastos[p].saldo.toFixed(2)}
-            </td>
-        `;
-        tbody.appendChild(tr);
-    });
-}
-
-// Atualizar sempre que abrir a aba Relatório
-document.querySelector(".tabs button[onclick=\"mostrarTab('relatorio')\"]")
-    .addEventListener("click", atualizarRelatorioTabela);
-
-// Exportar tabela como imagem
-document.getElementById("exportarImagem").addEventListener("click", () => {
-    const tabela = document.getElementById("tabelaRelatorio");
-    html2canvas(tabela).then(canvas => {
-        const link = document.createElement("a");
-        link.download = "relatorio.png";
-        link.href = canvas.toDataURL("image/png");
-        link.click();
-    });
-});
-
-
-
 
 /* ====== Relatório PDF ====== */
 function gerarPDF(){
