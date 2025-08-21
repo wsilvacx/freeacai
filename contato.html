@@ -504,6 +504,62 @@ function arraysEqual(a,b){
   for(let i=0;i<a.length;i++) if(a[i] !== b[i]) return false;
   return true;
 }
+function calcularSaldos() {
+    const table = document.getElementById('planilha');
+    const tbody = table.querySelector('tbody');
+    const rows = tbody.querySelectorAll('tr');
+    let valores = [];
+
+    rows.forEach(row => {
+        const nome = row.cells[0].querySelector('input').value;
+        const gasto = parseFloat(row.cells[1].querySelector('input').value) || 0;
+        valores.push({nome, gasto, row});
+    });
+
+    const total = valores.reduce((acc, v) => acc + v.gasto, 0);
+    const media = total / valores.length;
+
+    // Limpar resultados anteriores
+    document.getElementById('resultados').innerHTML = '';
+
+    valores.forEach(v => {
+        const saldo = (v.gasto - media).toFixed(2);
+        v.row.cells[2].textContent = saldo;
+        const resultadoDiv = document.createElement('div');
+        resultadoDiv.textContent = `${v.nome} deve receber ${saldo >= 0 ? saldo : 0} e deve pagar ${saldo < 0 ? (-saldo).toFixed(2) : 0}`;
+        document.getElementById('resultados').appendChild(resultadoDiv);
+    });
+}
+
+function gerarPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    let y = 10;
+
+    doc.setFontSize(16);
+    doc.text("Relatório de Saldos", 105, y, { align: 'center' });
+    y += 10;
+
+    const table = document.getElementById('planilha');
+    const rows = table.querySelectorAll('tbody tr');
+
+    rows.forEach(row => {
+        const nome = row.cells[0].querySelector('input').value;
+        const gasto = parseFloat(row.cells[1].querySelector('input').value) || 0;
+        const saldo = row.cells[2].textContent || '0';
+        doc.setFontSize(12);
+        doc.text(`${nome}: Gasto = ${gasto.toFixed(2)}, Saldo = ${saldo}`, 10, y);
+        y += 8;
+    });
+
+    doc.save('relatorio_saldos.pdf');
+}
+
+// Inicialização da tabela com 3 linhas como exemplo
+for (let i = 0; i < 3; i++) {
+    adicionarLinha();
+}
+
 </script>
 </body>
 </html>
