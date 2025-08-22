@@ -1,26 +1,26 @@
-
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Montar Horário Escolar</title>
+<title>Montar Horário Escolar Avançado</title>
 <style>
 body { font-family: Arial; margin:0; padding:0; background:#f0f2f5;}
 header { background:#2463ff; color:#fff; padding:15px; text-align:center; }
 main { display:flex; gap:20px; padding:20px; flex-wrap:wrap;}
-section { background:#fff; padding:15px; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,.1); }
-#prateleira { width:200px; min-width:200px; }
-.item { background:#2463ff; color:#fff; padding:5px; margin:5px 0; border-radius:5px; cursor:grab; }
+section { background:#fff; padding:15px; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,.1);}
+#prateleira { width:220px; min-width:220px; }
+.item { background:#2463ff; color:#fff; padding:5px; margin:5px 0; border-radius:5px; cursor:grab; display:flex; justify-content:space-between;}
 table { border-collapse:collapse; width:100%; }
 th, td { border:1px solid #ccc; padding:8px; text-align:center; min-width:80px; height:40px; }
 td { background:#fafafa; }
 td.dragover { background:#cce5ff; }
+.meta { font-size:12px; opacity:0.8;}
 </style>
 </head>
 <body>
 
-<header><h1>Montar Horário Escolar</h1></header>
+<header><h1>Montar Horário Escolar Avançado</h1></header>
 <main>
   <!-- Prateleira -->
   <section id="prateleira">
@@ -52,32 +52,41 @@ td.dragover { background:#cce5ff; }
 </main>
 
 <script>
-// Exemplo de dados: disciplinas + professor + meta
+// Dados de exemplo: professor, disciplinas, meta
 const professores = [
-  {nome:'João', disciplinas:['Matemática'], meta:{'Matemática':3}},
-  {nome:'Maria', disciplinas:['Português','História'], meta:{'Português':4,'História':2}},
-  {nome:'Carlos', disciplinas:['Física'], meta:{'Física':2}}
+  {nome:'João', disciplinas:['Matemática'], meta:{'Matemática':3}, count:{'Matemática':0}},
+  {nome:'Maria', disciplinas:['Português','História'], meta:{'Português':4,'História':2}, count:{'Português':0,'História':0}},
+  {nome:'Carlos', disciplinas:['Física'], meta:{'Física':2}, count:{'Física':0}}
 ];
 
 // Montar prateleira
 const prateleira = document.getElementById('disciplinas');
-professores.forEach(p => {
-  p.disciplinas.forEach(d => {
-    const div = document.createElement('div');
-    div.className = 'item';
-    div.draggable = true;
-    div.textContent = `${d} - ${p.nome}`;
-    div.dataset.professor = p.nome;
-    div.dataset.disciplina = d;
-    div.dataset.meta = p.meta[d];
-    div.dataset.count = 0;
-    div.addEventListener('dragstart', dragStart);
-    prateleira.appendChild(div);
+
+function atualizarPrateleira(){
+  prateleira.innerHTML = '';
+  professores.forEach(p=>{
+    p.disciplinas.forEach(d=>{
+      const div = document.createElement('div');
+      div.className='item';
+      div.draggable=true;
+      div.dataset.professor=p.nome;
+      div.dataset.disciplina=d;
+      div.innerHTML = `<span>${d} - ${p.nome}</span> <span class="meta">${p.count[d]}/${p.meta[d]}</span>`;
+      div.addEventListener('dragstart', dragStart);
+      prateleira.appendChild(div);
+    });
   });
-});
+}
+
+atualizarPrateleira();
 
 // Drag & Drop
-function dragStart(e){ e.dataTransfer.setData('text', e.target.textContent); e.dataTransfer.setData('professor', e.target.dataset.professor); e.dataTransfer.setData('disciplina', e.target.dataset.disciplina);}
+let draggedItem = null;
+
+function dragStart(e){
+  draggedItem = e.target;
+}
+
 const cells = document.querySelectorAll('#tabelaHorario td');
 cells.forEach(td=>{
   td.addEventListener('dragover', e=>{ e.preventDefault(); td.classList.add('dragover'); });
@@ -85,30 +94,39 @@ cells.forEach(td=>{
   td.addEventListener('drop', e=>{
     e.preventDefault();
     td.classList.remove('dragover');
-    const professor = e.dataTransfer.getData('professor');
-    const disciplina = e.dataTransfer.getData('disciplina');
-    const item = Array.from(prateleira.children).find(i=>i.dataset.professor===professor && i.dataset.disciplina===disciplina);
+    if(!draggedItem) return;
+    const professor = draggedItem.dataset.professor;
+    const disciplina = draggedItem.dataset.disciplina;
+    const profObj = professores.find(p=>p.nome===professor);
 
-    // validação de meta
-    let count = Number(item.dataset.count);
-    let meta = Number(item.dataset.meta);
-    if(count >= meta){
+    // Verifica meta
+    if(profObj.count[disciplina] >= profObj.meta[disciplina]){
       alert(`⚠️ Meta de aulas atingida para ${disciplina} - ${professor}`);
       return;
     }
 
-    // validação de conflito: professor não pode estar em duas células
-    let conflito = Array.from(cells).some(c => c.textContent.includes(professor));
-    if(conflito){
+    // Verifica conflito (professor já em outra célula)
+    const conflito = Array.from(cells).some(c=>c.textContent.includes(professor));
+    if(td.textContent && td.textContent !== draggedItem.textContent){
+      // Se já tem outra aula, devolve contagem do professor antigo
+      const partes = td.textContent.split(' - ');
+      const discOld = partes[0];
+      const profOld = partes[1];
+      const profOldObj = professores.find(p=>p.nome===profOld);
+      if(profOldObj) { profOldObj.count[discOld]--; }
+    }
+    if(conflito && (!td.textContent || td.textContent===draggedItem.textContent)){
       alert(`⚠️ Conflito! ${professor} já está em outro horário.`);
       return;
     }
 
     td.textContent = `${disciplina} - ${professor}`;
-    item.dataset.count = count+1;
+    profObj.count[disciplina]++;
+    atualizarPrateleira();
+    draggedItem = null;
   });
 });
 </script>
 
 </body>
-</html>
+</html>   
