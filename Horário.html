@@ -1,132 +1,176 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Montar Horário Escolar Avançado</title>
+<title>Sistema de Horários Escolares</title>
 <style>
-body { font-family: Arial; margin:0; padding:0; background:#f0f2f5;}
+body { font-family: Arial; margin:0; padding:0; background:#f0f2f5; }
 header { background:#2463ff; color:#fff; padding:15px; text-align:center; }
-main { display:flex; gap:20px; padding:20px; flex-wrap:wrap;}
-section { background:#fff; padding:15px; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,.1);}
-#prateleira { width:220px; min-width:220px; }
-.item { background:#2463ff; color:#fff; padding:5px; margin:5px 0; border-radius:5px; cursor:grab; display:flex; justify-content:space-between;}
+main { display:flex; flex-wrap:wrap; gap:20px; padding:20px; }
+section { background:#fff; padding:15px; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,.1); min-width:300px; }
+input, select, button { margin:5px 0; padding:6px; width:100%; border-radius:5px; border:1px solid #ccc; }
+button { background:#2463ff; color:#fff; border:none; cursor:pointer; }
+button:hover { background:#1d4cd8; }
+#prateleira { width:250px; min-width:250px; }
+.item { background:#2463ff; color:#fff; padding:5px; margin:5px 0; border-radius:5px; cursor:grab; display:flex; justify-content:space-between; }
 table { border-collapse:collapse; width:100%; }
 th, td { border:1px solid #ccc; padding:8px; text-align:center; min-width:80px; height:40px; }
 td { background:#fafafa; }
 td.dragover { background:#cce5ff; }
-.meta { font-size:12px; opacity:0.8;}
+.meta { font-size:12px; opacity:0.8; }
 </style>
 </head>
 <body>
 
-<header><h1>Montar Horário Escolar Avançado</h1></header>
+<header><h1>Sistema de Horários Escolares</h1></header>
 <main>
-  <!-- Prateleira -->
-  <section id="prateleira">
-    <h2>Disciplinas</h2>
-    <div id="disciplinas"></div>
-  </section>
 
-  <!-- Tabela de Horário -->
-  <section style="flex:1;">
-    <h2>Horário</h2>
-    <table id="tabelaHorario">
-      <thead>
-        <tr>
-          <th>Horário</th>
-          <th>Segunda</th>
-          <th>Terça</th>
-          <th>Quarta</th>
-          <th>Quinta</th>
-          <th>Sexta</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td>07:00-08:00</td><td></td><td></td><td></td><td></td><td></td></tr>
-        <tr><td>08:00-09:00</td><td></td><td></td><td></td><td></td><td></td></tr>
-        <tr><td>09:00-10:00</td><td></td><td></td><td></td><td></td><td></td></tr>
-      </tbody>
-    </table>
-  </section>
+<!-- Cadastro -->
+<section>
+<h2>Cadastro</h2>
+
+<h3>Turmas</h3>
+<input type="text" id="turma" placeholder="Nome da turma">
+<button onclick="cadastrarTurma()">Cadastrar Turma</button>
+<ul id="listaTurmas"></ul>
+
+<h3>Disciplinas</h3>
+<input type="text" id="disciplina" placeholder="Nome da disciplina">
+<button onclick="cadastrarDisciplina()">Cadastrar Disciplina</button>
+<ul id="listaDisciplinas"></ul>
+
+<h3>Professores</h3>
+<input type="text" id="professor" placeholder="Nome do professor">
+
+<label>Turma:</label>
+<select id="professorTurma"></select>
+
+<label>Disciplinas:</label>
+<select id="professorDisciplinas" multiple></select>
+
+<label>Disponibilidade (dias):</label>
+<div>
+  <label><input type="checkbox" value="Segunda" class="dias">Segunda</label>
+  <label><input type="checkbox" value="Terça" class="dias">Terça</label>
+  <label><input type="checkbox" value="Quarta" class="dias">Quarta</label>
+  <label><input type="checkbox" value="Quinta" class="dias">Quinta</label>
+  <label><input type="checkbox" value="Sexta" class="dias">Sexta</label>
+</div>
+
+<div id="cargaDisciplina"></div>
+<button onclick="cadastrarProfessor()">Cadastrar Professor</button>
+<ul id="listaProfessores"></ul>
+</section>
+
+<!-- Prateleira e Tabela -->
+<section id="prateleiraSection">
+<h2>Prateleira de Disciplinas</h2>
+<div id="prateleira"></div>
+
+<h2>Horário</h2>
+<table id="tabelaHorario">
+<thead>
+<tr>
+<th>Horário</th>
+<th>Segunda</th>
+<th>Terça</th>
+<th>Quarta</th>
+<th>Quinta</th>
+<th>Sexta</th>
+</tr>
+</thead>
+<tbody>
+<tr><td>07:00-08:00</td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>08:00-09:00</td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>09:00-10:00</td><td></td><td></td><td></td><td></td><td></td></tr>
+</tbody>
+</table>
+</section>
+
 </main>
 
 <script>
-// Dados de exemplo: professor, disciplinas, meta
-const professores = [
-  {nome:'João', disciplinas:['Matemática'], meta:{'Matemática':3}, count:{'Matemática':0}},
-  {nome:'Maria', disciplinas:['Português','História'], meta:{'Português':4,'História':2}, count:{'Português':0,'História':0}},
-  {nome:'Carlos', disciplinas:['Física'], meta:{'Física':2}, count:{'Física':0}}
-];
+// Dados
+let turmas = [];
+let disciplinas = [];
+let professores = [];
+let draggedItem = null;
 
-// Montar prateleira
-const prateleira = document.getElementById('disciplinas');
+// Cadastro Turmas
+function cadastrarTurma(){
+  const t = document.getElementById('turma').value.trim();
+  if(t){ turmas.push(t); atualizarLista('listaTurmas', turmas); atualizarSelect('professorTurma', turmas); document.getElementById('turma').value=''; }
+}
 
+// Cadastro Disciplinas
+function cadastrarDisciplina(){
+  const d = document.getElementById('disciplina').value.trim();
+  if(d){ disciplinas.push(d); atualizarLista('listaDisciplinas', disciplinas); atualizarSelect('professorDisciplinas', disciplinas,true); document.getElementById('disciplina').value=''; }
+}
+
+function atualizarLista(id, arr){
+  const ul = document.getElementById(id); ul.innerHTML='';
+  arr.forEach(item=>{ const li=document.createElement('li'); li.textContent=item; ul.appendChild(li); });
+}
+function atualizarSelect(id, arr, multiple=false){
+  const sel=document.getElementById(id); sel.innerHTML='';
+  arr.forEach(item=>{ const opt=document.createElement('option'); opt.value=item; opt.textContent=item; sel.appendChild(opt); });
+  sel.multiple=multiple;
+}
+
+// Cadastro Professor
+document.getElementById('professorDisciplinas').addEventListener('change', function(){
+  const div = document.getElementById('cargaDisciplina'); div.innerHTML='';
+  Array.from(this.selectedOptions).forEach(opt=>{
+    const label = document.createElement('label'); label.innerHTML=`${opt.value} carga(aulas/semana): <input type="number" min="1" value="1" data-disciplina="${opt.value}">`;
+    div.appendChild(label); div.appendChild(document.createElement('br'));
+  });
+});
+
+function cadastrarProfessor(){
+  const nome = document.getElementById('professor').value.trim();
+  const turma = document.getElementById('professorTurma').value;
+  const sel = document.getElementById('professorDisciplinas');
+  const disciplinasSel = Array.from(sel.selectedOptions).map(o=>o.value);
+  const dias = Array.from(document.querySelectorAll('.dias:checked')).map(d=>d.value);
+  const cargasInputs = document.querySelectorAll('#cargaDisciplina input');
+  let meta={}; cargasInputs.forEach(i=>{ meta[i.dataset.disciplina]=Number(i.value); });
+
+  if(nome && turma && disciplinasSel.length && dias.length){
+    professores.push({nome, turma, disciplinas:disciplinasSel, dias, meta, count:Object.assign({},meta)});
+    const li = document.createElement('li'); li.textContent=`${nome} - Turma: ${turma} - Disciplinas: ${disciplinasSel.join(', ')} - Dias: ${dias.join(', ')}`;
+    document.getElementById('listaProfessores').appendChild(li);
+    document.getElementById('professor').value=''; sel.value=null; document.getElementById('cargaDisciplina').innerHTML=''; document.querySelectorAll('.dias').forEach(d=>d.checked=false);
+    atualizarPrateleira();
+  }
+}
+
+// Prateleira
 function atualizarPrateleira(){
-  prateleira.innerHTML = '';
+  const prateleira=document.getElementById('prateleira'); prateleira.innerHTML='';
   professores.forEach(p=>{
     p.disciplinas.forEach(d=>{
-      const div = document.createElement('div');
-      div.className='item';
-      div.draggable=true;
-      div.dataset.professor=p.nome;
-      div.dataset.disciplina=d;
-      div.innerHTML = `<span>${d} - ${p.nome}</span> <span class="meta">${p.count[d]}/${p.meta[d]}</span>`;
-      div.addEventListener('dragstart', dragStart);
+      const div = document.createElement('div'); div.className='item'; div.draggable=true;
+      div.dataset.professor=p.nome; div.dataset.disciplina=d;
+      div.dataset.turma=p.turma; div.dataset.dias=p.dias.join(',');
+      div.dataset.meta=p.meta[d]; div.dataset.count=p.count[d];
+      div.innerHTML=`<span>${d} - ${p.nome} (${p.turma})</span> <span class="meta">${p.count[d]}/${p.meta[d]}</span>`;
+      div.addEventListener('dragstart', e=>{ draggedItem=e.target; });
       prateleira.appendChild(div);
     });
   });
 }
 
-atualizarPrateleira();
-
 // Drag & Drop
-let draggedItem = null;
-
-function dragStart(e){
-  draggedItem = e.target;
-}
-
 const cells = document.querySelectorAll('#tabelaHorario td');
 cells.forEach(td=>{
   td.addEventListener('dragover', e=>{ e.preventDefault(); td.classList.add('dragover'); });
   td.addEventListener('dragleave', e=>{ td.classList.remove('dragover'); });
   td.addEventListener('drop', e=>{
-    e.preventDefault();
-    td.classList.remove('dragover');
-    if(!draggedItem) return;
-    const professor = draggedItem.dataset.professor;
+    e.preventDefault(); td.classList.remove('dragover'); if(!draggedItem) return;
+
+    const profName = draggedItem.dataset.professor;
     const disciplina = draggedItem.dataset.disciplina;
-    const profObj = professores.find(p=>p.nome===professor);
-
-    // Verifica meta
-    if(profObj.count[disciplina] >= profObj.meta[disciplina]){
-      alert(`⚠️ Meta de aulas atingida para ${disciplina} - ${professor}`);
-      return;
-    }
-
-    // Verifica conflito (professor já em outra célula)
-    const conflito = Array.from(cells).some(c=>c.textContent.includes(professor));
-    if(td.textContent && td.textContent !== draggedItem.textContent){
-      // Se já tem outra aula, devolve contagem do professor antigo
-      const partes = td.textContent.split(' - ');
-      const discOld = partes[0];
-      const profOld = partes[1];
-      const profOldObj = professores.find(p=>p.nome===profOld);
-      if(profOldObj) { profOldObj.count[discOld]--; }
-    }
-    if(conflito && (!td.textContent || td.textContent===draggedItem.textContent)){
-      alert(`⚠️ Conflito! ${professor} já está em outro horário.`);
-      return;
-    }
-
-    td.textContent = `${disciplina} - ${professor}`;
-    profObj.count[disciplina]++;
-    atualizarPrateleira();
-    draggedItem = null;
-  });
-});
-</script>
-
-</body>
-</html>   
+    const turma = draggedItem.dataset.turma;
+    const diaIndex = td.cellIndex;
