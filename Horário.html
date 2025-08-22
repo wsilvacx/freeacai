@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Sistema de Horários — metas por disciplina × turma</title>
+<title>Sistema de Horários — Drag & Drop</title>
 <style>
   :root{--primary:#2463ff;--bg:#f6f8fc;--card:#fff;--ok:#138a36;--warn:#ad6400;--danger:#c0392b}
   body{font-family:Inter,Segoe UI,Roboto,Arial;color:#0f172a;background:var(--bg);margin:0;padding:18px}
   h1{margin:0 0 12px}
-  .layout{display:grid;grid-template-columns:1fr 420px;gap:18px}
+  .layout{display:grid;grid-template-columns:420px 1fr;gap:18px}
   .card{background:var(--card);border-radius:12px;padding:12px;box-shadow:0 8px 24px rgba(15,30,60,.08)}
   .muted{color:#63748a;font-size:13px}
   .controls{display:flex;gap:8px;flex-wrap:wrap}
@@ -28,7 +28,7 @@
   table.schedule th,table.schedule td{border:1px solid #e6edf5;padding:6px;text-align:center}
   table.schedule th{background:#f9fbff}
   td.cell{height:68px;vertical-align:middle;position:relative}
-  .assign{display:flex;flex-direction:column;gap:2px;padding:6px;border-radius:8px;border:1px solid #e8eefc;background:#f9fbff;cursor:grab}
+  .assign{display:flex;flex-direction:column;gap:2px;padding:6px;border-radius:8px;border:1px solid #e8eefc;background:#f9fbff}
   .assign .disc{font-weight:700}
   .assign .prof{font-size:12px;color:#556577}
   .droptarget{outline:2px dashed #9ab3ff; outline-offset:-4px}
@@ -37,75 +37,111 @@
   .modal-card{width:720px;max-width:96%;background:#fff;border-radius:12px;padding:14px;box-shadow:0 14px 60px rgba(10,20,40,.18)}
   .modal-sm{width:460px;max-width:94%}
   .close{float:right;cursor:pointer;color:#c0392b;font-weight:800}
-  .wizard-steps{display:flex;gap:8px;margin-bottom:10px}
-  .step{padding:6px 8px;border-radius:8px;background:#eff5ff;font-weight:700}
-  .disc-item{display:flex;align-items:center;gap:8px;padding:8px;border:1px solid #eef2fb;border-radius:8px;cursor:grab}
-  .disc-item.disabled{opacity:.55;cursor:not-allowed;}
-  .danger{background:#ffecec;color:var(--danger)}
-  .togglecopy{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:999px;border:1px dashed #c9d6ff;background:#f4f7ff;font-size:12px}
-  .shelf{background:#f4f6fc;border:1px solid #e6edf7;border-radius:12px;padding:8px;max-height:480px;overflow:auto}
+  .draggable-disc{display:flex;align-items:center;gap:4px;padding:4px 6px;border-radius:8px;border:1px solid #9ab3ff;background:#f4f7ff;cursor:grab;margin:2px}
+  .droppable-grid{min-height:68px}
 </style>
 </head>
 <body>
-<h1>Sistema de Horários — montagem de horários</h1>
+<h1>Sistema de Horários — Drag & Drop</h1>
 <div class="layout">
-
-  <!-- GRADE + PRATELEIRA -->
+  <!-- CADASTROS -->
   <div class="card">
     <div style="display:flex;justify-content:space-between;align-items:center">
-      <h2>Grade de horários</h2>
+      <h2 style="margin:0">Cadastros</h2>
       <div class="controls">
-        <label class="muted" style="display:flex;gap:8px;align-items:center">Períodos
+        <button id="btnAddDisc">+ Disciplina</button>
+        <button id="btnAddTurma">+ Turma</button>
+        <button id="btnAddProf">+ Professor</button>
+      </div>
+    </div>
+    <h3 style="margin-top:12px">Disciplinas</h3>
+    <div id="listaDisciplinas" class="list muted">Nenhuma disciplina.</div>
+    <h3 style="margin-top:10px">Turmas</h3>
+    <div id="listaTurmas" class="list muted">Nenhuma turma.</div>
+    <h3 style="margin-top:10px">Professores</h3>
+    <div id="listaProfessores" class="list muted">Nenhum professor.</div>
+  </div>
+
+  <!-- GRADE E PRATELEIRA -->
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <h2 style="margin:0">Montar horário</h2>
+      <div class="controls">
+        <label>Períodos
           <select id="periodosCount">
-            <option value="4">4</option><option value="5" selected>5</option><option value="6">6</option>
+            <option value="4">4</option>
+            <option value="5" selected>5</option>
+            <option value="6">6</option>
           </select>
         </label>
-        <label class="togglecopy"><input type="checkbox" id="toggleCopy"> Copiar ao arrastar</label>
         <button id="btnRenderGrid">Gerar grade</button>
       </div>
     </div>
 
-    <div style="display:flex;gap:12px;align-items:flex-start;margin-top:12px">
-      <!-- Grade -->
-      <div style="flex:1" id="gridArea"></div>
-
-      <!-- Prateleira -->
-      <div class="shelf">
-        <h3>Prateleira: Disciplinas × Professores</h3>
-        <div id="shelfItems" style="display:flex;flex-direction:column;gap:6px"></div>
-      </div>
+    <div style="margin-top:8px">
+      <label>Turma</label>
+      <select id="selectTurma"></select>
     </div>
+
+    <h3 style="margin-top:12px">Prateleira de Disciplinas</h3>
+    <div id="shelfDiscs" style="display:flex;flex-wrap:wrap;gap:6px;border:1px solid #e8eefc;padding:6px;min-height:50px;background:#f9f9f9;"></div>
+
+    <div id="gridArea" style="margin-top:12px"></div>
   </div>
+</div>
 
-  <!-- CADASTROS -->
-  <div class="card">
-    <h2>Cadastros</h2>
-    <div class="controls" style="margin-bottom:8px">
-      <button id="btnAddDisc">+ Disciplina</button>
-      <button id="btnAddTurma">+ Turma</button>
-      <button id="btnAddProf">+ Professor</button>
-    </div>
-    <h3>Disciplinas</h3>
-    <div id="listaDisciplinas" class="list muted">Nenhuma disciplina.</div>
-    <h3>Turmas</h3>
-    <div id="listaTurmas" class="list muted">Nenhuma turma.</div>
-    <h3>Professores</h3>
-    <div id="listaProfessores" class="list muted">Nenhum professor.</div>
-
+<!-- MODAIS -->
+<div id="modalDisciplina" class="modal">
+  <div class="modal-card modal-sm">
+    <span class="close" onclick="closeModal('modalDisciplina')">&times;</span>
+    <h3>Nova Disciplina</h3>
+    <label>Nome:</label>
+    <input type="text" id="inputDiscNome"/>
     <div class="controls" style="margin-top:10px">
-      <button id="btnExport">Exportar JSON</button>
-      <label class="pill" style="cursor:pointer">Importar JSON
-        <input id="importFile" type="file" accept="application/json" style="display:none"/>
-      </label>
-      <button id="btnClearAll" class="ghost">Apagar tudo</button>
+      <button onclick="saveDisc()">Salvar</button>
+      <button class="ghost" onclick="closeModal('modalDisciplina')">Cancelar</button>
     </div>
   </div>
+</div>
 
+<div id="modalTurma" class="modal">
+  <div class="modal-card modal-sm">
+    <span class="close" onclick="closeModal('modalTurma')">&times;</span>
+    <h3>Nova Turma</h3>
+    <label>Nome:</label>
+    <input type="text" id="inputTurmaNome"/>
+    <div class="controls" style="margin-top:10px">
+      <button onclick="saveTurma()">Salvar</button>
+      <button class="ghost" onclick="closeModal('modalTurma')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<div id="modalProfessor" class="modal">
+  <div class="modal-card">
+    <span class="close" onclick="closeModal('modalProfessor')">&times;</span>
+    <h3>Novo Professor</h3>
+    <label>Nome:</label>
+    <input type="text" id="inputProfNome"/>
+    <label>Dias disponíveis:</label>
+    <select id="inputProfDias" multiple>
+      <option value="Segunda">Segunda</option>
+      <option value="Terça">Terça</option>
+      <option value="Quarta">Quarta</option>
+      <option value="Quinta">Quinta</option>
+      <option value="Sexta">Sexta</option>
+      <option value="Sábado">Sábado</option>
+    </select>
+    <div class="controls" style="margin-top:10px">
+      <button onclick="saveProf()">Salvar</button>
+      <button class="ghost" onclick="closeModal('modalProfessor')">Cancelar</button>
+    </div>
+  </div>
 </div>
 
 <script>
-/* ====== STATE ====== */
-const LS_KEY='horarios_meta_drag_v2';
+/* ===== STATE ===== */
+const LS_KEY='horarios_drag';
 const DAYS=['Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
 let state={disciplinas:[], turmas:[], professores:[], horarios:{}};
 function uid(p='id'){return p+'_'+Math.random().toString(36).slice(2,9)}
@@ -113,93 +149,138 @@ function save(){localStorage.setItem(LS_KEY, JSON.stringify(state))}
 function load(){try{const raw=localStorage.getItem(LS_KEY); if(raw) state=JSON.parse(raw);}catch(e){}}
 load();
 
-/* ====== UTIL ====== */
+/* ===== HELPERS ===== */
 const $=s=>document.querySelector(s);
 function findDisc(id){return state.disciplinas.find(d=>d.id===id)}
 function findTurma(id){return state.turmas.find(t=>t.id===id)}
 function findProf(id){return state.professores.find(p=>p.id===id)}
-function contarAulas(profId, discId, turmaId){
-  let c=0;
-  for(const tid in state.horarios){
-    const h=state.horarios[tid]; if(!h) continue;
-    for(const d of DAYS){ (h.grid?.[d]||[]).forEach(cell=>{if(cell && cell.professorId===profId && cell.disciplinaId===discId && tid===turmaId) c++})}
-  }
-  return c;
-}
-function isProfBusy(profId, dia, periodo, ignore){
-  for(const tid in state.horarios){
-    const h=state.horarios[tid]; if(!h) continue;
-    const cell=h.grid?.[dia]?.[periodo]||null;
-    if(!cell) continue;
-    if(ignore && tid===ignore.turmaId && dia===ignore.dia && periodo===ignore.periodo) continue;
-    if(cell.professorId===profId) return true;
-  }
-  return false;
-}
 
-/* ====== RENDER GRADE ====== */
-function ensureHorario(turmaId,periodos){
-  if(!state.horarios[turmaId]){
-    const grid={}; DAYS.forEach(d=>grid[d]=Array(periodos).fill(null));
-    state.horarios[turmaId]={periodos,grid}; save();
-  } else if(state.horarios[turmaId].periodos!==periodos){
-    const old=state.horarios[turmaId]; const grid={};
-    DAYS.forEach(d=>grid[d]=Array.from({length:periodos},(_,i)=>old.grid[d][i]||null));
-    state.horarios[turmaId]={periodos,grid}; save();
-  }
+/* ===== RENDER LISTAS ===== */
+function renderAll(){
+  renderDiscList(); renderTurmaList(); renderProfList(); refreshSelectTurma(); renderShelf();
 }
-function renderGrid(turmaId){
-  const area=$('#gridArea'); area.innerHTML='';
-  const h=state.horarios[turmaId]; if(!h){area.innerHTML='<div class="muted">Gerar a grade.</div>'; return;}
-  const table=document.createElement('table'); table.className='schedule';
-  const thead=document.createElement('thead'); const trh=document.createElement('tr');
-  trh.innerHTML='<th>Período \\ Dia</th>'+DAYS.map(d=>`<th>${d}</th>`).join(''); thead.appendChild(trh); table.appendChild(thead);
-  const tbody=document.createElement('tbody');
-  for(let p=0;p<h.periodos;p++){
-    const tr=document.createElement('tr'); tr.innerHTML=`<th>Período ${p+1}</th>`;
-    DAYS.forEach(d=>{
-      const td=document.createElement('td'); td.className='cell'; td.dataset.turma=turmaId; td.dataset.dia=d; td.dataset.periodo=p;
-      const cell=h.grid[d][p];
-      if(cell){
-        const prof=findProf(cell.professorId)?.nome||'—';
-        const disc=findDisc(cell.disciplinaId)?.nome||'—';
-        const box=document.createElement('div'); box.className='assign'; box.draggable=true;
-        box.innerHTML=`<div class="disc">${disc}</div><div class="prof">${prof}</div>`;
-        box.addEventListener('dragstart', ev=>{ ev.dataTransfer.setData('text/plain', JSON.stringify({from:{turmaId,dia,period:p}, cell})); ev.dataTransfer.effectAllowed='copyMove'; });
-        td.appendChild(box);
-      } else td.innerHTML='<div class="muted">—</div>';
-      tr.appendChild(td);
-    });
-    tbody.appendChild(tr);
-  }
-  table.appendChild(tbody); area.appendChild(table);
+function renderDiscList(){
+  const box=$('#listaDisciplinas'); box.innerHTML='';
+  if(state.disciplinas.length===0){box.textContent='Nenhuma disciplina.'; return;}
+  state.disciplinas.forEach(d=>{
+    const row=document.createElement('div'); row.className='item';
+    row.innerHTML=`<div><strong>${d.nome}</strong></div>
+      <div class="controls">
+        <button class="ghost" data-id="${d.id}" data-act="disc-del">Remover</button>
+      </div>`;
+    box.appendChild(row);
+  });
 }
-
-/* ====== PRATELEIRA ====== */
-function renderPrateleira(){
-  const wrap=$('#shelfItems'); wrap.innerHTML='';
+function renderTurmaList(){
+  const box=$('#listaTurmas'); box.innerHTML='';
+  if(state.turmas.length===0){box.textContent='Nenhuma turma.'; return;}
+  state.turmas.forEach(t=>{
+    const row=document.createElement('div'); row.className='item';
+    row.innerHTML=`<div><strong>${t.nome}</strong></div>
+      <div class="controls">
+        <button class="ghost" data-id="${t.id}" data-act="turma-del">Remover</button>
+      </div>`;
+    box.appendChild(row);
+  });
+}
+function renderProfList(){
+  const box=$('#listaProfessores'); box.innerHTML='';
+  if(state.professores.length===0){box.textContent='Nenhum professor.'; return;}
   state.professores.forEach(p=>{
-    (p.assignments||[]).forEach(a=>{
-      const disc=findDisc(a.discId)?.nome||'—'; const turma=findTurma(a.turmaId)?.nome||'—';
-      const div=document.createElement('div'); div.className='disc-item'; div.draggable=true;
-      div.innerHTML=`<strong>${disc}</strong> — <span>${p.nome}</span>`;
-      div.addEventListener('dragstart', ev=>{ ev.dataTransfer.setData('text/plain', JSON.stringify({from:'shelf',profId:p.id,discId:a.discId})); ev.dataTransfer.effectAllowed='copy'; });
-      wrap.appendChild(div);
+    const row=document.createElement('div'); row.className='item';
+    row.innerHTML=`<div><strong>${p.nome}</strong> <span class="muted">(${p.dias.join(',')})</span></div>
+      <div class="controls"><button class="ghost" data-id="${p.id}" data-act="prof-del">Remover</button></div>`;
+    box.appendChild(row);
+  });
+}
+
+/* ===== PRATELEIRA ===== */
+function renderShelf(){
+  const shelf=$('#shelfDiscs'); shelf.innerHTML='';
+  state.disciplinas.forEach(d=>{
+    const profs = state.professores.filter(p=>p.assignments?.some(a=>a.discId===d.id));
+    profs.forEach(p=>{
+      const div=document.createElement('div'); div.className='draggable-disc';
+      div.draggable=true; div.dataset.disc=d.id; div.dataset.prof=p.id;
+      div.textContent=`${d.nome} — ${p.nome}`;
+      div.addEventListener('dragstart', e=>{
+        e.dataTransfer.setData('text/plain', JSON.stringify({discId:d.id, profId:p.id}));
+        e.dataTransfer.effectAllowed='copy';
+      });
+      shelf.appendChild(div);
     });
   });
 }
 
-/* ====== INIT ====== */
+/* ===== MODAIS ===== */
+function openModal(id){$('#'+id).classList.add('show');}
+function closeModal(id){$('#'+id).classList.remove('show');}
+
+/* ===== BOTÕES CADASTRO ===== */
+$('#btnAddDisc').onclick = ()=>{ $('#inputDiscNome').value=''; openModal('modalDisciplina'); }
+$('#btnAddTurma').onclick = ()=>{ $('#inputTurmaNome').value=''; openModal('modalTurma'); }
+$('#btnAddProf').onclick = ()=>{ $('#inputProfNome').value=''; $('#inputProfDias').value=''; openModal('modalProfessor'); }
+
+/* ===== SALVAR ===== */
+function saveDisc(){ const nome=$('#inputDiscNome').value.trim(); if(!nome) return alert('Digite o nome'); state.disciplinas.push({id:uid('disc'), nome}); save(); renderAll(); closeModal('modalDisciplina'); }
+function saveTurma(){ const nome=$('#inputTurmaNome').value.trim(); if(!nome) return alert('Digite o nome'); state.turmas.push({id:uid('turma'), nome}); save(); renderAll(); closeModal('modalTurma'); }
+function saveProf(){ const nome=$('#inputProfNome').value.trim(); if(!nome) return alert('Digite o nome'); const dias = Array.from($('#inputProfDias').selectedOptions).map(o=>o.value); state.professores.push({id:uid('prof'), nome, dias, assignments:[]}); save(); renderAll(); closeModal('modalProfessor'); }
+
+/* ===== LISTENER REMOÇÃO ===== */
+document.body.addEventListener('click', e=>{
+  const act = e.target.dataset.act; const id = e.target.dataset.id;
+  if(!act || !id) return;
+  if(act==='disc-del'){ if(confirm('Remover disciplina?')) { state.disciplinas=state.disciplinas.filter(d=>d.id!==id); save(); renderAll(); }}
+  if(act==='turma-del'){ if(confirm('Remover turma?')) { state.turmas=state.turmas.filter(t=>t.id!==id); save(); renderAll(); }}
+  if(act==='prof-del'){ if(confirm('Remover professor?')) { state.professores=state.professores.filter(p=>p.id!==id); save(); renderAll(); }}
+});
+
+/* ===== SELECT TURMA ===== */
 function refreshSelectTurma(){
-  const sel=$('#selectTurma'); if(!sel) return;
-  sel.innerHTML=''; state.turmas.forEach(t=>{ const o=document.createElement('option'); o.value=t.id; o.textContent=t.nome; sel.appendChild(o);});
+  const sel=$('#selectTurma'); sel.innerHTML='';
+  state.turmas.forEach(t=>{ const opt=document.createElement('option'); opt.value=t.id; opt.textContent=t.nome; sel.appendChild(opt); })
 }
-function init(){
-  refreshSelectTurma(); renderPrateleira();
-  const tid=$('#selectTurma')?.value; if(tid){ensureHorario(tid, parseInt($('#periodosCount').value,10)); renderGrid(tid);}
+
+/* ===== GRADE ===== */
+$('#btnRenderGrid').onclick=()=>{renderGrid();}
+
+function renderGrid(){
+  const n=parseInt($('#periodosCount').value);
+  const selTurma=$('#selectTurma').value; if(!selTurma) return alert('Selecione uma turma');
+  const grid=$('#gridArea'); grid.innerHTML='';
+  const table=document.createElement('table'); table.className='schedule';
+  const thead=document.createElement('thead'); const trh=document.createElement('tr'); trh.innerHTML='<th>Dia / Período</th>';
+  for(let i=1;i<=n;i++){ const th=document.createElement('th'); th.textContent='Per '+i; trh.appendChild(th); }
+  thead.appendChild(trh); table.appendChild(thead);
+  const tbody=document.createElement('tbody');
+  DAYS.forEach(dia=>{
+    const tr=document.createElement('tr');
+    const th=document.createElement('th'); th.textContent=dia; tr.appendChild(th);
+    for(let i=1;i<=n;i++){
+      const td=document.createElement('td'); td.className='cell droppable-grid';
+      td.dataset.dia=dia; td.dataset.periodo=i;
+      td.addEventListener('dragover', e=>{e.preventDefault(); td.classList.add('droptarget');})
+      td.addEventListener('dragleave', e=>{td.classList.remove('droptarget');})
+      td.addEventListener('drop', e=>{
+        e.preventDefault(); td.classList.remove('droptarget');
+        const data=JSON.parse(e.dataTransfer.getData('text/plain'));
+        const div=document.createElement('div'); div.className='assign';
+        div.innerHTML=`<div class="disc">${findDisc(data.discId).nome}</div><div class="prof">${findProf(data.profId).nome}</div>`;
+        td.appendChild(div);
+        if(!state.horarios[selTurma]) state.horarios[selTurma]={};
+        if(!state.horarios[selTurma][dia]) state.horarios[selTurma][dia]={};
+        state.horarios[selTurma][dia][i]=data;
+        save();
+      })
+      tr.appendChild(td);
+    }
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody); grid.appendChild(table);
 }
-$('#btnRenderGrid').addEventListener('click',()=>{ const tid=$('#selectTurma').value; ensureHorario(tid, parseInt($('#periodosCount').value,10)); renderGrid(tid); });
-init();
+
+/* ===== INIT ===== */
+renderAll();
 </script>
 </body>
 </html>
