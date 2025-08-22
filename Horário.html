@@ -1,1 +1,527 @@
-fgyuygghhh
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Sistema de Horários - Turmas, Disciplinas, Professores</title>
+<style>
+  :root{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; --gap:10px;}
+  body{margin:0;padding:20px;background:#f5f7fb;color:#111}
+  h1,h2{margin:0 0 12px 0}
+  .container{display:grid;grid-template-columns:360px 1fr;gap:20px}
+  .card{background:#fff;border-radius:8px;padding:14px;box-shadow:0 2px 8px rgba(20,30,60,0.06)}
+  label{display:block;margin:8px 0 6px;font-weight:600;font-size:13px}
+  input[type=text], select{width:100%;padding:8px;border-radius:6px;border:1px solid #d8dee9;background:#fbfcff}
+  button{padding:8px 12px;border-radius:6px;border:0;background:#2463ff;color:white;cursor:pointer}
+  button.ghost{background:transparent;color:#2463ff;border:1px solid #e1e6ff}
+  .small{font-size:13px;padding:6px 8px}
+  .list{max-height:180px;overflow:auto;margin-top:8px;border-top:1px dashed #eef2ff;padding-top:8px}
+  .item{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #f1f4fb}
+  .muted{color:#5b6b85;font-size:13px}
+  .row{display:flex;gap:8px;align-items:center}
+  .checkboxes{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{display:inline-flex;align-items:center;gap:6px;padding:6px 8px;border-radius:999px;background:#f1f5ff;border:1px solid #e6eeff;font-size:13px}
+  .grid{display:grid;gap:10px}
+  /* schedule grid */
+  .schedule-wrap{overflow:auto}
+  table.schedule{width:100%;border-collapse:collapse}
+  table.schedule th, table.schedule td{border:1px solid #e6edf5;padding:8px;text-align:center;min-width:120px}
+  table.schedule th{background:#fbfcff;font-weight:700}
+  .cell{min-height:60px;display:flex;flex-direction:column;gap:6px;align-items:center;justify-content:center}
+  .cell .assign{font-size:12px;padding:4px 6px;border-radius:6px;background:#eaf3ff;border:1px solid #cfe2ff}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .danger{background:#ffefef;color:#a80000}
+  .success{background:#eefef3;color:#006a2a;border:1px solid #bfeed0}
+  .note{font-size:13px;color:#4a5a72;margin-top:6px}
+  footer{margin-top:18px;text-align:center;color:#627385;font-size:13px}
+  .flex-between{display:flex;justify-content:space-between;align-items:center}
+</style>
+</head>
+<body>
+  <h1>Sistema de Horários — Turmas · Disciplinas · Professores</h1>
+  <p class="muted">Cadastre turmas, disciplinas e professores (com disciplinas e dias disponíveis). Depois monte o horário manualmente.</p>
+
+  <div class="container">
+    <div>
+      <div class="card" id="cadastros">
+        <h2>Cadastros</h2>
+
+        <!-- Disciplina -->
+        <label for="disciplinaNome">Nova disciplina</label>
+        <div class="row">
+          <input id="disciplinaNome" type="text" placeholder="Ex: Matemática" />
+          <button id="btnAddDisciplina">Adicionar</button>
+        </div>
+        <div class="list" id="listaDisciplinas"><!-- disciplinas aparecem aqui --></div>
+
+        <hr style="margin:12px 0;border:none;border-top:1px dashed #eef2ff">
+
+        <!-- Turma -->
+        <label for="turmaNome">Nova turma</label>
+        <div class="row">
+          <input id="turmaNome" type="text" placeholder="Ex: 6º ano A / 7º ano B" />
+          <button id="btnAddTurma">Adicionar</button>
+        </div>
+        <div class="list" id="listaTurmas"><!-- turmas --></div>
+
+        <hr style="margin:12px 0;border:none;border-top:1px dashed #eef2ff">
+
+        <!-- Professor -->
+        <h3 style="margin-top:0">Cadastrar professor</h3>
+        <label for="profNome">Nome do professor</label>
+        <input id="profNome" type="text" placeholder="Ex: João da Silva" />
+
+        <label>Disciplinas que leciona</label>
+        <div id="disciplinasCheckboxes" class="checkboxes"></div>
+
+        <label>Dias disponíveis</label>
+        <div id="diasCheckboxes" class="checkboxes">
+          <label class="chip"><input type="checkbox" value="Segunda" /> Segunda</label>
+          <label class="chip"><input type="checkbox" value="Terça" /> Terça</label>
+          <label class="chip"><input type="checkbox" value="Quarta" /> Quarta</label>
+          <label class="chip"><input type="checkbox" value="Quinta" /> Quinta</label>
+          <label class="chip"><input type="checkbox" value="Sexta" /> Sexta</label>
+          <label class="chip"><input type="checkbox" value="Sábado" /> Sábado</label>
+        </div>
+
+        <div class="row" style="margin-top:8px">
+          <button id="btnAddProfessor">Cadastrar professor</button>
+          <button id="btnLimparProf" class="ghost small">Limpar</button>
+        </div>
+
+        <div class="list" id="listaProfessores"><!-- professores --></div>
+
+        <div style="margin-top:12px" class="controls">
+          <button id="btnExport" class="small">Exportar JSON</button>
+          <label class="ghost chip small" style="padding:6px 10px">
+            Importar JSON
+            <input id="inputImport" type="file" accept="application/json" style="display:none" />
+          </label>
+          <button id="btnClearAll" class="danger small">Apagar tudo</button>
+        </div>
+
+        <p class="note">Os cadastros ficam salvos localmente no seu navegador (localStorage).</p>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <div class="flex-between">
+          <h2>Montar horário manual</h2>
+          <div>
+            <label style="display:inline-block; margin-right:8px">Períodos por dia</label>
+            <select id="periodosCount">
+              <option value="4">4</option>
+              <option value="5" selected>5</option>
+              <option value="6">6</option>
+            </select>
+            <button id="btnRenderGrid" class="small">Gerar grid</button>
+          </div>
+        </div>
+
+        <div style="margin-top:10px" class="row">
+          <label for="selectTurma">Turma (para montar horário)</label>
+          <select id="selectTurma"></select>
+
+          <label for="selectDisciplina" style="margin-left:8px">Disciplina</label>
+          <select id="selectDisciplina"></select>
+
+          <label for="selectProfessor" style="margin-left:8px">Professor</label>
+          <select id="selectProfessor"></select>
+        </div>
+
+        <div class="row" style="margin-top:10px">
+          <button id="btnAssignCell">Atribuir à célula selecionada</button>
+          <button id="btnClearCell" class="ghost">Limpar célula</button>
+          <button id="btnSaveHorario" class="success">Salvar horário</button>
+          <button id="btnLoadHorario" class="ghost">Carregar horário salvo</button>
+        </div>
+
+        <p class="note">Selecione uma célula na tabela (dia × período), escolha Turma + Disciplina + Professor e clique em <b>Atribuir</b>. O sistema checa se o professor leciona a disciplina e se está disponível no dia.</p>
+
+        <div style="margin-top:12px" id="gridArea" class="schedule-wrap"><!-- grid será inserida aqui --></div>
+
+        <div style="margin-top:10px" class="row">
+          <button id="btnExportHorario" class="small">Exportar horário atual (JSON)</button>
+          <button id="btnClearHorario" class="danger small">Limpar horário atual</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Sistema simples de horários — salva localmente no navegador. Desenvolvido para montar horários manualmente.
+  </footer>
+
+<script>
+/* ---------- Estrutura de dados no localStorage ----------
+dados = {
+  disciplinas: [{id, nome}],
+  turmas: [{id, nome}],
+  professores: [{id, nome, disciplinas: [id,...], dias: ["Segunda",...]}],
+  horarios: { '<turmaId>': { periodos: N, grid: { 'Segunda': ['cell0','cell1',...], ... }, createdAt } }
+}
+-------------------------------------------------------- */
+
+const LS_KEY = 'sis_horarios_v1';
+
+let state = {
+  disciplinas: [],
+  turmas: [],
+  professores: [],
+  horarios: {} // por turma
+};
+
+function uid(prefix='id'){return prefix+'_'+Math.random().toString(36).slice(2,9)}
+
+// --------- persistência ----------
+function saveState(){ localStorage.setItem(LS_KEY, JSON.stringify(state)); }
+function loadState(){
+  const raw = localStorage.getItem(LS_KEY);
+  if(raw) try{ state = JSON.parse(raw) }catch(e){ console.error(e); }
+}
+loadState();
+
+// --------- helpers DOM ----------
+const $ = sel => document.querySelector(sel);
+const $$ = sel => Array.from(document.querySelectorAll(sel));
+
+// --------- render listas de cadastros ----------
+function renderDisciplinas(){
+  const el = $('#listaDisciplinas'); el.innerHTML = '';
+  const checkWrap = $('#disciplinasCheckboxes'); checkWrap.innerHTML = '';
+  if(state.disciplinas.length===0){ el.innerHTML = '<div class="muted">Nenhuma disciplina cadastrada.</div>'}
+  state.disciplinas.forEach(d=>{
+    const div = document.createElement('div'); div.className='item';
+    div.innerHTML = `<div>${d.nome}</div><div><button data-id="${d.id}" class="btnDelDisc small ghost">Excluir</button></div>`;
+    el.appendChild(div);
+    // checkbox for professor form
+    const lab = document.createElement('label'); lab.className='chip';
+    lab.innerHTML = `<input type="checkbox" value="${d.id}" /> ${d.nome}`;
+    checkWrap.appendChild(lab);
+  });
+  refreshSelects();
+}
+
+function renderTurmas(){
+  const el = $('#listaTurmas'); el.innerHTML='';
+  if(state.turmas.length===0){ el.innerHTML = '<div class="muted">Nenhuma turma cadastrada.</div>'}
+  state.turmas.forEach(t=>{
+    const div = document.createElement('div'); div.className='item';
+    div.innerHTML = `<div>${t.nome}</div><div><button data-id="${t.id}" class="btnDelTurma small ghost">Excluir</button></div>`;
+    el.appendChild(div);
+  });
+  refreshSelects();
+}
+
+function renderProfessores(){
+  const el = $('#listaProfessores'); el.innerHTML='';
+  if(state.professores.length===0){ el.innerHTML = '<div class="muted">Nenhum professor cadastrado.</div>'}
+  state.professores.forEach(p=>{
+    const discNames = p.disciplinas.map(id=>findDiscById(id)?.nome || '—').join(', ');
+    const dias = p.dias.join(', ');
+    const div = document.createElement('div'); div.className='item';
+    div.innerHTML = `<div><b>${p.nome}</b><div class="muted">${discNames || '—'}</div></div>
+                     <div style="text-align:right">
+                       <div class="muted">${dias || '—'}</div>
+                       <button data-id="${p.id}" class="btnDelProf small ghost">Excluir</button>
+                     </div>`;
+    el.appendChild(div);
+  });
+  refreshSelects();
+}
+
+function refreshSelects(){
+  // atualiza selects de Turma, Disciplina e Professor para montar horário
+  const st = $('#selectTurma'); const sd = $('#selectDisciplina'); const sp = $('#selectProfessor');
+  st.innerHTML = ''; sd.innerHTML = ''; sp.innerHTML = '';
+  state.turmas.forEach(t=> st.appendChild(opt(t.id, t.nome)));
+  state.disciplinas.forEach(d=> sd.appendChild(opt(d.id, d.nome)));
+  state.professores.forEach(p=> sp.appendChild(opt(p.id, p.nome)));
+}
+
+// --------- util finders ----------
+function findDiscById(id){ return state.disciplinas.find(d=>d.id===id) }
+function findTurmaById(id){ return state.turmas.find(t=>t.id===id) }
+function findProfById(id){ return state.professores.find(p=>p.id===id) }
+function opt(val, txt){ const o = document.createElement('option'); o.value=val; o.textContent = txt; return o; }
+
+// --------- ações de cadastro ----------
+$('#btnAddDisciplina').addEventListener('click', ()=>{
+  const nome = $('#disciplinaNome').value.trim();
+  if(!nome){ alert('Digite o nome da disciplina.'); return; }
+  const exists = state.disciplinas.some(d=>d.nome.toLowerCase()===nome.toLowerCase());
+  if(exists){ alert('Essa disciplina já existe.'); return; }
+  state.disciplinas.push({id:uid('disc'), nome});
+  $('#disciplinaNome').value='';
+  saveState(); renderDisciplinas();
+});
+
+$('#btnAddTurma').addEventListener('click', ()=>{
+  const nome = $('#turmaNome').value.trim();
+  if(!nome){ alert('Digite o nome da turma.'); return; }
+  const exists = state.turmas.some(t=>t.nome.toLowerCase()===nome.toLowerCase());
+  if(exists){ alert('Essa turma já existe.'); return; }
+  state.turmas.push({id:uid('turma'), nome});
+  $('#turmaNome').value='';
+  saveState(); renderTurmas();
+});
+
+$('#btnAddProfessor').addEventListener('click', ()=>{
+  const nome = $('#profNome').value.trim();
+  if(!nome){ alert('Digite o nome do professor.'); return; }
+  // disciplinas selecionadas
+  const discSel = Array.from(document.querySelectorAll('#disciplinasCheckboxes input[type=checkbox]:checked')).map(i=>i.value);
+  if(discSel.length===0){ if(!confirm('Nenhuma disciplina selecionada. Deseja cadastrar o professor mesmo assim?')) return; }
+  const diasSel = Array.from(document.querySelectorAll('#diasCheckboxes input[type=checkbox]:checked')).map(i=>i.value);
+  state.professores.push({id:uid('prof'), nome, disciplinas: discSel, dias: diasSel});
+  // limpar form
+  $('#profNome').value='';
+  document.querySelectorAll('#disciplinasCheckboxes input[type=checkbox]').forEach(i=>i.checked=false);
+  document.querySelectorAll('#diasCheckboxes input[type=checkbox]').forEach(i=>i.checked=false);
+  saveState(); renderProfessores();
+});
+
+$('#btnLimparProf').addEventListener('click', ()=>{
+  $('#profNome').value='';
+  document.querySelectorAll('#disciplinasCheckboxes input[type=checkbox]').forEach(i=>i.checked=false);
+  document.querySelectorAll('#diasCheckboxes input[type=checkbox]').forEach(i=>i.checked=false);
+});
+
+// deletar (event delegation)
+document.addEventListener('click', (ev)=>{
+  if(ev.target.matches('.btnDelDisc')){
+    const id = ev.target.dataset.id;
+    if(!confirm('Excluir disciplina? Isso removerá a disciplina dos professores, mas horários precisam ser ajustados manualmente.')) return;
+    state.disciplinas = state.disciplinas.filter(d=>d.id!==id);
+    // remover disciplina de professores
+    state.professores.forEach(p=> p.disciplinas = p.disciplinas.filter(x=>x!==id));
+    saveState(); renderDisciplinas(); renderProfessores();
+  }
+  if(ev.target.matches('.btnDelTurma')){
+    const id = ev.target.dataset.id;
+    if(!confirm('Excluir turma? Horário associado a essa turma também será removido.')) return;
+    state.turmas = state.turmas.filter(t=>t.id!==id);
+    delete state.horarios[id];
+    saveState(); renderTurmas(); renderHorariosGrid(); 
+  }
+  if(ev.target.matches('.btnDelProf')){
+    const id = ev.target.dataset.id;
+    if(!confirm('Excluir professor? Atribuições no horário permanecem, será necessário ajustar manualmente.')) return;
+    state.professores = state.professores.filter(p=>p.id!==id);
+    saveState(); renderProfessores(); renderHorariosGrid();
+  }
+});
+
+// exportar / importar JSON
+$('#btnExport').addEventListener('click', ()=>{
+  const dataStr = JSON.stringify(state, null, 2);
+  const blob = new Blob([dataStr], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download = 'sis_horarios_backup.json'; document.body.appendChild(a); a.click();
+  a.remove(); URL.revokeObjectURL(url);
+});
+
+$('#inputImport').addEventListener('change', (ev)=>{
+  const f = ev.target.files[0];
+  if(!f) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try{
+      const imported = JSON.parse(e.target.result);
+      if(!confirm('Substituir os dados locais pelos dados do arquivo importado?')) return;
+      state = imported;
+      saveState();
+      renderDisciplinas(); renderTurmas(); renderProfessores(); renderHorariosGrid();
+      alert('Importação concluída.');
+    }catch(err){ alert('Arquivo inválido.'); }
+  };
+  reader.readAsText(f);
+});
+
+$('#btnClearAll').addEventListener('click', ()=>{
+  if(!confirm('Apagar todos os dados locais (disciplinas, turmas, professores e horários)?')) return;
+  state = {disciplinas:[], turmas:[], professores:[], horarios:{}};
+  saveState(); renderDisciplinas(); renderTurmas(); renderProfessores(); renderHorariosGrid();
+});
+
+// --------- grade de horários ----------
+const DAYS = ['Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
+
+let currentGrid = {
+  turmaId: null,
+  periodos: 5,
+  selectedCell: null, // {dia, periodoIndex}
+  grid: {} // dia -> array(periodos) each cell {turmaId, disciplinaId, professorId}
+};
+
+function ensureHorarioForTurma(turmaId, periodos){
+  if(!state.horarios[turmaId]) {
+    const g = {};
+    DAYS.forEach(day=> g[day] = Array(periodos).fill(null));
+    state.horarios[turmaId] = {periodos, grid: g, createdAt: new Date().toISOString()};
+    saveState();
+  } else {
+    // se o número de períodos mudou, ajustar
+    if(state.horarios[turmaId].periodos !== periodos){
+      const old = state.horarios[turmaId];
+      const g = {};
+      DAYS.forEach(day=>{
+        const arr = old.grid[day] || [];
+        const newArr = Array.from({length:periodos}).map((_,i)=> arr[i] || null);
+        g[day] = newArr;
+      });
+      state.horarios[turmaId] = {periodos, grid: g, createdAt: new Date().toISOString()};
+      saveState();
+    }
+  }
+}
+
+function renderHorariosGrid(){
+  const area = $('#gridArea'); area.innerHTML = '';
+  const turmaSelect = $('#selectTurma');
+  if(!turmaSelect.value){ area.innerHTML = '<div class="muted">Cadastre pelo menos uma turma e selecione-a aqui.</div>'; return; }
+  const turmaId = turmaSelect.value;
+  const periodos = parseInt($('#periodosCount').value, 10);
+  ensureHorarioForTurma(turmaId, periodos);
+  const horarioObj = state.horarios[turmaId];
+  currentGrid.turmaId = turmaId;
+  currentGrid.periodos = horarioObj.periodos;
+  currentGrid.grid = horarioObj.grid;
+  currentGrid.selectedCell = null;
+
+  // construir tabela
+  const table = document.createElement('table'); table.className='schedule';
+  const thead = document.createElement('thead');
+  const trh = document.createElement('tr');
+  trh.appendChild(document.createElement('th')).textContent = 'Período \\ Dia';
+  DAYS.forEach(d=> { const th = document.createElement('th'); th.textContent = d; trh.appendChild(th); });
+  thead.appendChild(trh);
+  table.appendChild(thead);
+
+  const tbody = document.createElement('tbody');
+  for(let p=0;p<currentGrid.periodos;p++){
+    const tr = document.createElement('tr');
+    const th = document.createElement('th'); th.textContent = 'Período ' + (p+1);
+    tr.appendChild(th);
+    DAYS.forEach(d=>{
+      const td = document.createElement('td');
+      td.dataset.dia = d; td.dataset.periodo = p;
+      td.className = 'cell';
+      const cellData = (currentGrid.grid[d] && currentGrid.grid[d][p]) || null;
+      if(cellData){
+        const discName = findDiscById(cellData.disciplinaId)?.nome || '—';
+        const profName = findProfById(cellData.professorId)?.nome || '—';
+        td.innerHTML = `<div class="assign"><b>${discName}</b></div><div class="muted">${profName}</div>`;
+      } else {
+        td.innerHTML = `<div class="muted">— vazio —</div>`;
+      }
+      // click to select
+      td.addEventListener('click', ()=> {
+        // highlight selection
+        document.querySelectorAll('td.cell').forEach(x=> x.style.outline = 'none');
+        td.style.outline = '3px solid rgba(36,99,255,0.12)';
+        currentGrid.selectedCell = {dia: d, periodo: p};
+      });
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  }
+  table.appendChild(tbody);
+  area.appendChild(table);
+}
+
+// botão gerar grid (quando alterar períodos)
+$('#btnRenderGrid').addEventListener('click', ()=>{
+  if(!$('#selectTurma').value){ alert('Selecione uma turma antes de gerar o grid.'); return; }
+  renderHorariosGrid();
+});
+
+// ao alterar turma, renderiza grid
+$('#selectTurma').addEventListener('change', ()=> {
+  renderHorariosGrid();
+});
+
+// quando mudar lista de disciplinas/professores, poderia atualizar selects - já temos refreshSelects
+
+// atribuir célula
+$('#btnAssignCell').addEventListener('click', ()=>{
+  if(!currentGrid.selectedCell){ alert('Selecione uma célula (clique sobre a célula desejada na tabela).'); return; }
+  const turmaId = $('#selectTurma').value;
+  const discId = $('#selectDisciplina').value;
+  const profId = $('#selectProfessor').value;
+  if(!discId || !profId || !turmaId) { alert('Selecione turma, disciplina e professor.'); return; }
+  const prof = findProfById(profId);
+  const dia = currentGrid.selectedCell.dia;
+  // validações: professor leciona disciplina?
+  if(!(prof.disciplinas || []).includes(discId)){
+    alert('Atenção: esse professor NÃO leciona a disciplina selecionada.');
+    return;
+  }
+  // validação: professor disponível no dia?
+  if(!(prof.dias || []).includes(dia)){
+    alert('Atenção: esse professor NÃO está disponível no dia ' + dia + '.');
+    return;
+  }
+  // se ok, atribui
+  currentGrid.grid[dia][currentGrid.selectedCell.periodo] = {turmaId, disciplinaId: discId, professorId: profId};
+  // persiste
+  state.horarios[turmaId] = { periodos: currentGrid.periodos, grid: currentGrid.grid, createdAt: new Date().toISOString() };
+  saveState();
+  renderHorariosGrid();
+});
+
+// limpar célula selecionada
+$('#btnClearCell').addEventListener('click', ()=>{
+  if(!currentGrid.selectedCell){ alert('Selecione uma célula.'); return; }
+  const dia = currentGrid.selectedCell.dia, p = currentGrid.selectedCell.periodo;
+  currentGrid.grid[dia][p] = null;
+  state.horarios[currentGrid.turmaId] = { periodos: currentGrid.periodos, grid: currentGrid.grid, createdAt: new Date().toISOString() };
+  saveState(); renderHorariosGrid();
+});
+
+// salvar horário (já salva automaticamente nas ações, mas manter botão)
+$('#btnSaveHorario').addEventListener('click', ()=>{
+  if(!currentGrid.turmaId){ alert('Selecione uma turma.'); return; }
+  state.horarios[currentGrid.turmaId] = { periodos: currentGrid.periodos, grid: currentGrid.grid, createdAt: new Date().toISOString() };
+  saveState();
+  alert('Horário salvo localmente.');
+});
+
+$('#btnLoadHorario').addEventListener('click', ()=>{
+  if(!$('#selectTurma').value){ alert('Selecione uma turma.'); return; }
+  renderHorariosGrid();
+});
+
+// export horario atual
+$('#btnExportHorario').addEventListener('click', ()=>{
+  if(!currentGrid.turmaId){ alert('Selecione uma turma.'); return; }
+  const payload = { turma: findTurmaById(currentGrid.turmaId), horario: state.horarios[currentGrid.turmaId], professores: state.professores, disciplinas: state.disciplinas };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download = `horario_${payload.turma?.nome || 'turma'}.json`; document.body.appendChild(a); a.click();
+  a.remove(); URL.revokeObjectURL(url);
+});
+
+// limpar horário atual
+$('#btnClearHorario').addEventListener('click', ()=>{
+  if(!currentGrid.turmaId){ alert('Selecione uma turma.'); return; }
+  if(!confirm('Limpar todo o horário desta turma?')) return;
+  const periodos = currentGrid.periodos;
+  const g = {}; DAYS.forEach(d=> g[d] = Array(periodos).fill(null));
+  state.horarios[currentGrid.turmaId] = {periodos, grid: g, createdAt: new Date().toISOString()};
+  saveState(); renderHorariosGrid();
+});
+
+// inicialização UI
+function init(){
+  renderDisciplinas(); renderTurmas(); renderProfessores();
+  // populate selects
+  if(state.turmas.length>0) $('#selectTurma').value = state.turmas[0].id;
+  renderHorariosGrid();
+}
+init();
+
+</script>
+</body>
+</html>
