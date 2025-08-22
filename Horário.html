@@ -5,57 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sistema de Criação de Horários Escolares</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0; padding: 0;
-      background: #f0f2f5;
-    }
-    header {
-      background: #2463ff;
-      color: #fff;
-      padding: 15px;
-      text-align: center;
-    }
-    main {
-      display: flex;
-      gap: 20px;
-      padding: 20px;
-    }
-    section {
-      background: #fff;
-      padding: 15px;
-      border-radius: 10px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      flex: 1;
-    }
-    h2 { font-size: 18px; margin-bottom: 10px; }
-    input, select, button {
-      margin: 5px 0;
-      padding: 6px;
-      width: 100%;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
-    button {
-      background: #2463ff;
-      color: #fff;
-      border: none;
-      cursor: pointer;
-    }
-    button:hover { background: #1d4cd8; }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-    }
-    table, th, td {
-      border: 1px solid #ccc;
-    }
-    th, td {
-      padding: 8px;
-      text-align: center;
-    }
-    .disciplinas { margin-top: 10px; }
+    body { font-family: Arial, sans-serif; background: #f0f2f5; margin:0; padding:0; }
+    header { background:#2463ff; color:#fff; padding:15px; text-align:center; }
+    main { display:flex; flex-wrap:wrap; gap:20px; padding:20px; }
+    section { background:#fff; padding:15px; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,.1); flex:1; min-width:320px; }
+    h2{font-size:18px; margin-bottom:10px;}
+    input, select, button { margin:5px 0; padding:6px; width:100%; border-radius:5px; border:1px solid #ccc; }
+    button{background:#2463ff; color:#fff; border:none; cursor:pointer;}
+    button:hover{background:#1d4cd8;}
+    table{width:100%; border-collapse:collapse; margin-top:10px;}
+    table, th, td{border:1px solid #ccc;}
+    th, td{padding:8px; text-align:center;}
+    td[contenteditable="true"]{background:#fafafa; cursor:pointer;}
+    ul{list-style:none; padding:0;}
   </style>
 </head>
 <body>
@@ -80,7 +42,8 @@
 
     <h3>Professores</h3>
     <input type="text" id="professor" placeholder="Nome do professor">
-    <select id="professorDisciplina"></select>
+    <label>Selecione as disciplinas:</label>
+    <select id="professorDisciplinas" multiple></select>
     <button onclick="cadastrarProfessor()">Cadastrar Professor</button>
     <ul id="listaProfessores"></ul>
   </section>
@@ -104,27 +67,15 @@
       <tbody>
         <tr>
           <td>07:00 - 08:00</td>
-          <td contenteditable="true"></td>
-          <td contenteditable="true"></td>
-          <td contenteditable="true"></td>
-          <td contenteditable="true"></td>
-          <td contenteditable="true"></td>
+          <td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td>
         </tr>
         <tr>
           <td>08:00 - 09:00</td>
-          <td contenteditable="true"></td>
-          <td contenteditable="true"></td>
-          <td contenteditable="true"></td>
-          <td contenteditable="true"></td>
-          <td contenteditable="true"></td>
+          <td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td>
         </tr>
         <tr>
           <td>09:00 - 10:00</td>
-          <td contenteditable="true"></td>
-          <td contenteditable="true"></td>
-          <td contenteditable="true"></td>
-          <td contenteditable="true"></td>
-          <td contenteditable="true"></td>
+          <td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td>
         </tr>
       </tbody>
     </table>
@@ -135,34 +86,42 @@
   let turmas = [];
   let disciplinas = [];
   let professores = [];
+  let horarios = {}; // { turma: { dia_hora: professor } }
 
   function cadastrarTurma() {
-    let nome = document.getElementById('turma').value;
+    let nome = document.getElementById('turma').value.trim();
     if(nome) {
       turmas.push(nome);
       atualizarLista('listaTurmas', turmas);
       atualizarSelect('turmaSelect', turmas);
       document.getElementById('turma').value = '';
+      horarios[nome] = {};
     }
   }
 
   function cadastrarDisciplina() {
-    let nome = document.getElementById('disciplina').value;
+    let nome = document.getElementById('disciplina').value.trim();
     if(nome) {
       disciplinas.push(nome);
       atualizarLista('listaDisciplinas', disciplinas);
-      atualizarSelect('professorDisciplina', disciplinas);
+      atualizarSelect('professorDisciplinas', disciplinas, true);
       document.getElementById('disciplina').value = '';
     }
   }
 
   function cadastrarProfessor() {
-    let nome = document.getElementById('professor').value;
-    let disc = document.getElementById('professorDisciplina').value;
-    if(nome && disc) {
-      professores.push(`${nome} - ${disc}`);
-      atualizarLista('listaProfessores', professores);
+    let nome = document.getElementById('professor').value.trim();
+    let select = document.getElementById('professorDisciplinas');
+    let selecionadas = Array.from(select.selectedOptions).map(opt => opt.value);
+
+    if(nome && selecionadas.length > 0) {
+      professores.push({ nome, disciplinas: selecionadas });
+      let lista = document.getElementById('listaProfessores');
+      let li = document.createElement('li');
+      li.textContent = `${nome} - (${selecionadas.join(", ")})`;
+      lista.appendChild(li);
       document.getElementById('professor').value = '';
+      select.value = null;
     }
   }
 
@@ -176,7 +135,7 @@
     });
   }
 
-  function atualizarSelect(elementoId, array) {
+  function atualizarSelect(elementoId, array, multiple=false) {
     let select = document.getElementById(elementoId);
     select.innerHTML = '';
     array.forEach(item => {
@@ -185,7 +144,31 @@
       option.textContent = item;
       select.appendChild(option);
     });
+    if(multiple) select.multiple = true;
   }
+
+  // --- Validação de conflito ---
+  document.querySelectorAll('#tabelaHorario td[contenteditable="true"]').forEach((celula, colIndex) => {
+    celula.addEventListener('blur', () => {
+      let turma = document.getElementById('turmaSelect').value;
+      let linha = celula.parentNode.rowIndex;
+      let coluna = colIndex; // 1=segunda ... 5=sexta
+      let chave = `${linha}_${coluna}`;
+      let valor = celula.textContent.trim();
+
+      if(valor){
+        // verifica se professor já está em outra turma nesse mesmo horário
+        for(let t in horarios){
+          if(t !== turma && horarios[t][chave] === valor){
+            alert(`⚠️ Conflito! O professor "${valor}" já está na turma "${t}" nesse horário.`);
+            celula.textContent = "";
+            return;
+          }
+        }
+        horarios[turma][chave] = valor;
+      }
+    });
+  });
 </script>
 
 </body>
