@@ -18,6 +18,7 @@ table { border-collapse:collapse; width:100%; }
 th, td { border:1px solid #ccc; padding:8px; text-align:center; min-width:80px; height:40px; }
 td { background:#fafafa; }
 td.dragover { background:#cce5ff; }
+td.bloqueado { background:#eee; color:#aaa; cursor:not-allowed; }
 .meta { font-size:12px; opacity:0.8; }
 </style>
 </head>
@@ -26,7 +27,6 @@ td.dragover { background:#cce5ff; }
 <header><h1>Sistema de Horários Escolares</h1></header>
 <main>
 
-<!-- Cadastro -->
 <section>
 <h2>Cadastro</h2>
 
@@ -63,7 +63,6 @@ td.dragover { background:#cce5ff; }
 <ul id="listaProfessores"></ul>
 </section>
 
-<!-- Prateleira e Tabela -->
 <section id="prateleiraSection">
 <h2>Prateleira de Disciplinas</h2>
 <div id="prateleira"></div>
@@ -96,6 +95,9 @@ let turmas = [];
 let disciplinas = [];
 let professores = [];
 let draggedItem = null;
+
+// cores para disciplinas
+const cores = ['#2463ff','#f39c12','#27ae60','#8e44ad','#c0392b','#16a085','#e67e22'];
 
 // Cadastro Turmas
 function cadastrarTurma(){
@@ -143,18 +145,20 @@ function cadastrarProfessor(){
     document.getElementById('listaProfessores').appendChild(li);
     document.getElementById('professor').value=''; sel.value=null; document.getElementById('cargaDisciplina').innerHTML=''; document.querySelectorAll('.dias').forEach(d=>d.checked=false);
     atualizarPrateleira();
+    atualizarBloqueios();
   }
 }
 
 // Prateleira
 function atualizarPrateleira(){
   const prateleira=document.getElementById('prateleira'); prateleira.innerHTML='';
-  professores.forEach(p=>{
-    p.disciplinas.forEach(d=>{
+  professores.forEach((p,index)=>{
+    p.disciplinas.forEach((d,i)=>{
       const div = document.createElement('div'); div.className='item'; div.draggable=true;
       div.dataset.professor=p.nome; div.dataset.disciplina=d;
       div.dataset.turma=p.turma; div.dataset.dias=p.dias.join(',');
       div.dataset.meta=p.meta[d]; div.dataset.count=p.count[d];
+      div.style.backgroundColor = cores[i % cores.length];
       div.innerHTML=`<span>${d} - ${p.nome} (${p.turma})</span> <span class="meta">${p.count[d]}/${p.meta[d]}</span>`;
       div.addEventListener('dragstart', e=>{ draggedItem=e.target; });
       prateleira.appendChild(div);
@@ -162,13 +166,30 @@ function atualizarPrateleira(){
   });
 }
 
+// Bloqueia células fora da disponibilidade do professor
+function atualizarBloqueios(){
+  const tabela = document.getElementById('tabelaHorario');
+  const diasMap = ['Segunda','Terça','Quarta','Quinta','Sexta'];
+  Array.from(tabela.rows).forEach((tr,rowIndex)=>{
+    Array.from(tr.cells).forEach((td,colIndex)=>{
+      if(colIndex===0) return; // primeira coluna = horário
+      td.classList.remove('bloqueado');
+      professores.forEach(p=>{
+        if(!p.dias.includes(diasMap[colIndex-1])){
+          td.classList.add('bloqueado');
+        }
+      });
+    });
+  });
+}
+
 // Drag & Drop
 const cells = document.querySelectorAll('#tabelaHorario td');
 cells.forEach(td=>{
-  td.addEventListener('dragover', e=>{ e.preventDefault(); td.classList.add('dragover'); });
+  td.addEventListener('dragover', e=>{ if(!td.classList.contains('bloqueado')) { e.preventDefault(); td.classList.add('dragover'); } });
   td.addEventListener('dragleave', e=>{ td.classList.remove('dragover'); });
   td.addEventListener('drop', e=>{
-    e.preventDefault(); td.classList.remove('dragover'); if(!draggedItem) return;
+    e.preventDefault(); td.classList.remove('dragover'); if(!draggedItem || td.classList.contains('bloqueado')) return;
 
     const profName = draggedItem.dataset.professor;
     const disciplina = draggedItem.dataset.disciplina;
@@ -177,30 +198,26 @@ cells.forEach(td=>{
     const horaIndex = td.parentNode.rowIndex;
     const profObj = professores.find(p => p.nome === profName);
 
-    // Verifica meta de aulas
     if(profObj.count[disciplina] >= profObj.meta[disciplina]){
       alert(`⚠️ Meta de aulas atingida para ${disciplina} - ${profName}`);
       return;
     }
 
-    // Verifica conflito: professor não pode estar em duas turmas no mesmo horário
     const conflito = Array.from(cells).some(c => {
-      if(c === td) return false; // ignora a célula atual
+      if(c === td) return false;
       const partes = c.textContent.split(' - ');
       if(partes.length < 2) return false;
       const prof = partes[1];
-      const turmaC = partes[2]; // se quiser considerar turma na string, ajustar
       const col = c.cellIndex;
       const row = c.parentNode.rowIndex;
       return prof === profName && col === diaIndex && row === horaIndex;
     });
 
     if(conflito){
-      alert(`⚠️ Conflito! ${profName} já está em outra turma nesse mesmo horário.`);
+      alert(`⚠️ Conflito! ${profName} já está em outra turma nesse horário.`);
       return;
     }
 
-    // Atualiza célula e contagem
     if(td.textContent){
       const partes = td.textContent.split(' - ');
       const discOld = partes[0];
@@ -210,8 +227,12 @@ cells.forEach(td=>{
     }
 
     td.textContent = `${disciplina} - ${profName}`;
+    td.style.backgroundColor = cores[disciplinas.indexOf(disciplina)%cores.length];
     profObj.count[disciplina]++;
     atualizarPrateleira();
     draggedItem = null;
   });
 });
+</script>
+</body>
+</html>
