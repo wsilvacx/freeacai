@@ -1,211 +1,253 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sistema de Criação de Horários</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Grade de Horários — Prateleira de Disciplinas</title>
 <style>
-    body { font-family: Arial, sans-serif; margin:0; padding:0; }
-    header { background-color: #4CAF50; color:white; text-align:center; padding:15px; }
-    nav { display:flex; justify-content:center; background:#f0f0f0; }
-    nav button { padding:10px 20px; margin:5px; cursor:pointer; border:none; background:#ddd; border-radius:5px; }
-    nav button.active { background:#4CAF50; color:white; }
-    section { display:none; padding:10px; }
-    section.active { display:block; }
-
-    /* Prateleira e grade */
-    .container { display:flex; flex-wrap: wrap; gap: 20px; }
-    .prateleira { flex:1; min-width:250px; border:2px solid #ccc; padding:10px; border-radius:5px; }
-    .prateleira h2 { text-align:center; }
-    .disciplina { background:#f0f0f0; padding:8px; margin:5px 0; border:1px solid #999; border-radius:3px; cursor:grab; }
-    .grade-horario { flex:3; overflow-x:auto; }
-    table { width:100%; border-collapse:collapse; min-width:600px; }
-    th, td { border:1px solid #ccc; text-align:center; padding:10px; min-width:100px; }
-    th { background:#f4f4f4; }
-    td { height:60px; vertical-align:middle; }
-    td.dragover { background:#d1ffd1; }
-
-    @media(max-width:768px){ .container{flex-direction:column;} }
+  :root{--primary:#2463ff;--bg:#f6f8fc;--card:#fff;--ok:#138a36;--warn:#ad6400;--danger:#c0392b}
+  body{font-family:Inter,Segoe UI,Roboto,Arial;color:#0f172a;background:var(--bg);margin:0;padding:18px}
+  h1,h2{margin:0 0 12px}
+  .layout{display:grid;grid-template-columns:320px 1fr;gap:18px}
+  .card{background:var(--card);border-radius:12px;padding:12px;box-shadow:0 8px 24px rgba(15,30,60,.08)}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+  button{background:var(--primary);color:#fff;border:none;border-radius:9px;padding:6px 10px;cursor:pointer}
+  select,input{padding:6px;border-radius:8px;border:1px solid #e6edf7;background:#fbfdff}
+  .list{margin-top:8px;max-height:600px;overflow:auto;padding-top:4px}
+  .assign{display:flex;flex-direction:column;gap:2px;padding:6px;border-radius:8px;border:1px solid #e8eefc;background:#f9fbff;cursor:grab}
+  .assign .disc{font-weight:700}
+  .assign .prof{font-size:12px;color:#556577}
+  table.schedule{width:100%;border-collapse:collapse;table-layout:fixed;margin-top:10px}
+  table.schedule th,table.schedule td{border:1px solid #e6edf5;padding:6px;text-align:center;vertical-align:middle}
+  table.schedule th{background:#f9fbff}
+  td.cell{height:68px;position:relative}
+  .droptarget{outline:2px dashed #9ab3ff; outline-offset:-4px}
+  .muted{color:#63748a;font-size:13px}
+  strong{display:block}
 </style>
 </head>
 <body>
-<header><h1>Sistema de Criação de Horários</h1></header>
-
-<nav>
-    <button class="tab-button active" data-target="cadastro">Cadastros</button>
-    <button class="tab-button" data-target="horario">Montagem de Horário</button>
-</nav>
-
-<section id="cadastro" class="active">
-    <h2>Cadastros</h2>
-    <div style="display:flex; flex-wrap:wrap; gap:20px;">
-        <div style="flex:1; min-width:200px;">
-            <h3>Turmas</h3>
-            <input type="text" id="nomeTurma" placeholder="Nome da turma">
-            <button onclick="adicionarTurma()">Adicionar</button>
-            <ul id="listaTurmas"></ul>
-        </div>
-        <div style="flex:1; min-width:200px;">
-            <h3>Disciplinas</h3>
-            <input type="text" id="nomeDisciplina" placeholder="Nome da disciplina">
-            <input type="number" id="quantidadeAulas" placeholder="Aulas disponíveis" min="1">
-            <button onclick="adicionarDisciplina()">Adicionar</button>
-            <ul id="listaDisciplinas"></ul>
-        </div>
-        <div style="flex:1; min-width:200px;">
-            <h3>Professores</h3>
-            <input type="text" id="nomeProfessor" placeholder="Nome do professor">
-            <input type="text" id="disciplinasProfessor" placeholder="Disciplinas (separadas por ,)">
-            <button onclick="adicionarProfessor()">Adicionar</button>
-            <ul id="listaProfessores"></ul>
-        </div>
+<h1>Grade de Horários</h1>
+<div class="layout">
+  <!-- Prateleira -->
+  <div class="card">
+    <h2>Disciplinas & Professores</h2>
+    <div id="prateleira" class="list">
+      <!-- itens serão renderizados aqui -->
     </div>
-</section>
+  </div>
 
-<section id="horario">
-    <h2>Montagem de Horário</h2>
-    <div class="container">
-        <div class="prateleira" id="prateleira">
-            <h2>Prateleira</h2>
-        </div>
-        <div class="grade-horario">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Horário</th>
-                        <th>Segunda</th>
-                        <th>Terça</th>
-                        <th>Quarta</th>
-                        <th>Quinta</th>
-                        <th>Sexta</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${[...Array(6)].map((_, i) =>
-                        `<tr>
-                            <td>${i+1}º Horário</td>
-                            <td class="cell" data-day="Segunda"></td>
-                            <td class="cell" data-day="Terça"></td>
-                            <td class="cell" data-day="Quarta"></td>
-                            <td class="cell" data-day="Quinta"></td>
-                            <td class="cell" data-day="Sexta"></td>
-                        </tr>`
-                    ).join('')}
-                </tbody>
-            </table>
-        </div>
+  <!-- Grade de Horários -->
+  <div class="card">
+    <div class="controls">
+      <label>Turma
+        <select id="selectTurma"></select>
+      </label>
+      <label>Períodos
+        <select id="periodosCount">
+          <option value="4">4</option>
+          <option value="5" selected>5</option>
+          <option value="6">6</option>
+        </select>
+      </label>
+      <button id="btnRenderGrid">Gerar grade</button>
     </div>
-    <button onclick="salvarHorario()">Salvar Horário</button>
-    <button onclick="carregarHorario()">Carregar Horário</button>
-</section>
+    <div id="gridArea"></div>
+  </div>
+</div>
 
 <script>
-    // Abas
-    const tabButtons = document.querySelectorAll('.tab-button');
-    const sections = document.querySelectorAll('section');
-    tabButtons.forEach(btn=>{
-        btn.addEventListener('click', ()=>{
-            tabButtons.forEach(b=>b.classList.remove('active'));
-            btn.classList.add('active');
-            sections.forEach(s=>s.classList.remove('active'));
-            document.getElementById(btn.dataset.target).classList.add('active');
-            if(btn.dataset.target==='horario'){ renderPrateleira(); }
-        });
+const LS_KEY='horarios_meta_drag_v2';
+const DAYS=['Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
+let state={disciplinas:[], turmas:[], professores:[], horarios:{}};
+
+function uid(p='id'){return p+'_'+Math.random().toString(36).slice(2,9)}
+function save(){localStorage.setItem(LS_KEY, JSON.stringify(state))}
+function load(){try{const raw=localStorage.getItem(LS_KEY); if(raw) state=JSON.parse(raw);}catch(e){}}
+load();
+
+const $=s=>document.querySelector(s);
+function findDisc(id){return state.disciplinas.find(d=>d.id===id)}
+function findTurma(id){return state.turmas.find(t=>t.id===id)}
+function findProf(id){return state.professores.find(p=>p.id===id)}
+
+function contarAulas(profId, discId, turmaId){
+  let c=0;
+  for(const tid in state.horarios){
+    const h=state.horarios[tid]; if(!h) continue;
+    for(const d of DAYS){
+      const arr=h.grid?.[d]||[];
+      arr.forEach(cell=>{
+        if(cell && cell.professorId===profId && cell.disciplinaId===discId && tid===turmaId) c++;
+      });
+    }
+  }
+  return c;
+}
+
+function isProfBusy(profId, dia, periodo, ignore){
+  for(const tid in state.horarios){
+    const h=state.horarios[tid]; if(!h) continue;
+    const cell=h.grid?.[dia]?.[periodo]||null;
+    if(!cell) continue;
+    if(ignore && tid===ignore.turmaId && dia===ignore.dia && periodo===ignore.periodo) continue;
+    if(cell.professorId===profId) return true;
+  }
+  return false;
+}
+
+/* ====== Prateleira ====== */
+function renderPrateleira(){
+  const prateleira = $('#prateleira');
+  prateleira.innerHTML = '';
+  
+  state.disciplinas.forEach(d => {
+    const container = document.createElement('div');
+    container.style.marginBottom = '10px';
+    
+    const title = document.createElement('strong');
+    title.textContent = d.nome;
+    container.appendChild(title);
+    
+    const profs = state.professores.filter(p => 
+      (p.assignments||[]).some(a => a.discId === d.id)
+    );
+    
+    profs.forEach(p => {
+      const item = document.createElement('div');
+      item.className = 'assign';
+      item.draggable = true;
+      item.style.marginTop = '4px';
+      item.innerHTML = `<div class="disc">${d.nome}</div><div class="prof">${p.nome}</div>`;
+      
+      item.addEventListener('dragstart', ev => {
+        ev.dataTransfer.setData('text/plain', JSON.stringify({profId: p.id, discId: d.id}));
+        ev.dataTransfer.effectAllowed = 'copy';
+      });
+      
+      container.appendChild(item);
     });
+    
+    prateleira.appendChild(container);
+  });
+}
 
-    // Dados
-    let turmas = [];
-    let disciplinas = [];
-    let professores = [];
+/* ====== Grade ====== */
+function refreshSelectTurma(){
+  const sel=$('#selectTurma'); sel.innerHTML='';
+  if(state.turmas.length===0){ sel.innerHTML='<option value="">(Cadastre turmas)</option>'; return; }
+  state.turmas.forEach(t=>{ const o=document.createElement('option'); o.value=t.id; o.textContent=t.nome; sel.appendChild(o); });
+}
 
-    function adicionarTurma(){
-        const nome = document.getElementById('nomeTurma').value.trim();
-        if(nome){ turmas.push(nome); atualizarLista('listaTurmas', turmas); document.getElementById('nomeTurma').value=''; }
-    }
-    function adicionarDisciplina(){
-        const nome = document.getElementById('nomeDisciplina').value.trim();
-        const qtd = parseInt(document.getElementById('quantidadeAulas').value);
-        if(nome && qtd>0){ disciplinas.push({nome, qtd}); atualizarLista('listaDisciplinas', disciplinas.map(d=>`${d.nome} (${d.qtd} aulas)`)); document.getElementById('nomeDisciplina').value=''; document.getElementById('quantidadeAulas').value=''; }
-    }
-    function adicionarProfessor(){
-        const nome = document.getElementById('nomeProfessor').value.trim();
-        const disc = document.getElementById('disciplinasProfessor').value.trim();
-        if(nome && disc){ professores.push({nome, disciplinas: disc.split(',').map(d=>d.trim())}); atualizarLista('listaProfessores', professores.map(p=>`${p.nome} - ${p.disciplinas.join(', ')}`)); document.getElementById('nomeProfessor').value=''; document.getElementById('disciplinasProfessor').value=''; }
-    }
-    function atualizarLista(id, arr){
-        const ul = document.getElementById(id); ul.innerHTML=''; arr.forEach(item=>{ const li=document.createElement('li'); li.textContent=item; ul.appendChild(li); });
-    }
+function ensureHorario(turmaId,periodos){
+  if(!state.horarios[turmaId]){
+    const grid={}; DAYS.forEach(d=>grid[d]=Array(periodos).fill(null));
+    state.horarios[turmaId]={periodos,grid}; save();
+  }else if(state.horarios[turmaId].periodos!==periodos){
+    const old=state.horarios[turmaId]; const grid={};
+    DAYS.forEach(d=>{
+      const arr=old.grid[d]||[];
+      grid[d]=Array.from({length:periodos},(_,i)=>arr[i]||null);
+    });
+    state.horarios[turmaId]={periodos,grid}; save();
+  }
+}
 
-    function renderPrateleira(){
-        const prateleira = document.getElementById('prateleira');
-        prateleira.querySelectorAll('.disciplina').forEach(d=>d.remove());
-        disciplinas.forEach(d=>{
-            professores.forEach(p=>{
-                if(p.disciplinas.includes(d.nome) && d.qtd>0){
-                    const div = document.createElement('div');
-                    div.classList.add('disciplina');
-                    div.draggable = true;
-                    div.dataset.professor = p.nome;
-                    div.dataset.nome = d.nome;
-                    div.dataset.qtd = d.qtd;
-                    div.textContent = `${d.nome} - ${p.nome} (${d.qtd} aulas)`;
-                    div.addEventListener('dragstart', e=>{
-                        e.dataTransfer.setData('text/plain', JSON.stringify({nome:d.nome, professor:p.nome}));
-                    });
-                    prateleira.appendChild(div);
-                }
-            });
+function renderGrid(turmaId){
+  const area=$('#gridArea'); area.innerHTML='';
+  const h=state.horarios[turmaId]; if(!h){area.innerHTML='<div class="muted">Gerar a grade.</div>'; return;}
+  const table=document.createElement('table'); table.className='schedule';
+  const thead=document.createElement('thead'); const trh=document.createElement('tr');
+  trh.innerHTML='<th>Período \\ Dia</th>'+DAYS.map(d=>`<th>${d}</th>`).join(''); thead.appendChild(trh); table.appendChild(thead);
+  const tbody=document.createElement('tbody');
+  for(let p=0;p<h.periodos;p++){
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<th>Período ${p+1}</th>`;
+    DAYS.forEach(d=>{
+      const td=document.createElement('td'); td.className='cell'; td.dataset.turma=turmaId; td.dataset.dia=d; td.dataset.periodo=String(p);
+      const cell=h.grid[d][p];
+      if(cell){
+        const prof=findProf(cell.professorId)?.nome||'—';
+        const disc=findDisc(cell.disciplinaId)?.nome||'—';
+        const box=document.createElement('div'); box.className='assign'; box.draggable=true;
+        box.innerHTML=`<div class="disc">${disc}</div><div class="prof">${prof}</div>`;
+        box.addEventListener('dragstart',(ev)=>{
+          ev.dataTransfer.setData('text/plain', JSON.stringify({from:{turmaId, dia:d, periodo:p}, cell}));
+          ev.dataTransfer.effectAllowed='copyMove';
         });
-        setupDragAndDrop();
-    }
+        td.appendChild(box);
+      }else td.innerHTML='<div class="muted">—</div>';
+      
+      td.addEventListener('dragover',(ev)=>{ev.preventDefault(); td.classList.add('droptarget');});
+      td.addEventListener('dragleave',()=>td.classList.remove('droptarget'));
+      td.addEventListener('drop',(ev)=>{td.classList.remove('droptarget'); handleDrop(td, ev);});
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  }
+  table.appendChild(tbody); area.appendChild(table);
+}
 
-    function setupDragAndDrop(){
-        const cells = document.querySelectorAll('.cell');
-        cells.forEach(cell=>{
-            cell.addEventListener('dragover', e=>{ e.preventDefault(); cell.classList.add('dragover'); });
-            cell.addEventListener('dragleave', e=>{ cell.classList.remove('dragover'); });
-            cell.addEventListener('drop', e=>{
-                e.preventDefault();
-                cell.classList.remove('dragover');
-                const data = JSON.parse(e.dataTransfer.getData('text/plain'));
-                if(cell.textContent){ // devolve aula anterior
-                    const [nomeAnt, profAnt] = cell.textContent.split(' - ');
-                    const discAnt = disciplinas.find(d=>d.nome===nomeAnt.trim());
-                    discAnt.qtd+=1;
-                }
-                const sameTimeCells = Array.from(cells).filter(c=>c.dataset.day===cell.dataset.day);
-                const conflict = sameTimeCells.some(c=>c.textContent.includes(data.professor));
-                if(conflict){ alert('Conflito: Este professor já está alocado neste horário.'); return; }
-                cell.textContent = `${data.nome} - ${data.professor}`;
-                const disc = disciplinas.find(d=>d.nome===data.nome);
-                disc.qtd -=1;
-                renderPrateleira();
-            });
-        });
-    }
+/* ====== Drop Handler ====== */
+function handleDrop(targetTd, ev){
+  ev.preventDefault();
+  targetTd.classList.remove('droptarget');
+  const payload = JSON.parse(ev.dataTransfer.getData('text/plain')||'{}');
+  const dst = {turmaId: targetTd.dataset.turma, dia: targetTd.dataset.dia, periodo: parseInt(targetTd.dataset.periodo,10)};
+  const dstExisting = state.horarios[dst.turmaId]?.grid[dst.dia]?.[dst.periodo] || null;
 
-    function salvarHorario(){
-        const horario = [];
-        document.querySelectorAll('.cell').forEach(cell=>{
-            horario.push(cell.textContent);
-        });
-        localStorage.setItem('horario', JSON.stringify(horario));
-        localStorage.setItem('disciplinas', JSON.stringify(disciplinas));
-        alert('Horário salvo com sucesso!');
-    }
+  // prateleira
+  if(payload.profId && payload.discId){
+    if(dstExisting){ alert('Célula já ocupada!'); return; }
+    if(!canPlace(payload.profId, payload.discId, dst.turmaId, dst.dia, dst.periodo, null)) return;
+    state.horarios[dst.turmaId].grid[dst.dia][dst.periodo] = {professorId: payload.profId, disciplinaId: payload.discId};
+    save(); renderGrid($('#selectTurma').value); return;
+  }
 
-    function carregarHorario(){
-        const horario = JSON.parse(localStorage.getItem('horario') || '[]');
-        const discSalvas = JSON.parse(localStorage.getItem('disciplinas') || '[]');
-        if(horario.length && discSalvas.length){
-            disciplinas = discSalvas;
-            document.querySelectorAll('.cell').forEach((cell,i)=>{
-                cell.textContent = horario[i];
-            });
-            renderPrateleira();
-            alert('Horário carregado!');
-        }
+  // mover/copy antigo
+  if(!payload.from || !payload.cell) return;
+  const src = payload.from; const srcCell = payload.cell;
+  const copyMode = ev.ctrlKey || ev.metaKey;
+  if(src.turmaId===dst.turmaId && src.dia===dst.dia && src.periodo===dst.periodo) return;
+
+  if(copyMode){
+    if(dstExisting){ alert('Para copiar, escolha célula vazia.'); return; }
+    if(!canPlace(srcCell.professorId, srcCell.disciplinaId, dst.turmaId, dst.dia, dst.periodo, null)) return;
+    state.horarios[dst.turmaId].grid[dst.dia][dst.periodo] = {...srcCell};
+  }else{
+    if(dstExisting){
+      const Aok = canPlace(srcCell.professorId, srcCell.disciplinaId, dst.turmaId, dst.dia, dst.periodo, {turmaId:src.turmaId,dia:src.dia,periodo:src.periodo});
+      const Bok = canPlace(dstExisting.professorId, dstExisting.disciplinaId, src.turmaId, src.dia, src.periodo, {turmaId:dst.turmaId,dia:dst.dia,periodo:dst.periodo});
+      if(!Aok || !Bok) return;
+      state.horarios[dst.turmaId].grid[dst.dia][dst.periodo]=srcCell;
+      state.horarios[src.turmaId].grid[src.dia][src.periodo]=dstExisting;
+    }else{
+      if(!canPlace(srcCell.professorId, srcCell.disciplinaId, dst.turmaId, dst.dia, dst.periodo, {turmaId:src.turmaId,dia:src.dia,periodo:src.periodo})) return;
+      state.horarios[dst.turmaId].grid[dst.dia][dst.periodo]=srcCell;
+      state.horarios[src.turmaId].grid[src.dia][src.periodo]=null;
     }
+  }
+  save(); renderGrid($('#selectTurma').value);
+}
+
+/* ====== Validação ====== */
+function canPlace(profId,discId,turmaId,dia,periodo,ignore){
+  const maxAulas=contarAulas(profId,discId,turmaId);
+  if(isProfBusy(profId,dia,periodo,ignore)){ alert('Professor já ocupado nesse horário!'); return false;}
+  if(maxAulas>=99){alert('Atingida carga máxima'); return false;} // ajuste carga real se desejar
+  return true;
+}
+
+/* ====== Inicialização ====== */
+function init(){
+  refreshSelectTurma();
+  renderPrateleira();
+  const tid = $('#selectTurma').value;
+  if(tid){ensureHorario(tid, parseInt($('#periodosCount').value,10)); renderGrid(tid);}
+}
+$('#btnRenderGrid').addEventListener('click',()=>{const tid=$('#selectTurma').value; ensureHorario(tid, parseInt($('#periodosCount').value,10)); renderGrid(tid);});
+$('#selectTurma').addEventListener('change',()=>{const tid=$('#selectTurma').value; renderGrid(tid);});
+init();
 </script>
 </body>
 </html>
