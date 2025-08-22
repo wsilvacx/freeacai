@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Sistema de Horários — metas por disciplina × turma + drag & drop</title>
+<title>Sistema de Horários — metas por disciplina × turma + mover/copiar por drag & drop</title>
 <style>
   :root{--primary:#2463ff;--bg:#f6f8fc;--card:#fff;--ok:#138a36;--warn:#ad6400;--danger:#c0392b}
   body{font-family:Inter,Segoe UI,Roboto,Arial;color:#0f172a;background:var(--bg);margin:0;padding:18px}
@@ -42,6 +42,7 @@
   .disc-item{display:flex;align-items:center;gap:8px;padding:8px;border:1px solid #eef2fb;border-radius:8px}
   .disc-item.disabled{opacity:.55}
   .danger{background:#ffecec;color:var(--danger)}
+  .togglecopy{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:999px;border:1px dashed #c9d6ff;background:#f4f7ff;font-size:12px}
 </style>
 </head>
 <body>
@@ -86,6 +87,7 @@
             <option value="4">4</option><option value="5" selected>5</option><option value="6">6</option>
           </select>
         </label>
+        <label class="togglecopy"><input type="checkbox" id="toggleCopy"> Copiar ao arrastar</label>
         <button id="btnRenderGrid">Gerar grade</button>
       </div>
     </div>
@@ -95,7 +97,11 @@
       <select id="selectTurma"></select>
     </div>
 
-    <p class="muted" style="margin-top:6px">Clique numa célula para atribuir. Você também pode <b>arrastar e soltar</b> aulas entre células (inclusive troca entre preenchidas).</p>
+    <p class="muted" style="margin-top:6px">
+      Clique numa célula para atribuir. Você também pode <b>arrastar e soltar</b> aulas:
+      <br>• <b>Mover</b>: arraste normalmente • <b>Copiar</b>: segure <b>CTRL</b>/<b>⌘</b> ao soltar <i>ou</i> ative “Copiar ao arrastar”.
+      <br>Copiar só funciona para destino <b>vazio</b>. Mover permite <b>trocar</b> entre preenchidas.
+    </p>
     <div id="gridArea" style="margin-top:10px"></div>
 
     <div class="controls" style="margin-top:10px">
@@ -211,7 +217,7 @@
 
 <script>
 /* ====== STATE ====== */
-const LS_KEY='horarios_meta_drag_v1';
+const LS_KEY='horarios_meta_drag_v2';
 const DAYS=['Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
 let state={disciplinas:[], turmas:[], professores:[], horarios:{}};
 /*
@@ -296,7 +302,6 @@ function renderProfList(){
   state.professores.forEach(p=>{
     const wrap=document.createElement('div'); wrap.className='item';
     const metas=document.createElement('div'); metas.className='list-mini';
-    // linhas de metas por assignment
     (p.assignments||[]).forEach(a=>{
       const disc=findDisc(a.discId)?.nome||'—';
       const turma=findTurma(a.turmaId)?.nome||'—';
@@ -391,8 +396,6 @@ $('#saveProf').onclick=()=>{
       }
     });
   }
-  // require at least 1 vínculo?
-  // if(assignments.length===0){ if(!confirm('Salvar sem vínculos?')) return; }
   if(profWizard.editingId){
     const p=findProf(profWizard.editingId);
     p.nome=profWizard.temp.nome; p.dias=profWizard.temp.dias; p.assignments=assignments;
@@ -516,6 +519,7 @@ function renderGrid(turmaId){
         // drag payload
         box.addEventListener('dragstart',(ev)=>{
           ev.dataTransfer.setData('text/plain', JSON.stringify({from:{turmaId, dia:d, periodo:p}, cell}));
+          ev.dataTransfer.effectAllowed='copyMove';
           highlightDropTargets(true);
         });
         box.addEventListener('dragend',()=>highlightDropTargets(false));
@@ -526,7 +530,13 @@ function renderGrid(turmaId){
       // click to open modal
       td.addEventListener('click',()=>openAssignModal(turmaId,d,p));
       // dnd target
-      td.addEventListener('dragover',(ev)=>{ev.preventDefault(); td.classList.add('droptarget');});
+      td.addEventListener('dragover',(ev)=>{
+        ev.preventDefault();
+        // define o cursor de destino conforme CTRL/⌘ ou toggle
+        const copyMode = ev.ctrlKey || ev.metaKey || $('#toggleCopy').checked;
+        ev.dataTransfer.dropEffect = copyMode ? 'copy' : 'move';
+        td.classList.add('droptarget');
+      });
       td.addEventListener('dragleave',()=>td.classList.remove('droptarget'));
       td.addEventListener('drop',(ev)=>{ev.preventDefault(); td.classList.remove('droptarget'); handleDrop(td, ev);});
       tr.appendChild(td);
@@ -550,7 +560,6 @@ function openAssignModal(turmaId,dia,period){
   $('#assignTurmaName').textContent=findTurma(turmaId)?.nome||'—';
   $('#assignDia').textContent=dia; $('#assignPeriodo').textContent=String(period+1);
 
-  // profs elegíveis: tem vínculo com esta turma, está disponível no dia e não está ocupado neste slot (exceto se já estiver aqui)
   const select=$('#assignProfessor'); select.innerHTML='';
   const existing=state.horarios[turmaId]?.grid[dia][period]||null;
 
@@ -583,7 +592,6 @@ function populateAssignDiscs(profId){
 
   assigns.forEach(a=>{
     let used=contarAulas(profId,a.discId,a.turmaId);
-    // se já existe algo na célula com este professor/disciplina/mesma turma, permitir reescolher (não bloquear por conta do próprio slot)
     const existing=state.horarios[currentCell.turmaId]?.grid[currentCell.dia][currentCell.period]||null;
     if(existing && existing.professorId===profId && existing.disciplinaId===a.discId && currentCell.turmaId===a.turmaId){ used = Math.max(0, used-1); }
     const disabled=used>=a.max;
@@ -604,7 +612,6 @@ $('#assignSave').onclick=()=>{
   const discId=radio.value;
   const {turmaId,dia,period}=currentCell;
 
-  // validação final
   if(!canPlace(profId,discId,turmaId,dia,period,{turmaId,dia,periodo:period})) return;
 
   state.horarios[turmaId].grid[dia][period]={professorId:profId,disciplinaId:discId};
@@ -625,7 +632,6 @@ function canPlace(profId,discId,turmaId,dia,periodo,ignore){
   const vinc=(prof.assignments||[]).find(a=>a.discId===discId && a.turmaId===turmaId);
   if(!vinc){ alert('Este professor não está vinculado a esta turma para esta disciplina.'); return false; }
   let used=contarAulas(profId,discId,turmaId);
-  // se estamos movendo de uma célula (ignore param) com mesmo prof+disc+turma, descontar 1 para a validação
   if(ignore){
     const old=state.horarios[ignore.turmaId]?.grid[ignore.dia]?.[ignore.periodo]||null;
     if(old && old.professorId===profId && old.disciplinaId===discId && ignore.turmaId===turmaId) used=Math.max(0,used-1);
@@ -634,37 +640,43 @@ function canPlace(profId,discId,turmaId,dia,periodo,ignore){
   return true;
 }
 
-/* ====== DRAG & DROP: mover e trocar ====== */
+/* ====== DRAG & DROP: mover, copiar e trocar ====== */
 function handleDrop(targetTd, ev){
   const payload=JSON.parse(ev.dataTransfer.getData('text/plain')||'{}');
   if(!payload.from || !payload.cell) return;
   const src=payload.from; const srcCell=payload.cell;
   const dst={turmaId:targetTd.dataset.turma, dia:targetTd.dataset.dia, periodo:parseInt(targetTd.dataset.periodo,10)};
+  const dstExisting = state.horarios[dst.turmaId]?.grid[dst.dia]?.[dst.periodo] || null;
+
+  // detectar modo copiar (CTRL/⌘ ou toggle)
+  const copyMode = ev.ctrlKey || ev.metaKey || $('#toggleCopy').checked;
 
   // se mesmo lugar, não faz nada
   if(src.turmaId===dst.turmaId && src.dia===dst.dia && src.periodo===dst.periodo) return;
 
-  const dstExisting = state.horarios[dst.turmaId]?.grid[dst.dia]?.[dst.periodo] || null;
-
-  // tenta SWAP se destino preenchido
-  if(dstExisting){
-    // validar colocar A no destino, e B na origem
-    const Aok = canPlace(srcCell.professorId, srcCell.disciplinaId, dst.turmaId, dst.dia, dst.periodo, {turmaId:src.turmaId,dia:src.dia,periodo:src.periodo});
-    if(!Aok) return;
-    const Bok = canPlace(dstExisting.professorId, dstExisting.disciplinaId, src.turmaId, src.dia, src.periodo, {turmaId:dst.turmaId,dia:dst.dia,periodo:dst.periodo});
-    if(!Bok) return;
-    // efetiva troca
-    state.horarios[dst.turmaId].grid[dst.dia][dst.periodo]=srcCell;
-    state.horarios[src.turmaId].grid[src.dia][src.periodo]=dstExisting;
-  }else{
-    // mover para vazio
-    const ok = canPlace(srcCell.professorId, srcCell.disciplinaId, dst.turmaId, dst.dia, dst.periodo, {turmaId:src.turmaId,dia:src.dia,periodo:src.periodo});
+  if(copyMode){
+    // copiar só para destino vazio
+    if(dstExisting){ alert('Para copiar, escolha uma célula vazia.'); return; }
+    const ok = canPlace(srcCell.professorId, srcCell.disciplinaId, dst.turmaId, dst.dia, dst.periodo, null);
     if(!ok) return;
-    state.horarios[dst.turmaId].grid[dst.dia][dst.periodo]=srcCell;
-    state.horarios[src.turmaId].grid[src.dia][src.periodo]=null;
+    state.horarios[dst.turmaId].grid[dst.dia][dst.periodo] = {professorId:srcCell.professorId, disciplinaId:srcCell.disciplinaId};
+  }else{
+    // mover: permite swap
+    if(dstExisting){
+      const Aok = canPlace(srcCell.professorId, srcCell.disciplinaId, dst.turmaId, dst.dia, dst.periodo, {turmaId:src.turmaId,dia:src.dia,periodo:src.periodo});
+      if(!Aok) return;
+      const Bok = canPlace(dstExisting.professorId, dstExisting.disciplinaId, src.turmaId, src.dia, src.periodo, {turmaId:dst.turmaId,dia:dst.dia,periodo:dst.periodo});
+      if(!Bok) return;
+      state.horarios[dst.turmaId].grid[dst.dia][dst.periodo]=srcCell;
+      state.horarios[src.turmaId].grid[src.dia][src.periodo]=dstExisting;
+    }else{
+      const ok = canPlace(srcCell.professorId, srcCell.disciplinaId, dst.turmaId, dst.dia, dst.periodo, {turmaId:src.turmaId,dia:src.dia,periodo:src.periodo});
+      if(!ok) return;
+      state.horarios[dst.turmaId].grid[dst.dia][dst.periodo]=srcCell;
+      state.horarios[src.turmaId].grid[src.dia][src.periodo]=null;
+    }
   }
   save();
-  // re-render duas turmas envolvidas (podem ser diferentes)
   renderGrid($('#selectTurma').value);
   renderProfList();
 }
@@ -700,7 +712,6 @@ $('#btnClearHorario').onclick=()=>{
 /* ====== INIT ====== */
 function init(){
   refreshSelectTurma(); renderAll();
-  // selecionar primeira turma se houver
   if(state.turmas.length>0){ $('#selectTurma').value=state.turmas[0].id; ensureHorario($('#selectTurma').value, parseInt($('#periodosCount').value,10)); renderGrid($('#selectTurma').value); }
 }
 init();
