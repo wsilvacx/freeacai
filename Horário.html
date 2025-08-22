@@ -174,3 +174,44 @@ cells.forEach(td=>{
     const disciplina = draggedItem.dataset.disciplina;
     const turma = draggedItem.dataset.turma;
     const diaIndex = td.cellIndex;
+    const horaIndex = td.parentNode.rowIndex;
+    const profObj = professores.find(p => p.nome === profName);
+
+    // Verifica meta de aulas
+    if(profObj.count[disciplina] >= profObj.meta[disciplina]){
+      alert(`⚠️ Meta de aulas atingida para ${disciplina} - ${profName}`);
+      return;
+    }
+
+    // Verifica conflito: professor não pode estar em duas turmas no mesmo horário
+    const conflito = Array.from(cells).some(c => {
+      if(c === td) return false; // ignora a célula atual
+      const partes = c.textContent.split(' - ');
+      if(partes.length < 2) return false;
+      const prof = partes[1];
+      const turmaC = partes[2]; // se quiser considerar turma na string, ajustar
+      const col = c.cellIndex;
+      const row = c.parentNode.rowIndex;
+      return prof === profName && col === diaIndex && row === horaIndex;
+    });
+
+    if(conflito){
+      alert(`⚠️ Conflito! ${profName} já está em outra turma nesse mesmo horário.`);
+      return;
+    }
+
+    // Atualiza célula e contagem
+    if(td.textContent){
+      const partes = td.textContent.split(' - ');
+      const discOld = partes[0];
+      const profOld = partes[1];
+      const profOldObj = professores.find(p => p.nome === profOld);
+      if(profOldObj) profOldObj.count[discOld]--;
+    }
+
+    td.textContent = `${disciplina} - ${profName}`;
+    profObj.count[disciplina]++;
+    atualizarPrateleira();
+    draggedItem = null;
+  });
+});
