@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -138,7 +137,11 @@ function cadastrarProfessor(){
   let meta={}; cargasInputs.forEach(i=>{ meta[i.dataset.disciplina]=Number(i.value); });
 
   if(nome && turma && disciplinasSel.length && dias.length){
-    professores.push({nome, turma, disciplinas:disciplinasSel, dias, meta, count:Object.assign({},meta)});
+    // Inicializa contagem em 0
+    let countInicial = {};
+    disciplinasSel.forEach(d => { countInicial[d] = 0; });
+
+    professores.push({nome, turma, disciplinas:disciplinasSel, dias, meta, count: countInicial});
     const li = document.createElement('li'); li.textContent=`${nome} - Turma: ${turma} - Disciplinas: ${disciplinasSel.join(', ')} - Dias: ${dias.join(', ')}`;
     document.getElementById('listaProfessores').appendChild(li);
     document.getElementById('professor').value=''; sel.value=null; document.getElementById('cargaDisciplina').innerHTML=''; document.querySelectorAll('.dias').forEach(d=>d.checked=false);
@@ -218,6 +221,7 @@ cells.forEach(td=>{
       const prof = partes[1];
       const col = c.cellIndex;
       const row = c.parentNode.rowIndex;
+      return prof === profName && col === dia;
       return prof === profName && col === diaIndex && row === horaIndex;
     });
 
@@ -226,6 +230,7 @@ cells.forEach(td=>{
       return;
     }
 
+    // Atualiza contagem caso a célula já tivesse outra aula
     if(td.textContent){
       const partes = td.textContent.split(' - ');
       const discOld = partes[0];
@@ -234,9 +239,12 @@ cells.forEach(td=>{
       if(profOldObj) profOldObj.count[discOld]--;
     }
 
+    // Aloca a aula
     td.textContent = `${disciplina} - ${profName}`;
     td.style.backgroundColor = cores[disciplinas.indexOf(disciplina)%cores.length];
     profObj.count[disciplina]++;
+
+    // Atualiza a prateleira para refletir contagem
     atualizarPrateleira();
     draggedItem = null;
   });
