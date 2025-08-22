@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -90,13 +91,10 @@ td.bloqueado { background:#eee; color:#aaa; cursor:not-allowed; }
 </main>
 
 <script>
-// Dados
 let turmas = [];
 let disciplinas = [];
 let professores = [];
 let draggedItem = null;
-
-// cores para disciplinas
 const cores = ['#2463ff','#f39c12','#27ae60','#8e44ad','#c0392b','#16a085','#e67e22'];
 
 // Cadastro Turmas
@@ -172,7 +170,7 @@ function atualizarBloqueios(){
   const diasMap = ['Segunda','Terça','Quarta','Quinta','Sexta'];
   Array.from(tabela.rows).forEach((tr,rowIndex)=>{
     Array.from(tr.cells).forEach((td,colIndex)=>{
-      if(colIndex===0) return; // primeira coluna = horário
+      if(colIndex===0) return;
       td.classList.remove('bloqueado');
       professores.forEach(p=>{
         if(!p.dias.includes(diasMap[colIndex-1])){
@@ -198,11 +196,21 @@ cells.forEach(td=>{
     const horaIndex = td.parentNode.rowIndex;
     const profObj = professores.find(p => p.nome === profName);
 
-    if(profObj.count[disciplina] >= profObj.meta[disciplina]){
+    // Contagem correta das aulas já alocadas (ignora célula atual)
+    const aulasAlocadas = Array.from(cells).filter(c => {
+      const partes = c.textContent.split(' - ');
+      if(partes.length < 2) return false;
+      const prof = partes[1];
+      const disc = partes[0];
+      return prof === profName && disc === disciplina && c !== td;
+    }).length;
+
+    if(aulasAlocadas >= profObj.meta[disciplina]){
       alert(`⚠️ Meta de aulas atingida para ${disciplina} - ${profName}`);
       return;
     }
 
+    // Conflito: professor não pode estar em duas turmas no mesmo horário
     const conflito = Array.from(cells).some(c => {
       if(c === td) return false;
       const partes = c.textContent.split(' - ');
