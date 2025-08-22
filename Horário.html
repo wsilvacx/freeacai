@@ -1,286 +1,176 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Sistema de Horários — Drag & Drop</title>
+<meta charset="UTF-8">
+<title>Sistema de Horários Escolares</title>
 <style>
-  :root{--primary:#2463ff;--bg:#f6f8fc;--card:#fff;--ok:#138a36;--warn:#ad6400;--danger:#c0392b}
-  body{font-family:Inter,Segoe UI,Roboto,Arial;color:#0f172a;background:var(--bg);margin:0;padding:18px}
-  h1{margin:0 0 12px}
-  .layout{display:grid;grid-template-columns:420px 1fr;gap:18px}
-  .card{background:var(--card);border-radius:12px;padding:12px;box-shadow:0 8px 24px rgba(15,30,60,.08)}
-  .muted{color:#63748a;font-size:13px}
-  .controls{display:flex;gap:8px;flex-wrap:wrap}
-  button{background:var(--primary);color:#fff;border:none;border-radius:9px;padding:8px 10px;cursor:pointer}
-  button.ghost{background:#fff;color:var(--primary);border:1px solid #dfe8ff}
-  button.bad{background:#ffe8e6;color:var(--danger)}
-  input,select{width:100%;padding:8px;border:1px solid #e6edf7;border-radius:9px;background:#fbfdff}
-  .list{margin-top:8px;max-height:260px;overflow:auto;border-top:1px dashed #e8eefc;padding-top:8px}
-  .item{display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;border-bottom:1px solid #f1f4fb;gap:8px}
-  .pill{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:999px;border:1px solid #e9f1ff;background:#f7faff;font-size:12px}
-  .ok{color:var(--ok);font-weight:700}
-  .gray{color:#9aa6b2}
-  .list-mini{margin-top:4px;display:flex;flex-direction:column;gap:4px}
-  .mini-row{display:flex;gap:6px;align-items:center;font-size:13px}
-  .mini-row .status{margin-left:auto}
-  table.schedule{width:100%;border-collapse:collapse;margin-top:10px;table-layout:fixed}
-  table.schedule th,table.schedule td{border:1px solid #e6edf5;padding:6px;text-align:center}
-  table.schedule th{background:#f9fbff}
-  td.cell{height:68px;vertical-align:middle;position:relative}
-  .assign{display:flex;flex-direction:column;gap:2px;padding:6px;border-radius:8px;border:1px solid #e8eefc;background:#f9fbff}
-  .assign .disc{font-weight:700}
-  .assign .prof{font-size:12px;color:#556577}
-  .droptarget{outline:2px dashed #9ab3ff; outline-offset:-4px}
-  .modal{display:none;position:fixed;inset:0;background:rgba(6,12,30,.45);z-index:1000;justify-content:center;align-items:center}
-  .modal.show{display:flex}
-  .modal-card{width:720px;max-width:96%;background:#fff;border-radius:12px;padding:14px;box-shadow:0 14px 60px rgba(10,20,40,.18)}
-  .modal-sm{width:460px;max-width:94%}
-  .close{float:right;cursor:pointer;color:#c0392b;font-weight:800}
-  .draggable-disc{display:flex;align-items:center;gap:4px;padding:4px 6px;border-radius:8px;border:1px solid #9ab3ff;background:#f4f7ff;cursor:grab;margin:2px}
-  .droppable-grid{min-height:68px}
+  body { font-family: Arial, sans-serif; margin: 20px; }
+  .tab { display: none; }
+  .tab.active { display: block; }
+  button { margin: 5px; }
+  table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+  th, td { border: 1px solid #000; padding: 5px; text-align: center; }
 </style>
 </head>
 <body>
-<h1>Sistema de Horários — Drag & Drop</h1>
-<div class="layout">
-  <!-- CADASTROS -->
-  <div class="card">
-    <div style="display:flex;justify-content:space-between;align-items:center">
-      <h2 style="margin:0">Cadastros</h2>
-      <div class="controls">
-        <button id="btnAddDisc">+ Disciplina</button>
-        <button id="btnAddTurma">+ Turma</button>
-        <button id="btnAddProf">+ Professor</button>
-      </div>
-    </div>
-    <h3 style="margin-top:12px">Disciplinas</h3>
-    <div id="listaDisciplinas" class="list muted">Nenhuma disciplina.</div>
-    <h3 style="margin-top:10px">Turmas</h3>
-    <div id="listaTurmas" class="list muted">Nenhuma turma.</div>
-    <h3 style="margin-top:10px">Professores</h3>
-    <div id="listaProfessores" class="list muted">Nenhum professor.</div>
-  </div>
 
-  <!-- GRADE E PRATELEIRA -->
-  <div class="card">
-    <div style="display:flex;justify-content:space-between;align-items:center">
-      <h2 style="margin:0">Montar horário</h2>
-      <div class="controls">
-        <label>Períodos
-          <select id="periodosCount">
-            <option value="4">4</option>
-            <option value="5" selected>5</option>
-            <option value="6">6</option>
-          </select>
-        </label>
-        <button id="btnRenderGrid">Gerar grade</button>
-      </div>
-    </div>
+<h1>Sistema de Horários Escolares</h1>
 
-    <div style="margin-top:8px">
-      <label>Turma</label>
-      <select id="selectTurma"></select>
-    </div>
+<!-- Abas -->
+<button onclick="showTab('cadastro')">Cadastro</button>
+<button onclick="showTab('montar')">Montar Horário</button>
 
-    <h3 style="margin-top:12px">Prateleira de Disciplinas</h3>
-    <div id="shelfDiscs" style="display:flex;flex-wrap:wrap;gap:6px;border:1px solid #e8eefc;padding:6px;min-height:50px;background:#f9f9f9;"></div>
+<!-- Aba Cadastro -->
+<div id="cadastro" class="tab active">
+  <h2>Cadastro</h2>
 
-    <div id="gridArea" style="margin-top:12px"></div>
-  </div>
+  <h3>Turma</h3>
+  <input type="text" id="nomeTurma" placeholder="Nome da Turma">
+  <button onclick="cadastrarTurma()">Cadastrar Turma</button>
+  <ul id="listaTurmas"></ul>
+
+  <h3>Disciplina</h3>
+  <input type="text" id="nomeDisciplina" placeholder="Nome da Disciplina">
+  <button onclick="cadastrarDisciplina()">Cadastrar Disciplina</button>
+  <ul id="listaDisciplinas"></ul>
+
+  <h3>Professor</h3>
+  <input type="text" id="nomeProfessor" placeholder="Nome do Professor">
+  <select id="disciplinasProfessor" multiple></select>
+  <input type="number" id="metaAulas" placeholder="Meta de aulas por disciplina">
+  <button onclick="cadastrarProfessor()">Cadastrar Professor</button>
+  <ul id="listaProfessores"></ul>
 </div>
 
-<!-- MODAIS -->
-<div id="modalDisciplina" class="modal">
-  <div class="modal-card modal-sm">
-    <span class="close" onclick="closeModal('modalDisciplina')">&times;</span>
-    <h3>Nova Disciplina</h3>
-    <label>Nome:</label>
-    <input type="text" id="inputDiscNome"/>
-    <div class="controls" style="margin-top:10px">
-      <button onclick="saveDisc()">Salvar</button>
-      <button class="ghost" onclick="closeModal('modalDisciplina')">Cancelar</button>
-    </div>
-  </div>
-</div>
+<!-- Aba Montar Horário -->
+<div id="montar" class="tab">
+  <h2>Montar Horário</h2>
 
-<div id="modalTurma" class="modal">
-  <div class="modal-card modal-sm">
-    <span class="close" onclick="closeModal('modalTurma')">&times;</span>
-    <h3>Nova Turma</h3>
-    <label>Nome:</label>
-    <input type="text" id="inputTurmaNome"/>
-    <div class="controls" style="margin-top:10px">
-      <button onclick="saveTurma()">Salvar</button>
-      <button class="ghost" onclick="closeModal('modalTurma')">Cancelar</button>
-    </div>
-  </div>
-</div>
+  <label>Turma:</label>
+  <select id="turmaHorario"></select>
+  <label>Dia:</label>
+  <select id="diaHorario">
+    <option value="Segunda">Segunda</option>
+    <option value="Terça">Terça</option>
+    <option value="Quarta">Quarta</option>
+    <option value="Quinta">Quinta</option>
+    <option value="Sexta">Sexta</option>
+  </select>
+  <label>Horário:</label>
+  <input type="time" id="horaHorario">
+  <label>Disciplina:</label>
+  <select id="disciplinaHorario"></select>
+  <label>Professor:</label>
+  <select id="professorHorario"></select>
+  <button onclick="adicionarHorario()">Adicionar</button>
 
-<div id="modalProfessor" class="modal">
-  <div class="modal-card">
-    <span class="close" onclick="closeModal('modalProfessor')">&times;</span>
-    <h3>Novo Professor</h3>
-    <label>Nome:</label>
-    <input type="text" id="inputProfNome"/>
-    <label>Dias disponíveis:</label>
-    <select id="inputProfDias" multiple>
-      <option value="Segunda">Segunda</option>
-      <option value="Terça">Terça</option>
-      <option value="Quarta">Quarta</option>
-      <option value="Quinta">Quinta</option>
-      <option value="Sexta">Sexta</option>
-      <option value="Sábado">Sábado</option>
-    </select>
-    <div class="controls" style="margin-top:10px">
-      <button onclick="saveProf()">Salvar</button>
-      <button class="ghost" onclick="closeModal('modalProfessor')">Cancelar</button>
-    </div>
-  </div>
+  <h3>Horário Montado</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Turma</th>
+        <th>Dia</th>
+        <th>Hora</th>
+        <th>Disciplina</th>
+        <th>Professor</th>
+      </tr>
+    </thead>
+    <tbody id="tabelaHorario"></tbody>
+  </table>
 </div>
 
 <script>
-/* ===== STATE ===== */
-const LS_KEY='horarios_drag';
-const DAYS=['Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
-let state={disciplinas:[], turmas:[], professores:[], horarios:{}};
-function uid(p='id'){return p+'_'+Math.random().toString(36).slice(2,9)}
-function save(){localStorage.setItem(LS_KEY, JSON.stringify(state))}
-function load(){try{const raw=localStorage.getItem(LS_KEY); if(raw) state=JSON.parse(raw);}catch(e){}}
-load();
+  let turmas = [];
+  let disciplinas = [];
+  let professores = [];
+  let horarios = [];
 
-/* ===== HELPERS ===== */
-const $=s=>document.querySelector(s);
-function findDisc(id){return state.disciplinas.find(d=>d.id===id)}
-function findTurma(id){return state.turmas.find(t=>t.id===id)}
-function findProf(id){return state.professores.find(p=>p.id===id)}
+  function showTab(tab) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(tab).classList.add('active');
+    if(tab === 'montar') atualizarSelecoes();
+  }
 
-/* ===== RENDER LISTAS ===== */
-function renderAll(){
-  renderDiscList(); renderTurmaList(); renderProfList(); refreshSelectTurma(); renderShelf();
-}
-function renderDiscList(){
-  const box=$('#listaDisciplinas'); box.innerHTML='';
-  if(state.disciplinas.length===0){box.textContent='Nenhuma disciplina.'; return;}
-  state.disciplinas.forEach(d=>{
-    const row=document.createElement('div'); row.className='item';
-    row.innerHTML=`<div><strong>${d.nome}</strong></div>
-      <div class="controls">
-        <button class="ghost" data-id="${d.id}" data-act="disc-del">Remover</button>
-      </div>`;
-    box.appendChild(row);
-  });
-}
-function renderTurmaList(){
-  const box=$('#listaTurmas'); box.innerHTML='';
-  if(state.turmas.length===0){box.textContent='Nenhuma turma.'; return;}
-  state.turmas.forEach(t=>{
-    const row=document.createElement('div'); row.className='item';
-    row.innerHTML=`<div><strong>${t.nome}</strong></div>
-      <div class="controls">
-        <button class="ghost" data-id="${t.id}" data-act="turma-del">Remover</button>
-      </div>`;
-    box.appendChild(row);
-  });
-}
-function renderProfList(){
-  const box=$('#listaProfessores'); box.innerHTML='';
-  if(state.professores.length===0){box.textContent='Nenhum professor.'; return;}
-  state.professores.forEach(p=>{
-    const row=document.createElement('div'); row.className='item';
-    row.innerHTML=`<div><strong>${p.nome}</strong> <span class="muted">(${p.dias.join(',')})</span></div>
-      <div class="controls"><button class="ghost" data-id="${p.id}" data-act="prof-del">Remover</button></div>`;
-    box.appendChild(row);
-  });
-}
-
-/* ===== PRATELEIRA ===== */
-function renderShelf(){
-  const shelf=$('#shelfDiscs'); shelf.innerHTML='';
-  state.disciplinas.forEach(d=>{
-    const profs = state.professores.filter(p=>p.assignments?.some(a=>a.discId===d.id));
-    profs.forEach(p=>{
-      const div=document.createElement('div'); div.className='draggable-disc';
-      div.draggable=true; div.dataset.disc=d.id; div.dataset.prof=p.id;
-      div.textContent=`${d.nome} — ${p.nome}`;
-      div.addEventListener('dragstart', e=>{
-        e.dataTransfer.setData('text/plain', JSON.stringify({discId:d.id, profId:p.id}));
-        e.dataTransfer.effectAllowed='copy';
-      });
-      shelf.appendChild(div);
-    });
-  });
-}
-
-/* ===== MODAIS ===== */
-function openModal(id){$('#'+id).classList.add('show');}
-function closeModal(id){$('#'+id).classList.remove('show');}
-
-/* ===== BOTÕES CADASTRO ===== */
-$('#btnAddDisc').onclick = ()=>{ $('#inputDiscNome').value=''; openModal('modalDisciplina'); }
-$('#btnAddTurma').onclick = ()=>{ $('#inputTurmaNome').value=''; openModal('modalTurma'); }
-$('#btnAddProf').onclick = ()=>{ $('#inputProfNome').value=''; $('#inputProfDias').value=''; openModal('modalProfessor'); }
-
-/* ===== SALVAR ===== */
-function saveDisc(){ const nome=$('#inputDiscNome').value.trim(); if(!nome) return alert('Digite o nome'); state.disciplinas.push({id:uid('disc'), nome}); save(); renderAll(); closeModal('modalDisciplina'); }
-function saveTurma(){ const nome=$('#inputTurmaNome').value.trim(); if(!nome) return alert('Digite o nome'); state.turmas.push({id:uid('turma'), nome}); save(); renderAll(); closeModal('modalTurma'); }
-function saveProf(){ const nome=$('#inputProfNome').value.trim(); if(!nome) return alert('Digite o nome'); const dias = Array.from($('#inputProfDias').selectedOptions).map(o=>o.value); state.professores.push({id:uid('prof'), nome, dias, assignments:[]}); save(); renderAll(); closeModal('modalProfessor'); }
-
-/* ===== LISTENER REMOÇÃO ===== */
-document.body.addEventListener('click', e=>{
-  const act = e.target.dataset.act; const id = e.target.dataset.id;
-  if(!act || !id) return;
-  if(act==='disc-del'){ if(confirm('Remover disciplina?')) { state.disciplinas=state.disciplinas.filter(d=>d.id!==id); save(); renderAll(); }}
-  if(act==='turma-del'){ if(confirm('Remover turma?')) { state.turmas=state.turmas.filter(t=>t.id!==id); save(); renderAll(); }}
-  if(act==='prof-del'){ if(confirm('Remover professor?')) { state.professores=state.professores.filter(p=>p.id!==id); save(); renderAll(); }}
-});
-
-/* ===== SELECT TURMA ===== */
-function refreshSelectTurma(){
-  const sel=$('#selectTurma'); sel.innerHTML='';
-  state.turmas.forEach(t=>{ const opt=document.createElement('option'); opt.value=t.id; opt.textContent=t.nome; sel.appendChild(opt); })
-}
-
-/* ===== GRADE ===== */
-$('#btnRenderGrid').onclick=()=>{renderGrid();}
-
-function renderGrid(){
-  const n=parseInt($('#periodosCount').value);
-  const selTurma=$('#selectTurma').value; if(!selTurma) return alert('Selecione uma turma');
-  const grid=$('#gridArea'); grid.innerHTML='';
-  const table=document.createElement('table'); table.className='schedule';
-  const thead=document.createElement('thead'); const trh=document.createElement('tr'); trh.innerHTML='<th>Dia / Período</th>';
-  for(let i=1;i<=n;i++){ const th=document.createElement('th'); th.textContent='Per '+i; trh.appendChild(th); }
-  thead.appendChild(trh); table.appendChild(thead);
-  const tbody=document.createElement('tbody');
-  DAYS.forEach(dia=>{
-    const tr=document.createElement('tr');
-    const th=document.createElement('th'); th.textContent=dia; tr.appendChild(th);
-    for(let i=1;i<=n;i++){
-      const td=document.createElement('td'); td.className='cell droppable-grid';
-      td.dataset.dia=dia; td.dataset.periodo=i;
-      td.addEventListener('dragover', e=>{e.preventDefault(); td.classList.add('droptarget');})
-      td.addEventListener('dragleave', e=>{td.classList.remove('droptarget');})
-      td.addEventListener('drop', e=>{
-        e.preventDefault(); td.classList.remove('droptarget');
-        const data=JSON.parse(e.dataTransfer.getData('text/plain'));
-        const div=document.createElement('div'); div.className='assign';
-        div.innerHTML=`<div class="disc">${findDisc(data.discId).nome}</div><div class="prof">${findProf(data.profId).nome}</div>`;
-        td.appendChild(div);
-        if(!state.horarios[selTurma]) state.horarios[selTurma]={};
-        if(!state.horarios[selTurma][dia]) state.horarios[selTurma][dia]={};
-        state.horarios[selTurma][dia][i]=data;
-        save();
-      })
-      tr.appendChild(td);
+  function cadastrarTurma() {
+    const nome = document.getElementById('nomeTurma').value.trim();
+    if(nome && !turmas.includes(nome)) {
+      turmas.push(nome);
+      document.getElementById('listaTurmas').innerHTML += `<li>${nome}</li>`;
+      document.getElementById('nomeTurma').value = '';
     }
-    tbody.appendChild(tr);
-  });
-  table.appendChild(tbody); grid.appendChild(table);
-}
+  }
 
-/* ===== INIT ===== */
-renderAll();
+  function cadastrarDisciplina() {
+    const nome = document.getElementById('nomeDisciplina').value.trim();
+    if(nome && !disciplinas.includes(nome)) {
+      disciplinas.push(nome);
+      document.getElementById('listaDisciplinas').innerHTML += `<li>${nome}</li>`;
+      document.getElementById('nomeDisciplina').value = '';
+      atualizarSelecoes();
+    }
+  }
+
+  function cadastrarProfessor() {
+    const nome = document.getElementById('nomeProfessor').value.trim();
+    const selDisciplinas = Array.from(document.getElementById('disciplinasProfessor').selectedOptions).map(o => o.value);
+    const meta = parseInt(document.getElementById('metaAulas').value);
+
+    if(nome && selDisciplinas.length && meta > 0) {
+      professores.push({ nome, disciplinas: selDisciplinas, metaAulas: meta });
+      document.getElementById('listaProfessores').innerHTML += `<li>${nome} - ${selDisciplinas.join(', ')} - Meta: ${meta}</li>`;
+      document.getElementById('nomeProfessor').value = '';
+      document.getElementById('metaAulas').value = '';
+    }
+  }
+
+  function atualizarSelecoes() {
+    const turmaSel = document.getElementById('turmaHorario');
+    turmaSel.innerHTML = turmas.map(t => `<option value="${t}">${t}</option>`).join('');
+
+    const discSel = document.getElementById('disciplinaHorario');
+    discSel.innerHTML = disciplinas.map(d => `<option value="${d}">${d}</option>`).join('');
+
+    const profSel = document.getElementById('professorHorario');
+    profSel.innerHTML = professores.map(p => `<option value="${p.nome}">${p.nome}</option>`).join('');
+
+    const disciplinasProfessor = document.getElementById('disciplinasProfessor');
+    disciplinasProfessor.innerHTML = disciplinas.map(d => `<option value="${d}">${d}</option>`).join('');
+  }
+
+  function adicionarHorario() {
+    const turma = document.getElementById('turmaHorario').value;
+    const dia = document.getElementById('diaHorario').value;
+    const hora = document.getElementById('horaHorario').value;
+    const disciplina = document.getElementById('disciplinaHorario').value;
+    const professor = document.getElementById('professorHorario').value;
+
+    if(!turma || !dia || !hora || !disciplina || !professor) {
+      alert('Preencha todos os campos!');
+      return;
+    }
+
+    // Verificar se professor já está em outra turma no mesmo horário
+    const conflito = horarios.find(h => h.professor === professor && h.dia === dia && h.hora === hora);
+    if(conflito) {
+      alert(`Conflito: Professor ${professor} já está com a turma ${conflito.turma} neste horário.`);
+      return;
+    }
+
+    horarios.push({ turma, dia, hora, disciplina, professor });
+    atualizarTabela();
+  }
+
+  function atualizarTabela() {
+    const tbody = document.getElementById('tabelaHorario');
+    tbody.innerHTML = horarios.map(h => `<tr>
+      <td>${h.turma}</td>
+      <td>${h.dia}</td>
+      <td>${h.hora}</td>
+      <td>${h.disciplina}</td>
+      <td>${h.professor}</td>
+    </tr>`).join('');
+  }
 </script>
+
 </body>
 </html>
