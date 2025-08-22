@@ -1,356 +1,211 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Sistema de Criação de Horários</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      display: flex;
-      height: 100vh;
-      background: #f4f6f9;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema de Criação de Horários</title>
+<style>
+    body { font-family: Arial, sans-serif; margin:0; padding:0; }
+    header { background-color: #4CAF50; color:white; text-align:center; padding:15px; }
+    nav { display:flex; justify-content:center; background:#f0f0f0; }
+    nav button { padding:10px 20px; margin:5px; cursor:pointer; border:none; background:#ddd; border-radius:5px; }
+    nav button.active { background:#4CAF50; color:white; }
+    section { display:none; padding:10px; }
+    section.active { display:block; }
 
-    /* Menu lateral */
-    #sidebar {
-      width: 300px;
-      background: #1e272e;
-      color: white;
-      display: flex;
-      flex-direction: column;
-    }
+    /* Prateleira e grade */
+    .container { display:flex; flex-wrap: wrap; gap: 20px; }
+    .prateleira { flex:1; min-width:250px; border:2px solid #ccc; padding:10px; border-radius:5px; }
+    .prateleira h2 { text-align:center; }
+    .disciplina { background:#f0f0f0; padding:8px; margin:5px 0; border:1px solid #999; border-radius:3px; cursor:grab; }
+    .grade-horario { flex:3; overflow-x:auto; }
+    table { width:100%; border-collapse:collapse; min-width:600px; }
+    th, td { border:1px solid #ccc; text-align:center; padding:10px; min-width:100px; }
+    th { background:#f4f4f4; }
+    td { height:60px; vertical-align:middle; }
+    td.dragover { background:#d1ffd1; }
 
-    /* Abas */
-    .tab-buttons {
-      display: flex;
-      background: #2f3640;
-    }
-    .tab-buttons button {
-      flex: 1;
-      padding: 10px;
-      border: none;
-      background: #2f3640;
-      color: white;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    .tab-buttons button.active {
-      background: #00a8ff;
-    }
-
-    .tab-content {
-      flex: 1;
-      padding: 15px;
-      display: none;
-    }
-    .tab-content.active {
-      display: block;
-    }
-
-    #sidebar input, #sidebar select, #sidebar button {
-      width: 100%;
-      margin: 5px 0;
-      padding: 8px;
-      border: none;
-      border-radius: 4px;
-    }
-    #sidebar input, #sidebar select {
-      background: #fff;
-      color: #2f3640;
-    }
-    #sidebar button {
-      background: #00a8ff;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    #sidebar button:hover {
-      background: #0097e6;
-    }
-
-    /* Conteúdo principal */
-    #main {
-      flex: 1;
-      padding: 20px;
-      overflow-x: auto;
-    }
-    h2 {
-      margin-top: 0;
-      color: #2f3640;
-    }
-
-    /* Prateleira */
-    #prateleira {
-      margin-bottom: 20px;
-      padding: 10px;
-      background: #dcdde1;
-      border-radius: 6px;
-      min-height: 70px;
-    }
-    .item {
-      display: inline-block;
-      margin: 5px;
-      padding: 7px 12px;
-      background: #273c75;
-      color: white;
-      border-radius: 20px;
-      cursor: grab;
-      font-size: 14px;
-    }
-
-    /* Grade */
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      background: white;
-      border-radius: 6px;
-      overflow: hidden;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      text-align: center;
-      width: 120px;
-      height: 60px;
-    }
-    th {
-      background: #40739e;
-      color: white;
-    }
-    .celula {
-      position: relative;
-      font-size: 14px;
-    }
-    .remove {
-      position: absolute;
-      top: 2px;
-      right: 5px;
-      cursor: pointer;
-      font-size: 14px;
-      color: red;
-      font-weight: bold;
-    }
-  </style>
+    @media(max-width:768px){ .container{flex-direction:column;} }
+</style>
 </head>
 <body>
-  <!-- Menu lateral -->
-  <div id="sidebar">
-    <div class="tab-buttons">
-      <button class="active" onclick="openTab('turmas')">Turmas</button>
-      <button onclick="openTab('disciplinas')">Disciplinas</button>
-      <button onclick="openTab('professores')">Professores</button>
+<header><h1>Sistema de Criação de Horários</h1></header>
+
+<nav>
+    <button class="tab-button active" data-target="cadastro">Cadastros</button>
+    <button class="tab-button" data-target="horario">Montagem de Horário</button>
+</nav>
+
+<section id="cadastro" class="active">
+    <h2>Cadastros</h2>
+    <div style="display:flex; flex-wrap:wrap; gap:20px;">
+        <div style="flex:1; min-width:200px;">
+            <h3>Turmas</h3>
+            <input type="text" id="nomeTurma" placeholder="Nome da turma">
+            <button onclick="adicionarTurma()">Adicionar</button>
+            <ul id="listaTurmas"></ul>
+        </div>
+        <div style="flex:1; min-width:200px;">
+            <h3>Disciplinas</h3>
+            <input type="text" id="nomeDisciplina" placeholder="Nome da disciplina">
+            <input type="number" id="quantidadeAulas" placeholder="Aulas disponíveis" min="1">
+            <button onclick="adicionarDisciplina()">Adicionar</button>
+            <ul id="listaDisciplinas"></ul>
+        </div>
+        <div style="flex:1; min-width:200px;">
+            <h3>Professores</h3>
+            <input type="text" id="nomeProfessor" placeholder="Nome do professor">
+            <input type="text" id="disciplinasProfessor" placeholder="Disciplinas (separadas por ,)">
+            <button onclick="adicionarProfessor()">Adicionar</button>
+            <ul id="listaProfessores"></ul>
+        </div>
     </div>
+</section>
 
-    <div id="turmas" class="tab-content active">
-      <h3>Cadastro de Turma</h3>
-      <input type="text" id="nomeTurma" placeholder="Nome da turma">
-      <button onclick="adicionarTurma()">Adicionar Turma</button>
-      <select id="listaTurmas"></select>
+<section id="horario">
+    <h2>Montagem de Horário</h2>
+    <div class="container">
+        <div class="prateleira" id="prateleira">
+            <h2>Prateleira</h2>
+        </div>
+        <div class="grade-horario">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Horário</th>
+                        <th>Segunda</th>
+                        <th>Terça</th>
+                        <th>Quarta</th>
+                        <th>Quinta</th>
+                        <th>Sexta</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${[...Array(6)].map((_, i) =>
+                        `<tr>
+                            <td>${i+1}º Horário</td>
+                            <td class="cell" data-day="Segunda"></td>
+                            <td class="cell" data-day="Terça"></td>
+                            <td class="cell" data-day="Quarta"></td>
+                            <td class="cell" data-day="Quinta"></td>
+                            <td class="cell" data-day="Sexta"></td>
+                        </tr>`
+                    ).join('')}
+                </tbody>
+            </table>
+        </div>
     </div>
+    <button onclick="salvarHorario()">Salvar Horário</button>
+    <button onclick="carregarHorario()">Carregar Horário</button>
+</section>
 
-    <div id="disciplinas" class="tab-content">
-      <h3>Cadastro de Disciplinas</h3>
-      <input type="text" id="nomeDisciplina" placeholder="Nome da disciplina">
-      <button onclick="adicionarDisciplina()">Adicionar Disciplina</button>
-      <select id="listaDisciplinas"></select>
-    </div>
+<script>
+    // Abas
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const sections = document.querySelectorAll('section');
+    tabButtons.forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+            tabButtons.forEach(b=>b.classList.remove('active'));
+            btn.classList.add('active');
+            sections.forEach(s=>s.classList.remove('active'));
+            document.getElementById(btn.dataset.target).classList.add('active');
+            if(btn.dataset.target==='horario'){ renderPrateleira(); }
+        });
+    });
 
-    <div id="professores" class="tab-content">
-      <h3>Cadastro de Professores</h3>
-      <input type="text" id="nomeProfessor" placeholder="Nome do professor">
-      <label>Disciplina:</label>
-      <select id="disciplinaProfessor"></select>
-      <label>Meta de aulas:</label>
-      <input type="number" id="metaProfessor" min="1" value="1">
-      <label>Dias disponíveis:</label><br>
-      <label><input type="checkbox" value="Segunda">Seg</label>
-      <label><input type="checkbox" value="Terça">Ter</label>
-      <label><input type="checkbox" value="Quarta">Qua</label>
-      <label><input type="checkbox" value="Quinta">Qui</label>
-      <label><input type="checkbox" value="Sexta">Sex</label><br>
-      <button onclick="adicionarProfessor()">Adicionar Professor</button>
-      <select id="listaProfessores"></select>
-    </div>
-  </div>
-
-  <!-- Conteúdo principal -->
-  <div id="main">
-    <h2>Prateleira</h2>
-    <div id="prateleira"></div>
-
-    <h2>Grade de Horários</h2>
-    <table id="grade">
-      <thead>
-        <tr>
-          <th>Período</th>
-          <th>Segunda</th>
-          <th>Terça</th>
-          <th>Quarta</th>
-          <th>Quinta</th>
-          <th>Sexta</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
-
-  <script>
+    // Dados
     let turmas = [];
     let disciplinas = [];
     let professores = [];
 
-    // Alternar abas
-    function openTab(tab) {
-      document.querySelectorAll(".tab-content").forEach(div => div.classList.remove("active"));
-      document.querySelectorAll(".tab-buttons button").forEach(btn => btn.classList.remove("active"));
-      document.getElementById(tab).classList.add("active");
-      event.target.classList.add("active");
+    function adicionarTurma(){
+        const nome = document.getElementById('nomeTurma').value.trim();
+        if(nome){ turmas.push(nome); atualizarLista('listaTurmas', turmas); document.getElementById('nomeTurma').value=''; }
+    }
+    function adicionarDisciplina(){
+        const nome = document.getElementById('nomeDisciplina').value.trim();
+        const qtd = parseInt(document.getElementById('quantidadeAulas').value);
+        if(nome && qtd>0){ disciplinas.push({nome, qtd}); atualizarLista('listaDisciplinas', disciplinas.map(d=>`${d.nome} (${d.qtd} aulas)`)); document.getElementById('nomeDisciplina').value=''; document.getElementById('quantidadeAulas').value=''; }
+    }
+    function adicionarProfessor(){
+        const nome = document.getElementById('nomeProfessor').value.trim();
+        const disc = document.getElementById('disciplinasProfessor').value.trim();
+        if(nome && disc){ professores.push({nome, disciplinas: disc.split(',').map(d=>d.trim())}); atualizarLista('listaProfessores', professores.map(p=>`${p.nome} - ${p.disciplinas.join(', ')}`)); document.getElementById('nomeProfessor').value=''; document.getElementById('disciplinasProfessor').value=''; }
+    }
+    function atualizarLista(id, arr){
+        const ul = document.getElementById(id); ul.innerHTML=''; arr.forEach(item=>{ const li=document.createElement('li'); li.textContent=item; ul.appendChild(li); });
     }
 
-    // Funções do menu lateral
-    function adicionarTurma() {
-      const nome = document.getElementById("nomeTurma").value;
-      if (nome) {
-        turmas.push(nome);
-        atualizarSelect("listaTurmas", turmas);
-        document.getElementById("nomeTurma").value = "";
-        salvarLocalStorage();
-      }
-    }
-
-    function adicionarDisciplina() {
-      const nome = document.getElementById("nomeDisciplina").value;
-      if (nome) {
-        disciplinas.push(nome);
-        atualizarSelect("listaDisciplinas", disciplinas);
-        atualizarSelect("disciplinaProfessor", disciplinas);
-        document.getElementById("nomeDisciplina").value = "";
-        salvarLocalStorage();
-      }
-    }
-
-    function adicionarProfessor() {
-      const nome = document.getElementById("nomeProfessor").value;
-      const disciplina = document.getElementById("disciplinaProfessor").value;
-      const meta = parseInt(document.getElementById("metaProfessor").value);
-      const dias = Array.from(document.querySelectorAll("#professores input[type=checkbox]:checked"))
-                       .map(cb => cb.value);
-      if (nome && disciplina) {
-        professores.push({ nome, disciplina, meta, dias });
-        atualizarSelect("listaProfessores", professores.map(p => p.nome));
-        atualizarPrateleira();
-        document.getElementById("nomeProfessor").value = "";
-        salvarLocalStorage();
-      }
-    }
-
-    function atualizarSelect(id, lista) {
-      const select = document.getElementById(id);
-      select.innerHTML = "";
-      lista.forEach(item => {
-        const option = document.createElement("option");
-        option.textContent = item;
-        select.appendChild(option);
-      });
-    }
-
-    // Prateleira
-    function atualizarPrateleira() {
-      const div = document.getElementById("prateleira");
-      div.innerHTML = "";
-      professores.forEach(prof => {
-        const item = document.createElement("div");
-        item.className = "item";
-        item.draggable = true;
-        item.textContent = `${prof.disciplina} - ${prof.nome}`;
-        item.dataset.professor = prof.nome;
-        item.dataset.disciplina = prof.disciplina;
-        item.addEventListener("dragstart", drag);
-        div.appendChild(item);
-      });
-    }
-
-    // Grade
-    function gerarGrade(periodos = 6) {
-      const tbody = document.querySelector("#grade tbody");
-      tbody.innerHTML = "";
-      for (let i = 1; i <= periodos; i++) {
-        const tr = document.createElement("tr");
-        const th = document.createElement("th");
-        th.textContent = `P${i}`;
-        tr.appendChild(th);
-        ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"].forEach(dia => {
-          const td = document.createElement("td");
-          td.className = "celula";
-          td.dataset.dia = dia;
-          td.dataset.periodo = i;
-          td.addEventListener("dragover", allowDrop);
-          td.addEventListener("drop", drop);
-          tr.appendChild(td);
+    function renderPrateleira(){
+        const prateleira = document.getElementById('prateleira');
+        prateleira.querySelectorAll('.disciplina').forEach(d=>d.remove());
+        disciplinas.forEach(d=>{
+            professores.forEach(p=>{
+                if(p.disciplinas.includes(d.nome) && d.qtd>0){
+                    const div = document.createElement('div');
+                    div.classList.add('disciplina');
+                    div.draggable = true;
+                    div.dataset.professor = p.nome;
+                    div.dataset.nome = d.nome;
+                    div.dataset.qtd = d.qtd;
+                    div.textContent = `${d.nome} - ${p.nome} (${d.qtd} aulas)`;
+                    div.addEventListener('dragstart', e=>{
+                        e.dataTransfer.setData('text/plain', JSON.stringify({nome:d.nome, professor:p.nome}));
+                    });
+                    prateleira.appendChild(div);
+                }
+            });
         });
-        tbody.appendChild(tr);
-      }
-    }
-    gerarGrade();
-
-    // Drag & Drop
-    function drag(ev) {
-      ev.dataTransfer.setData("text", JSON.stringify({
-        professor: ev.target.dataset.professor,
-        disciplina: ev.target.dataset.disciplina
-      }));
-    }
-    function allowDrop(ev) { ev.preventDefault(); }
-    function drop(ev) {
-      ev.preventDefault();
-      const data = JSON.parse(ev.dataTransfer.getData("text"));
-      const td = ev.target.closest("td");
-
-      // Verifica conflito
-      const conflito = document.querySelector(
-        `td[data-dia="${td.dataset.dia}"][data-periodo="${td.dataset.periodo}"] div[data-professor="${data.professor}"]`
-      );
-      if (conflito) {
-        alert("Conflito: professor já alocado nesse horário.");
-        return;
-      }
-
-      const div = document.createElement("div");
-      div.textContent = `${data.disciplina} - ${data.professor}`;
-      div.dataset.professor = data.professor;
-      div.dataset.disciplina = data.disciplina;
-
-      const remove = document.createElement("span");
-      remove.textContent = "×";
-      remove.className = "remove";
-      remove.onclick = () => td.innerHTML = "";
-
-      td.innerHTML = "";
-      td.appendChild(div);
-      td.appendChild(remove);
-
-      salvarLocalStorage();
+        setupDragAndDrop();
     }
 
-    // LocalStorage
-    function salvarLocalStorage() {
-      const dados = { turmas, disciplinas, professores };
-      localStorage.setItem("sistemaHorarios", JSON.stringify(dados));
+    function setupDragAndDrop(){
+        const cells = document.querySelectorAll('.cell');
+        cells.forEach(cell=>{
+            cell.addEventListener('dragover', e=>{ e.preventDefault(); cell.classList.add('dragover'); });
+            cell.addEventListener('dragleave', e=>{ cell.classList.remove('dragover'); });
+            cell.addEventListener('drop', e=>{
+                e.preventDefault();
+                cell.classList.remove('dragover');
+                const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+                if(cell.textContent){ // devolve aula anterior
+                    const [nomeAnt, profAnt] = cell.textContent.split(' - ');
+                    const discAnt = disciplinas.find(d=>d.nome===nomeAnt.trim());
+                    discAnt.qtd+=1;
+                }
+                const sameTimeCells = Array.from(cells).filter(c=>c.dataset.day===cell.dataset.day);
+                const conflict = sameTimeCells.some(c=>c.textContent.includes(data.professor));
+                if(conflict){ alert('Conflito: Este professor já está alocado neste horário.'); return; }
+                cell.textContent = `${data.nome} - ${data.professor}`;
+                const disc = disciplinas.find(d=>d.nome===data.nome);
+                disc.qtd -=1;
+                renderPrateleira();
+            });
+        });
     }
-    function carregarLocalStorage() {
-      const dados = JSON.parse(localStorage.getItem("sistemaHorarios"));
-      if (dados) {
-        turmas = dados.turmas || [];
-        disciplinas = dados.disciplinas || [];
-        professores = dados.professores || [];
-        atualizarSelect("listaTurmas", turmas);
-        atualizarSelect("listaDisciplinas", disciplinas);
-        atualizarSelect("disciplinaProfessor", disciplinas);
-        atualizarSelect("listaProfessores", professores.map(p => p.nome));
-        atualizarPrateleira();
-      }
+
+    function salvarHorario(){
+        const horario = [];
+        document.querySelectorAll('.cell').forEach(cell=>{
+            horario.push(cell.textContent);
+        });
+        localStorage.setItem('horario', JSON.stringify(horario));
+        localStorage.setItem('disciplinas', JSON.stringify(disciplinas));
+        alert('Horário salvo com sucesso!');
     }
-    carregarLocalStorage();
-  </script>
+
+    function carregarHorario(){
+        const horario = JSON.parse(localStorage.getItem('horario') || '[]');
+        const discSalvas = JSON.parse(localStorage.getItem('disciplinas') || '[]');
+        if(horario.length && discSalvas.length){
+            disciplinas = discSalvas;
+            document.querySelectorAll('.cell').forEach((cell,i)=>{
+                cell.textContent = horario[i];
+            });
+            renderPrateleira();
+            alert('Horário carregado!');
+        }
+    }
+</script>
 </body>
 </html>
