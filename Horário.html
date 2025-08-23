@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Horários Escolares — Persistência Automática (com mover aulas)</title>
+<title>Horários Escolares — Persistência Automática</title>
 <style>
 :root{
   --primary:#1768c6;
@@ -74,7 +74,7 @@ td.slot.drag-over{outline:4px dashed rgba(23,104,198,0.16)}
 </style>
 </head>
 <body>
-<header>Horários Escolares — Persistência Automática (com mover aulas)</header>
+<header>Horários Escolares — Persistência Automática</header>
 
 <div class="container">
   <div class="tabs">
@@ -152,7 +152,8 @@ td.slot.drag-over{outline:4px dashed rgba(23,104,198,0.16)}
   </div>
 </div>
 
-<!-- Modal Turma -->
+<!-- Modais: Turma, Disciplina, Professor Wizard -->
+<!-- Turma -->
 <div class="modal" id="modalTurma">
   <div class="modal-card">
     <div class="space-between"><h3 style="margin:0">Turma</h3><button class="btn ghost" onclick="closeModal('modalTurma')">Fechar</button></div>
@@ -167,7 +168,7 @@ td.slot.drag-over{outline:4px dashed rgba(23,104,198,0.16)}
   </div>
 </div>
 
-<!-- Modal Disciplina -->
+<!-- Disciplina -->
 <div class="modal" id="modalDisciplina">
   <div class="modal-card">
     <div class="space-between"><h3 style="margin:0">Disciplina</h3><button class="btn ghost" onclick="closeModal('modalDisciplina')">Fechar</button></div>
@@ -182,53 +183,51 @@ td.slot.drag-over{outline:4px dashed rgba(23,104,198,0.16)}
   </div>
 </div>
 
-<!-- Modal Professor (Wizard) -->
+<!-- Professor Wizard -->
 <div class="modal" id="modalProfessor">
   <div class="modal-card">
     <div class="space-between">
       <h3 style="margin:0">Professor</h3>
       <button class="btn ghost" onclick="closeProfessorModal()">Fechar</button>
     </div>
+
     <div style="margin-top:10px">
       <div class="wizard-steps">
         <div class="pill" id="pill1">1. Dados</div>
         <div class="pill" id="pill2">2. Disciplinas / Meta</div>
         <div class="pill" id="pill3">3. Disponibilidade</div>
       </div>
+
       <div id="wiz1">
         <label>Nome</label>
-        <input type="text" id="profName" placeholder="Ex: Maria Silva">
-        <div style="margin-top:12px;text-align:right">
+        <input type="text" id="inputProfName" placeholder="Ex: João da Silva">
+        <div style="margin-top:10px" class="space-between">
           <button class="btn ghost" onclick="closeProfessorModal()">Cancelar</button>
-          <button class="btn" onclick="profNext(2)">Próximo</button>
+          <button class="btn" onclick="wizardNext()">Próximo</button>
         </div>
       </div>
+
       <div id="wiz2" style="display:none">
-        <label>Disciplina</label>
-        <select id="profDiscSelect" style="padding:8px;border-radius:8px;border:1px solid #e6eef8"></select>
-        <div class="row" style="margin-top:8px">
-          <input type="number" id="profMeta" placeholder="Meta de aulas (nº)" min="1" style="width:140px">
-          <button class="btn ghost" onclick="addProfDisc()">Adicionar</button>
-        </div>
-        <ul id="profDiscList" class="simple small-muted" style="margin-top:8px"></ul>
-        <div style="margin-top:12px;text-align:right">
-          <button class="btn ghost" onclick="profPrev(1)">Voltar</button>
-          <button class="btn" onclick="profNext(3)">Próximo</button>
+        <label>Disciplinas que leciona</label>
+        <div id="profDiscList"></div>
+        <div style="margin-top:10px" class="space-between">
+          <button class="btn ghost" onclick="wizardPrev()">Voltar</button>
+          <button class="btn" onclick="wizardNext()">Próximo</button>
         </div>
       </div>
+
       <div id="wiz3" style="display:none">
-        <label>Disponibilidade (marque dias)</label>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px">
-          <label><input type="checkbox" value="Segunda" class="disp-day"> Segunda</label>
-          <label><input type="checkbox" value="Terça" class="disp-day"> Terça</label>
-          <label><input type="checkbox" value="Quarta" class="disp-day"> Quarta</label>
-          <label><input type="checkbox" value="Quinta" class="disp-day"> Quinta</label>
-          <label><input type="checkbox" value="Sexta" class="disp-day"> Sexta</label>
+        <label>Disponibilidade (Dias)</label>
+        <div style="display:flex;gap:8px;margin-top:6px">
+          <label><input type="checkbox" class="chkDia" value="Segunda">Seg</label>
+          <label><input type="checkbox" class="chkDia" value="Terça">Ter</label>
+          <label><input type="checkbox" class="chkDia" value="Quarta">Qua</label>
+          <label><input type="checkbox" class="chkDia" value="Quinta">Qui</label>
+          <label><input type="checkbox" class="chkDia" value="Sexta">Sex</label>
         </div>
-        <ul id="previewDisp" class="simple small-muted" style="margin-top:8px"></ul>
-        <div style="margin-top:12px;text-align:right">
-          <button class="btn ghost" onclick="profPrev(2)">Voltar</button>
-          <button class="btn" onclick="saveProfessor()">Salvar</button>
+        <div style="margin-top:10px" class="space-between">
+          <button class="btn ghost" onclick="wizardPrev()">Voltar</button>
+          <button class="btn" onclick="saveProfessorWizard()">Salvar</button>
         </div>
       </div>
     </div>
@@ -236,203 +235,200 @@ td.slot.drag-over{outline:4px dashed rgba(23,104,198,0.16)}
 </div>
 
 <script>
-/* ===== STORAGE & DATA ===== */
-const STORAGE_KEY = 'horario_app_v2';
+/* --- DADOS --- */
 let turmas=[], disciplinas=[], professores=[], horarios=[];
+let currentWizardStep = 1;
 
-/* wizard temp */
-let editingProfessorId=null;
-let wizardTemp={discs:[],days:[]};
-let editingTurmaId=null;
-let editingDiscId=null;
+/* --- UTIL --- */
+function uid(){return Date.now()+Math.random().toString(16).slice(2)}
+function openModal(id){document.getElementById(id).classList.add('open')}
+function closeModal(id){document.getElementById(id).classList.remove('open')}
 
-/* drag helpers */
-let draggedItem=null;
-let draggedLesson=null;
-
-function uid(){ return 'id'+Math.random().toString(36).slice(2,9); }
-function timeToMinutes(t){ const [hh,mm]=t.split(':').map(Number); return hh*60+mm; }
-function minutesToTime(m){ return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0'); }
-
-/* persistence */
-function saveToStorage(){ localStorage.setItem(STORAGE_KEY, JSON.stringify({turmas,disciplinas,professores,horarios})); }
-function loadFromStorage(){ 
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if(!raw) return false;
-  const data = JSON.parse(raw);
-  turmas = data.turmas||[]; disciplinas = data.disciplinas||[]; professores = data.professores||[]; horarios = data.horarios||[];
-  return true;
-}
-
-/* initial render */
-if(loadFromStorage()) renderAll(); else renderAll();
-
-/* ===== TABS ===== */
-const tabBtnCad = document.getElementById('tabBtnCad');
-const tabBtnMont = document.getElementById('tabBtnMont');
-tabBtnCad.onclick = ()=>showCard('cadastro');
-tabBtnMont.onclick = ()=>showCard('montar');
-function showCard(id){
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  if(id==='cadastro') tabBtnCad.classList.add('active'); else tabBtnMont.classList.add('active');
-  document.getElementById('cardCadastro').style.display = id==='cadastro'?'block':'none';
-  document.getElementById('cardMontar').style.display = id==='montar'?'block':'none';
-  if(id==='montar'){ atualizarSelectTurma(); renderShelf(); resetarGrade(); }
-}
-
-/* ===== MODAL HELPERS ===== */
-function openModal(id){ document.getElementById(id).classList.add('open'); }
-function closeModal(id){ document.getElementById(id).classList.remove('open'); }
-
-/* ===== CRUD TURMA ===== */
-function saveTurma(){ 
-  const name=document.getElementById('inputTurmaName').value.trim(); 
-  if(!name){ alert('Informe nome'); return; }
-  if(editingTurmaId){ turmas.find(t=>t.id===editingTurmaId).name=name; editingTurmaId=null; } 
-  else { if(turmas.some(t=>t.name===name)){ alert('Turma já existe'); return; } turmas.push({id:uid(),name}); }
-  renderTurmas(); closeModal('modalTurma'); saveToStorage(); 
+/* --- CRUD Turma --- */
+function saveTurma(){
+  const name = document.getElementById('inputTurmaName').value.trim();
+  if(!name) return alert('Informe o nome da turma');
+  turmas.push({id:uid(), name});
+  renderTurmas(); closeModal('modalTurma'); document.getElementById('inputTurmaName').value='';
 }
 function renderTurmas(){
-  const ul=document.getElementById('listaTurmas'); ul.innerHTML='';
-  turmas.forEach(t=>{ const li=document.createElement('li'); li.textContent=t.name; ul.appendChild(li); });
+  const ul = document.getElementById('listaTurmas'); ul.innerHTML='';
+  const select = document.getElementById('selectTurma'); select.innerHTML='<option value="">-- Selecione --</option>'
+  turmas.forEach(t=>{
+    const li = document.createElement('li'); li.textContent=t.name;
+    const del = document.createElement('button'); del.textContent='✖'; del.className='icon-btn'; del.onclick=()=>{turmas=turmas.filter(x=>x.id!==t.id);renderTurmas();resetarGrade();}
+    li.appendChild(del); ul.appendChild(li)
+    const opt = document.createElement('option'); opt.value=t.id; opt.text=t.name; select.appendChild(opt)
+  })
 }
 
-/* ===== CRUD DISCIPLINA ===== */
-function saveDisciplina(){ 
-  const name=document.getElementById('inputDiscName').value.trim(); 
-  if(!name){ alert('Informe nome'); return; }
-  if(editingDiscId){ disciplinas.find(d=>d.id===editingDiscId).name=name; editingDiscId=null; } 
-  else { if(disciplinas.some(d=>d.name===name)){ alert('Disciplina já existe'); return; } disciplinas.push({id:uid(),name}); }
-  renderDisciplinas(); closeModal('modalDisciplina'); saveToStorage(); 
+/* --- CRUD Disciplina --- */
+function saveDisciplina(){
+  const name = document.getElementById('inputDiscName').value.trim();
+  if(!name) return alert('Informe o nome da disciplina');
+  disciplinas.push({id:uid(), name}); renderDisciplinas(); closeModal('modalDisciplina'); document.getElementById('inputDiscName').value='';
 }
 function renderDisciplinas(){
-  const ul=document.getElementById('listaDisciplinas'); ul.innerHTML='';
-  disciplinas.forEach(d=>{ const li=document.createElement('li'); li.textContent=d.name; ul.appendChild(li); });
+  const ul = document.getElementById('listaDisciplinas'); ul.innerHTML='';
+  disciplinas.forEach(d=>{
+    const li = document.createElement('li'); li.textContent=d.name;
+    const del = document.createElement('button'); del.textContent='✖'; del.className='icon-btn'; del.onclick=()=>{disciplinas=disciplinas.filter(x=>x.id!==d.id);renderDisciplinas();}
+    li.appendChild(del); ul.appendChild(li)
+  })
 }
 
-/* ===== CRUD PROFESSOR ===== */
-function openProfessorWizard(){ wizardTemp={discs:[],days:[]}; editingProfessorId=null; showWizardStep(1); openModal('modalProfessor'); atualizarSelectDisc(); renderProfPreview(); }
-function showWizardStep(n){ [1,2,3].forEach(i=>{ document.getElementById('wiz'+i).style.display=i===n?'block':'none'; document.getElementById('pill'+i).style.background=i===n?'#dbeafe':'#f1f5f9'; }); }
-function profNext(n){ showWizardStep(n); }
-function profPrev(n){ showWizardStep(n); }
-function closeProfessorModal(){ closeModal('modalProfessor'); wizardTemp={discs:[],days:[]}; editingProfessorId=null; }
-function atualizarSelectDisc(){ const sel=document.getElementById('profDiscSelect'); sel.innerHTML=''; disciplinas.forEach(d=>{ const opt=document.createElement('option'); opt.value=d.id; opt.textContent=d.name; sel.appendChild(opt); }); }
-function addProfDisc(){ const discId=document.getElementById('profDiscSelect').value; const meta=parseInt(document.getElementById('profMeta').value); if(!discId||!meta){ alert('Selecione disciplina e meta'); return; } if(wizardTemp.discs.some(d=>d.id===discId)){ alert('Disciplina já adicionada'); return; } wizardTemp.discs.push({id:discId,meta}); renderProfPreview(); }
-function renderProfPreview(){ const ul=document.getElementById('profDiscList'); ul.innerHTML=''; wizardTemp.discs.forEach(d=>{ const name=disciplinas.find(ds=>ds.id===d.id).name; const li=document.createElement('li'); li.textContent=name+' — '+d.meta+' aulas'; ul.appendChild(li); }); }
-document.querySelectorAll('.disp-day').forEach(chk=>chk.addEventListener('change',()=>{
-  wizardTemp.days = Array.from(document.querySelectorAll('.disp-day')).filter(c=>c.checked).map(c=>c.value);
-  const ul=document.getElementById('previewDisp'); ul.innerHTML=''; wizardTemp.days.forEach(d=>{ const li=document.createElement('li'); li.textContent=d; ul.appendChild(li); });
-}));
-function saveProfessor(){ 
-  const name=document.getElementById('profName').value.trim(); 
-  if(!name){ alert('Informe nome'); return; }
-  if(wizardTemp.discs.length===0){ alert('Adicione pelo menos 1 disciplina'); return; }
-  if(wizardTemp.days.length===0){ alert('Selecione dias de disponibilidade'); return; }
-
-  if(editingProfessorId){
-    const p=professores.find(p=>p.id===editingProfessorId);
-    p.name=name; p.disciplinas=wizardTemp.discs; p.days=wizardTemp.days;
-  } else {
-    professores.push({id:uid(),name,disciplinas:wizardTemp.discs,days:wizardTemp.days});
+/* --- CRUD Professores Wizard --- */
+function openProfessorWizard(){
+  currentWizardStep=1; document.getElementById('wiz1').style.display='block'; document.getElementById('wiz2').style.display='none'; document.getElementById('wiz3').style.display='none';
+  document.getElementById('pill1').style.background='#dbeafe'; document.getElementById('pill2').style.background='#f1f5f9'; document.getElementById('pill3').style.background='#f1f5f9';
+  document.getElementById('inputProfName').value=''; document.getElementById('profDiscList').innerHTML='';
+  document.querySelectorAll('.chkDia').forEach(c=>c.checked=false);
+  openModal('modalProfessor');
+}
+function wizardNext(){
+  if(currentWizardStep===1){
+    const name = document.getElementById('inputProfName').value.trim();
+    if(!name) return alert('Informe o nome do professor');
+    // Carrega lista disciplinas com check
+    const container = document.getElementById('profDiscList'); container.innerHTML='';
+    disciplinas.forEach(d=>{
+      const lbl=document.createElement('label'); lbl.style.marginRight='8px';
+      const chk = document.createElement('input'); chk.type='checkbox'; chk.value=d.id;
+      lbl.appendChild(chk); lbl.appendChild(document.createTextNode(d.name));
+      container.appendChild(lbl)
+    })
+    document.getElementById('wiz1').style.display='none'; document.getElementById('wiz2').style.display='block';
+    document.getElementById('pill1').style.background='#f1f5f9'; document.getElementById('pill2').style.background='#dbeafe';
+    currentWizardStep=2;
+  } else if(currentWizardStep===2){
+    document.getElementById('wiz2').style.display='none'; document.getElementById('wiz3').style.display='block';
+    document.getElementById('pill2').style.background='#f1f5f9'; document.getElementById('pill3').style.background='#dbeafe';
+    currentWizardStep=3;
   }
-  closeProfessorModal(); renderProfessores(); saveToStorage(); atualizarSelectTurma(); renderShelf();
 }
-function renderProfessores(){ const ul=document.getElementById('listaProfessores'); ul.innerHTML=''; professores.forEach(p=>{ const li=document.createElement('li'); li.textContent=p.name; ul.appendChild(li); }); }
+function wizardPrev(){
+  if(currentWizardStep===2){
+    document.getElementById('wiz2').style.display='none'; document.getElementById('wiz1').style.display='block';
+    document.getElementById('pill2').style.background='#dbeafe'; document.getElementById('pill1').style.background='#dbeafe';
+    currentWizardStep=1;
+  } else if(currentWizardStep===3){
+    document.getElementById('wiz3').style.display='none'; document.getElementById('wiz2').style.display='block';
+    document.getElementById('pill3').style.background='#f1f5f9'; document.getElementById('pill2').style.background='#dbeafe';
+    currentWizardStep=2;
+  }
+}
+function saveProfessorWizard(){
+  const name=document.getElementById('inputProfName').value.trim();
+  const discIds = Array.from(document.querySelectorAll('#profDiscList input:checked')).map(c=>c.value);
+  const dias = Array.from(document.querySelectorAll('.chkDia:checked')).map(c=>c.value);
+  if(!name) return alert('Nome obrigatório'); if(discIds.length===0) return alert('Selecione pelo menos uma disciplina'); if(dias.length===0) return alert('Selecione pelo menos um dia');
+  const prof={id:uid(), name, disponibilidades:dias, disciplinasMeta: discIds.map(id=>({discId:id,discName:disciplinas.find(d=>d.id===id).name}))}
+  professores.push(prof); renderProfessores(); closeProfessorModal();
+}
+function renderProfessores(){
+  const ul=document.getElementById('listaProfessores'); ul.innerHTML='';
+  professores.forEach(p=>{
+    const li=document.createElement('li'); li.textContent=p.name;
+    const del=document.createElement('button'); del.textContent='✖'; del.className='icon-btn';
+    del.onclick=()=>{professores=professores.filter(x=>x.id!==p.id);renderProfessores();}
+    li.appendChild(del); ul.appendChild(li)
+  })
+}
+function closeProfessorModal(){closeModal('modalProfessor')}
 
-/* ===== MONTAR HORÁRIO ===== */
-function atualizarSelectTurma(){ const sel=document.getElementById('selectTurma'); sel.innerHTML=''; turmas.forEach(t=>{ const opt=document.createElement('option'); opt.value=t.id; opt.textContent=t.name; sel.appendChild(opt); }); }
-function resetarGrade(){ renderGrade(); renderShelf(); }
+/* --- Grade --- */
+const times=['08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00']
+function resetarGrade(){
+  const tbody=document.getElementById('grade'); tbody.innerHTML='';
+  const turmaId = document.getElementById('selectTurma').value;
+  times.forEach(t=>{
+    const tr=document.createElement('tr'); 
+    const tdTime=document.createElement('td'); tdTime.textContent=t; tr.appendChild(tdTime)
+    ['Segunda','Terça','Quarta','Quinta','Sexta'].forEach(d=>{
+      const td=document.createElement('td'); td.className='slot'; td.dataset.day=d; td.dataset.time=t;
+      td.ondragover=e=>e.preventDefault();
+      td.ondrop=slotDrop; tr.appendChild(td)
+    })
+    tbody.appendChild(tr)
+  })
+  renderGrade()
+}
+function renderGrade(){
+  const turmaId=document.getElementById('selectTurma').value;
+  horarios.filter(h=>h.turmaId===turmaId).forEach(h=>{
+    const cells=document.querySelectorAll(`td.slot[data-day="${h.dia}"][data-time="${h.inicio}"]`)
+    if(cells.length){
+      const td=cells[0]; const span=document.createElement('span'); span.className='lesson'; span.draggable=true;
+      span.textContent=h.disciplinaName; 
+      const small=document.createElement('span'); small.className='small'; small.textContent=h.professorName; span.appendChild(small);
+      span.dataset.id=h.id; span.ondragstart=lessonDragStart; span.ondblclick=()=>{horarios=horarios.filter(x=>x.id!==h.id);resetarGrade(); renderShelf(); saveToStorage();}
+      td.appendChild(span)
+    }
+  })
+}
 
-/* ===== SHELF ===== */
+/* --- Shelf --- */
 function renderShelf(){
   const shelf=document.getElementById('shelf'); shelf.innerHTML='';
   professores.forEach(p=>{
-    p.disciplinas.forEach(d=>{
-      const countUsed = horarios.filter(h=>h.profId===p.id && h.discId===d.id && h.turmaId===document.getElementById('selectTurma').value).length;
-      const done = countUsed>=d.meta;
-      const div=document.createElement('div'); div.className='shelf-item'+(done?' done':''); div.textContent=disciplinas.find(ds=>ds.id===d.id).name+' ('+p.name+')';
-      div.dataset.profId = p.id; div.dataset.discId=d.id; div.dataset.name=disciplinas.find(ds=>ds.id===d.id).name;
-      div.setAttribute('draggable',true); 
-      div.ondragstart = e => { draggedItem = div; draggedLesson = null; };
-      shelf.appendChild(div);
-    });
-  });
+    p.disciplinasMeta.forEach(d=>{
+      const count = horarios.filter(h=>h.professorId===p.id && h.disciplinaId===d.discId).length;
+      const div=document.createElement('div'); div.className='shelf-item'; div.draggable=true;
+      div.dataset.profId=p.id; div.dataset.discId=d.discId; div.dataset.origin='shelf';
+      div.innerHTML=`${d.discName} - ${p.name} <span class="count-bubble">${count}</span>`;
+      div.ondragstart=lessonDragStart;
+      if(count>0) div.classList.add('done');
+      shelf.appendChild(div)
+    })
+  })
 }
 
-/* ===== GRADE ===== */
-function renderGrade(){
-  const tbody=document.getElementById('grade'); tbody.innerHTML='';
-  const turmaId=document.getElementById('selectTurma').value; 
-  const hours=['08:00','09:00','10:00','11:00','13:00','14:00','15:00','16:00'];
+/* --- Drag & Drop --- */
+function lessonDragStart(e){e.dataTransfer.setData('application/json',JSON.stringify(e.currentTarget.dataset))}
+function slotDrop(e){
+  e.preventDefault(); e.currentTarget.classList.remove('drag-over');
+  const payload=JSON.parse(e.dataTransfer.getData('application/json')||'null'); if(!payload) return;
+  const day=e.currentTarget.dataset.day; const time=e.currentTarget.dataset.time;
+  const turmaId=document.getElementById('selectTurma').value; if(!turmaId){ alert('Selecione a turma'); return; }
+  const inicio=time; const fim=minutesToTime(timeToMinutes(time)+60);
 
-  hours.forEach(hour=>{
-    const tr=document.createElement('tr');
-    const tdHour=document.createElement('td'); tdHour.textContent=hour; tr.appendChild(tdHour);
-
-    ['Segunda','Terça','Quarta','Quinta','Sexta'].forEach(day=>{
-      const td=document.createElement('td'); td.className='slot'; td.dataset.day=day; td.dataset.hour=hour;
-      td.ondragover=e=>e.preventDefault();
-      td.ondragenter=e=>td.classList.add('drag-over');
-      td.ondragleave=e=>td.classList.remove('drag-over');
-      td.ondrop=e=>handleDrop(e);
-
-      const lesson = horarios.find(h=>h.turmaId===turmaId && h.day===day && h.hour===hour);
-      if(lesson){
-        const prof = professores.find(p=>p.id===lesson.profId);
-        const disc = disciplinas.find(d=>d.id===lesson.discId);
-        const div=document.createElement('div'); div.className='lesson'; div.textContent=disc.name;
-        const sm=document.createElement('span'); sm.className='small'; sm.textContent=prof.name; div.appendChild(sm);
-
-        div.setAttribute('draggable',true);
-        div.ondblclick=()=>{ if(confirm('Remover aula?')){ horarios=horarios.filter(hh=>hh!==lesson); renderGrade(); renderShelf(); saveToStorage(); } };
-        div.ondragstart=e=>{ draggedLesson = lesson; draggedItem=null; };
-
-        td.appendChild(div);
-      }
-      tr.appendChild(td);
-    });
-    tbody.appendChild(tr);
-  });
-}
-
-function handleDrop(e){
-  e.preventDefault(); 
-  e.currentTarget.classList.remove('drag-over');
-  const slot = e.currentTarget;
-  const turmaId = document.getElementById('selectTurma').value;
-  const day = slot.dataset.day;
-  const hour = slot.dataset.hour;
-
-  if(draggedItem){ 
-    const profId = draggedItem.dataset.profId; 
-    const discId = draggedItem.dataset.discId; 
-    const name = draggedItem.dataset.name;
-
-    if(horarios.find(h=>h.turmaId===turmaId && h.day===day && h.hour===hour)){ alert('Célula já ocupada'); return; }
-    const prof = professores.find(p=>p.id===profId);
-    if(!prof.days.includes(day)){ alert('Professor indisponível nesse dia'); return; }
-    const countUsed = horarios.filter(h=>h.turmaId===turmaId && h.profId===profId && h.discId===discId).length;
-    const meta = prof.disciplinas.find(d=>d.id===discId).meta;
-    if(countUsed>=meta){ alert('Meta de aulas atingida'); return; }
-
-    horarios.push({turmaId,profId,discId,day,hour});
-  } else if(draggedLesson){
-    if(horarios.find(h=>h.turmaId===turmaId && h.day===day && h.hour===hour)){ alert('Célula já ocupada'); return; }
-    const prof = professores.find(p=>p.id===draggedLesson.profId);
-    if(!prof.days.includes(day)){ alert('Professor indisponível nesse dia'); return; }
-    draggedLesson.day=day; draggedLesson.hour=hour;
+  if(payload.origin==='shelf'){
+    const prof=professores.find(p=>p.id===payload.profId); if(!prof) return;
+    if(!prof.disponibilidades.includes(day)){ alert(`${prof.name} não disponível neste dia`); return; }
+    if(professorOcupado(prof.id,day,inicio)){ alert(`${prof.name} já ocupado neste horário`); return; }
+    if(horarios.find(h=>h.turmaId===turmaId && h.dia===day && h.inicio===inicio)){ alert('Célula ocupada para esta turma'); return; }
+    const discMeta=prof.disciplinasMeta.find(d=>d.discId===payload.discId);
+    horarios.push({id:uid(), turmaId, turmaName:turmas.find(t=>t.id===turmaId).name, dia, inicio, fim, disciplinaId:discMeta.discId, disciplinaName:discMeta.discName, professorId:prof.id, professorName:prof.name});
+    resetarGrade(); renderShelf(); saveToStorage(); return;
   }
 
-  renderGrade(); renderShelf(); saveToStorage();
+  if(payload.origin==='grade'){
+    const lesson=horarios.find(h=>h.id===payload.id); if(!lesson) return;
+    const prof=professores.find(p=>p.id===lesson.professorId); if(!prof) return;
+    if(!prof.disponibilidades.includes(day)){ alert(`${prof.name} não disponível neste dia`); return; }
+    if(professorOcupado(prof.id,day,inicio,lesson.id)){ alert(`${prof.name} já ocupado neste horário`); return; }
+    const targetOcc=horarios.find(h=>h.turmaId===turmaId && h.dia===day && h.inicio===inicio && h.id!==lesson.id);
+    if(targetOcc){ alert('Célula ocupada'); return; }
+    lesson.turmaId=turmaId; lesson.turmaName=turmas.find(t=>t.id===turmaId).name; lesson.dia=day; lesson.inicio=inicio; lesson.fim=fim;
+    resetarGrade(); renderShelf(); saveToStorage();
+  }
 }
 
-/* ===== EXPORT/IMPORT ===== */
-function exportJSON(){ const data={turmas,disciplinas,professores,horarios}; const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='horarios.json'; a.click(); }
-function importExample(){ localStorage.removeItem(STORAGE_KEY); location.reload(); }
+/* --- Helpers --- */
+function timeToMinutes(t){const [h,m]=t.split(':').map(Number); return h*60+m}
+function minutesToTime(m){const h=Math.floor(m/60); const min=m%60; return (h<10?'0':'')+h+':'+(min<10?'0':'')+min}
+function professorOcupado(profId,dia,inicio,ignoreId=null){return horarios.some(h=>h.professorId===profId && h.dia===dia && h.inicio===inicio && h.id!==ignoreId)}
+function saveToStorage(){localStorage.setItem('horarios',JSON.stringify({turmas,disciplinas,professores,horarios}))}
+function loadFromStorage(){const d=JSON.parse(localStorage.getItem('horarios')||'{}'); turmas=d.turmas||[];disciplinas=d.disciplinas||[];professores=d.professores||[];horarios=d.horarios||[];renderTurmas();renderDisciplinas();renderProfessores();renderShelf();resetarGrade()}
+loadFromStorage()
 
-/* ===== RENDER ALL ===== */
-function renderAll(){ renderTurmas(); renderDisciplinas(); renderProfessores(); atualizarSelectTurma(); renderShelf(); renderGrade(); }
+/* --- Tabs --- */
+document.getElementById('tabBtnCad').onclick=function(){document.getElementById('cardCadastro').style.display='block'; document.getElementById('cardMontar').style.display='none'; this.classList.add('active'); document.getElementById('tabBtnMont').classList.remove('active')}
+document.getElementById('tabBtnMont').onclick=function(){document.getElementById('cardCadastro').style.display='none'; document.getElementById('cardMontar').style.display='block'; this.classList.add('active'); document.getElementById('tabBtnCad').classList.remove('active')}
 
+/* --- Export / Import --- */
+function exportJSON(){const data={turmas,disciplinas,professores,horarios}; const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='horarios.json'; a.click();}
+function importExample(){const example={turmas:[{id:'1',name:'6ºA'}],disciplinas:[{id:'1',name:'Matemática'}],professores:[{id:'1',name:'João',disponibilidades:['Segunda','Terça'],disciplinasMeta:[{discId:'1',discName:'Matemática'}]}],horarios:[]}; localStorage.setItem('horarios',JSON.stringify(example)); loadFromStorage(); alert('Exemplo importado!')}
 </script>
 </body>
 </html>
