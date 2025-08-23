@@ -9,7 +9,7 @@
   .tab.active { display: block; }
   button { margin: 5px; }
   table { border-collapse: collapse; width: 100%; margin-top: 10px; }
-  th, td { border: 1px solid #000; padding: 5px; text-align: center; min-width: 100px; height: 60px; }
+  th, td { border: 1px solid #000; padding: 5px; text-align: center; min-width: 120px; height: 70px; }
   .modal {
     display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(0,0,0,0.5); justify-content: center; align-items: center;
@@ -51,6 +51,10 @@
 <!-- Aba Montar Horário -->
 <div id="montar" class="tab">
   <h2>Montar Horário</h2>
+
+  <label>Selecionar Turma:</label>
+  <select id="turmaSelecionada" onchange="resetarGrade()"></select>
+
   <h3>Prateleira de Aulas</h3>
   <div id="prateleira" class="prateleira"></div>
 
@@ -66,9 +70,7 @@
         <th>Sexta</th>
       </tr>
     </thead>
-    <tbody id="grade">
-      <!-- Gerado dinamicamente -->
-    </tbody>
+    <tbody id="grade"></tbody>
   </table>
 </div>
 
@@ -131,12 +133,15 @@
   let turmas = [];
   let disciplinas = [];
   let professores = [];
-  let horarios = [];
+  let horarios = []; // {professor, disciplina, dia, hora, turma}
 
   function showTab(tab) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.getElementById(tab).classList.add('active');
-    if(tab === 'montar') atualizarPrateleira();
+    if(tab === 'montar') {
+      atualizarPrateleira();
+      atualizarTurmasSelect();
+    }
   }
 
   function openModal(id) { document.getElementById(id).style.display = 'flex'; }
@@ -149,6 +154,7 @@
       document.getElementById('listaTurmas').innerHTML += `<li>${nome}</li>`;
       document.getElementById('nomeTurma').value = '';
       closeModal('modalTurma');
+      atualizarTurmasSelect();
     }
   }
 
@@ -190,16 +196,34 @@
     disciplinasProfessor.innerHTML = disciplinas.map(d => `<option value="${d}">${d}</option>`).join('');
   }
 
-  // Montar grade de horários (5 dias x 6 horários exemplo)
+  function atualizarTurmasSelect() {
+    const select = document.getElementById('turmaSelecionada');
+    select.innerHTML = turmas.map(t => `<option value="${t}">${t}</option>`).join('');
+    resetarGrade();
+  }
+
+  // Montar grade de horários
   const horariosBase = ["07:00","08:00","09:00","10:00","11:00","12:00"];
   const dias = ["Segunda","Terça","Quarta","Quinta","Sexta"];
-  const grade = document.getElementById('grade');
-  horariosBase.forEach(hora => {
-    let row = `<tr><td>${hora}</td>`;
-    dias.forEach(d => row += `<td class="dropzone" data-dia="${d}" data-hora="${hora}" ondrop="drop(event)" ondragover="allowDrop(event)"></td>`);
-    row += "</tr>";
-    grade.innerHTML += row;
-  });
+
+  function resetarGrade() {
+    const grade = document.getElementById('grade');
+    grade.innerHTML = "";
+    horariosBase.forEach(hora => {
+      let row = `<tr><td>${hora}</td>`;
+      dias.forEach(d => row += `<td class="dropzone" data-dia="${d}" data-hora="${hora}" ondrop="drop(event)" ondragover="allowDrop(event)"></td>`);
+      row += "</tr>";
+      grade.innerHTML += row;
+    });
+
+    // Reexibir aulas já lançadas da turma ativa
+    const turma = document.getElementById('turmaSelecionada').value;
+    horarios.filter(h => h.turma === turma).forEach(h => {
+      const cell = [...document.querySelectorAll('.dropzone')]
+        .find(c => c.dataset.dia === h.dia && c.dataset.hora === h.hora);
+      if(cell) cell.innerText = `${h.disciplina}\n${h.professor}`;
+    });
+  }
 
   function atualizarPrateleira() {
     const prateleira = document.getElementById('prateleira');
@@ -230,8 +254,10 @@
     const data = JSON.parse(ev.dataTransfer.getData("text"));
     const dia = ev.target.dataset.dia;
     const hora = ev.target.dataset.hora;
+    const turma = document.getElementById('turmaSelecionada').value;
 
     const prof = professores.find(p => p.nome === data.professor);
+
     if(!prof.disponibilidade.includes(dia)) {
       alert("Professor não disponível neste dia!");
       return;
@@ -243,7 +269,7 @@
       return;
     }
 
-    horarios.push({ ...data, dia, hora });
+    horarios.push({ ...data, dia, hora, turma });
     ev.target.innerText = `${data.disciplina}\n${data.professor}`;
     prof.aulasDadas++;
     atualizarPrateleira();
