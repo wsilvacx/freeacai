@@ -9,7 +9,7 @@
   .tab.active { display: block; }
   button { margin: 5px; }
   table { border-collapse: collapse; width: 100%; margin-top: 10px; }
-  th, td { border: 1px solid #000; padding: 5px; text-align: center; min-width: 120px; height: 70px; }
+  th, td { border: 1px solid #000; padding: 5px; text-align: center; min-width: 120px; height: 70px; vertical-align: top; }
   .modal {
     display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(0,0,0,0.5); justify-content: center; align-items: center;
@@ -20,9 +20,10 @@
   .wizard-step { display: none; }
   .wizard-step.active { display: block; }
   .prateleira { margin: 15px 0; padding: 10px; border: 1px solid #aaa; min-height: 100px; display: flex; flex-wrap: wrap; gap: 10px; }
-  .item { padding: 8px; border: 1px solid #000; cursor: grab; background: #f0f0f0; border-radius: 4px; }
+  .item { padding: 6px; border: 1px solid #000; cursor: grab; background: #f0f0f0; border-radius: 4px; font-size: 13px; }
   .item.verde { background: #4caf50; color: white; }
   td.dropzone { background: #fafafa; }
+  .aula { background: #d9edf7; border: 1px solid #31708f; border-radius: 4px; padding: 4px; font-size: 12px; cursor: grab; }
 </style>
 </head>
 <body>
@@ -202,7 +203,6 @@
     resetarGrade();
   }
 
-  // Montar grade de horários
   const horariosBase = ["07:00","08:00","09:00","10:00","11:00","12:00"];
   const dias = ["Segunda","Terça","Quarta","Quinta","Sexta"];
 
@@ -216,12 +216,11 @@
       grade.innerHTML += row;
     });
 
-    // Reexibir aulas já lançadas da turma ativa
     const turma = document.getElementById('turmaSelecionada').value;
     horarios.filter(h => h.turma === turma).forEach(h => {
       const cell = [...document.querySelectorAll('.dropzone')]
         .find(c => c.dataset.dia === h.dia && c.dataset.hora === h.hora);
-      if(cell) cell.innerText = `${h.disciplina}\n${h.professor}`;
+      if(cell) addAulaToCell(cell, h);
     });
   }
 
@@ -246,9 +245,13 @@
   function drag(ev) {
     ev.dataTransfer.setData("text", JSON.stringify({
       professor: ev.target.dataset.professor,
-      disciplina: ev.target.dataset.disciplina
+      disciplina: ev.target.dataset.disciplina,
+      origem: ev.target.dataset.origem || "prateleira",
+      dia: ev.target.dataset.dia,
+      hora: ev.target.dataset.hora
     }));
   }
+
   function drop(ev) {
     ev.preventDefault();
     const data = JSON.parse(ev.dataTransfer.getData("text"));
@@ -264,15 +267,49 @@
     }
 
     const conflito = horarios.find(h => h.professor === data.professor && h.dia === dia && h.hora === hora);
-    if(conflito) {
+    if(conflito && (data.origem !== "grade" || conflito.turma !== turma)) {
       alert(`Conflito: ${data.professor} já está em outra turma neste horário.`);
       return;
     }
 
-    horarios.push({ ...data, dia, hora, turma });
-    ev.target.innerText = `${data.disciplina}\n${data.professor}`;
-    prof.aulasDadas++;
+    // Se a origem for grade, remover do horário anterior
+    if(data.origem === "grade") {
+      horarios = horarios.filter(h => !(h.professor === data.professor && h.disciplina === data.disciplina && h.dia === data.dia && h.hora === data.hora && h.turma === turma));
+      resetarGrade();
+    } else {
+      prof.aulasDadas++;
+    }
+
+    horarios.push({ professor: data.professor, disciplina: data.disciplina, dia, hora, turma });
+    const cell = ev.target.closest(".dropzone");
+    addAulaToCell(cell, { professor: data.professor, disciplina: data.disciplina, dia, hora, turma });
     atualizarPrateleira();
+  }
+
+  function addAulaToCell(cell, h) {
+    const aulaDiv = document.createElement("div");
+    aulaDiv.className = "aula";
+    aulaDiv.innerText = `${h.disciplina}\n${h.professor}`;
+    aulaDiv.draggable = true;
+    aulaDiv.dataset.professor = h.professor;
+    aulaDiv.dataset.disciplina = h.disciplina;
+    aulaDiv.dataset.origem = "grade";
+    aulaDiv.dataset.dia = h.dia;
+    aulaDiv.dataset.hora = h.hora;
+
+    aulaDiv.addEventListener("dragstart", drag);
+    aulaDiv.addEventListener("dblclick", () => {
+      if(confirm("Remover esta aula?")) {
+        horarios = horarios.filter(x => !(x.professor === h.professor && x.disciplina === h.disciplina && x.dia === h.dia && x.hora === h.hora && x.turma === h.turma));
+        const prof = professores.find(p => p.nome === h.professor);
+        if(prof) prof.aulasDadas--;
+        resetarGrade();
+        atualizarPrateleira();
+      }
+    });
+
+    cell.innerHTML = "";
+    cell.appendChild(aulaDiv);
   }
 </script>
 
