@@ -1,317 +1,579 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<title>Sistema de Horários Escolares</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Sistema de Horários Escolares — Integrado & Responsivo</title>
 <style>
-  body { font-family: Arial, sans-serif; margin: 20px; }
-  .tab { display: none; }
-  .tab.active { display: block; }
-  button { margin: 5px; }
-  table { border-collapse: collapse; width: 100%; margin-top: 10px; }
-  th, td { border: 1px solid #000; padding: 5px; text-align: center; min-width: 120px; height: 70px; vertical-align: top; }
-  .modal {
-    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.5); justify-content: center; align-items: center;
+  :root{
+    --primary:#1768c6;
+    --bg:#f5f7fb;
+    --card:#ffffff;
+    --muted:#6b7280;
+    --success:#2ecc71;
+    --danger:#e74c3c;
+    --surface-shadow: 0 6px 18px rgba(23,104,198,0.08);
   }
-  .modal-content {
-    background: #fff; padding: 20px; border-radius: 5px; width: 400px;
-  }
-  .wizard-step { display: none; }
-  .wizard-step.active { display: block; }
-  .prateleira { margin: 15px 0; padding: 10px; border: 1px solid #aaa; min-height: 100px; display: flex; flex-wrap: wrap; gap: 10px; }
-  .item { padding: 6px; border: 1px solid #000; cursor: grab; background: #f0f0f0; border-radius: 4px; font-size: 13px; }
-  .item.verde { background: #4caf50; color: white; }
-  td.dropzone { background: #fafafa; }
-  .aula { background: #d9edf7; border: 1px solid #31708f; border-radius: 4px; padding: 4px; font-size: 12px; cursor: grab; }
+  *{box-sizing:border-box}
+  body{font-family:Inter, "Segoe UI", Roboto, Arial; margin:0;background:var(--bg);color:#111}
+  header{background:linear-gradient(90deg,var(--primary),#0f5fa8); color:#fff; padding:18px 20px; font-weight:700; font-size:1.1rem; box-shadow:0 2px 8px rgba(0,0,0,0.08)}
+  .container{max-width:1200px;margin:18px auto;padding:0 16px;}
+  .tabs{display:flex;gap:8px;margin:10px 0}
+  .tab-btn{flex:0 0 auto;padding:10px 14px;border-radius:8px;border:1px solid transparent;background:transparent;color:var(--primary);cursor:pointer;font-weight:600}
+  .tab-btn.active{background:var(--card);box-shadow:var(--surface-shadow);border-color:#e2e8f0;color:var(--primary)}
+  .layout{display:grid;grid-template-columns:1fr;gap:16px}
+  @media(min-width:980px){ .layout{grid-template-columns:360px 1fr} }
+
+  /* Card */
+  .card{background:var(--card);border-radius:10px;padding:14px;box-shadow:var(--surface-shadow);border:1px solid #eef2f6}
+
+  /* forms */
+  label{display:block;font-weight:600;margin-bottom:6px;color:#0f172a;font-size:0.95rem}
+  input[type=text], input[type=time], input[type=number], select {width:100%;padding:8px;border-radius:8px;border:1px solid #dbe6f2;background:#fff}
+  .row{display:flex;gap:8px;align-items:center}
+  .row .col{flex:1}
+
+  /* prateleira */
+  .shelf{display:flex;flex-wrap:wrap;gap:10px;padding:12px;border-radius:10px;background:linear-gradient(180deg,#ffffff,#fbfdff);border:1px dashed #e6eef8;min-height:110px}
+  .shelf-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;background:#f7fbff;border-left:4px solid var(--primary);cursor:grab;box-shadow:0 2px 6px rgba(11,65,130,0.04)}
+  .shelf-item:hover{transform:translateY(-3px)}
+  .shelf-item.done{background:#ecfaf1;border-left-color:var(--success);color:#074b24}
+  .shelf-item .meta{font-size:0.85rem;color:var(--muted);margin-left:4px}
+  .count-bubble{background:#fff;padding:4px 8px;border-radius:999px;border:1px solid #e6eef8;font-weight:700;font-size:0.85rem}
+
+  /* grid */
+  .grid-wrap{overflow:auto}
+  table.schedule{width:100%;border-collapse:collapse;border-radius:8px;overflow:hidden}
+  table.schedule thead th{background:var(--primary);color:#fff;padding:10px;font-weight:700;position:sticky;top:0;z-index:2}
+  table.schedule th, table.schedule td{border:1px solid #eef2f6;padding:8px;text-align:center;min-width:110px;vertical-align:top}
+  td.slot{background:#fbfdff;min-height:72px;position:relative}
+  td.slot.drag-over{outline:4px dashed rgba(23,104,198,0.18)}
+  .lesson{display:block;background:#e8f4ff;border-left:4px solid var(--primary);padding:8px;border-radius:6px;cursor:grab;font-size:13px}
+  .lesson .small{display:block;font-size:12px;color:var(--muted);margin-top:6px}
+
+  /* controls */
+  .controls{display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
+  .muted{color:var(--muted);font-size:0.95rem}
+  .btn-ghost{background:transparent;border:1px solid #dbe6f2;padding:8px 10px;border-radius:8px;color:var(--primary);cursor:pointer}
+
+  /* modal */
+  .modal{display:none;position:fixed;inset:0;background:rgba(2,6,23,0.45);align-items:center;justify-content:center;padding:20px;z-index:1000}
+  .modal.open{display:flex}
+  .modal-card{background:var(--card);border-radius:10px;padding:16px;max-width:540px;width:100%;box-shadow:0 10px 30px rgba(2,6,23,0.2)}
+  .wizard-steps{display:flex;gap:6px;margin:8px 0}
+  .wizard-step-pill{background:#f1f5f9;padding:6px 10px;border-radius:999px;font-size:13px}
+  .small-muted{font-size:0.9rem;color:var(--muted)}
+
+  /* small helpers */
+  .flex{display:flex;gap:8px;align-items:center}
+  .space-between{display:flex;justify-content:space-between;align-items:center}
+  .danger{color:var(--danger);font-weight:700}
+  .success{color:var(--success);font-weight:700}
+  .kbd{background:#fff;padding:6px 8px;border-radius:6px;border:1px solid #eef2f6;font-weight:700}
 </style>
 </head>
 <body>
+<header>Horários Escolares — Sistema Integrado</header>
+<div class="container">
+  <div class="tabs">
+    <button class="tab-btn active" id="btn-cad">Cadastro</button>
+    <button class="tab-btn" id="btn-mont">Montar Horário</button>
+  </div>
 
-<h1>Sistema de Horários Escolares</h1>
+  <div class="layout">
+    <!-- LEFT: Cadastro -->
+    <div class="card" id="cadastro">
+      <div class="space-between">
+        <h3 style="margin:0;color:var(--primary)">Cadastro</h3>
+        <div class="small-muted">Gerencie turmas, disciplinas e professores</div>
+      </div>
 
-<!-- Abas -->
-<button onclick="showTab('cadastro')">Cadastro</button>
-<button onclick="showTab('montar')">Montar Horário</button>
+      <div style="margin-top:12px" class="row">
+        <div class="col"><button onclick="openModal('modalTurma')" class="btn-ghost">+ Nova Turma</button></div>
+        <div class="col"><button onclick="openModal('modalDisciplina')" class="btn-ghost">+ Nova Disciplina</button></div>
+        <div class="col"><button onclick="openModal('modalProfessor')" style="background:var(--primary);color:#fff;border-radius:8px;padding:8px 12px">+ Professor</button></div>
+      </div>
 
-<!-- Aba Cadastro -->
-<div id="cadastro" class="tab active">
-  <h2>Cadastro</h2>
-  <button onclick="openModal('modalTurma')">Cadastrar Turma</button>
-  <button onclick="openModal('modalDisciplina')">Cadastrar Disciplina</button>
-  <button onclick="openModal('modalProfessor')">Cadastrar Professor</button>
+      <hr style="margin:12px 0;border:none;border-top:1px solid #eef2f6">
 
-  <h3>Turmas</h3>
-  <ul id="listaTurmas"></ul>
-  <h3>Disciplinas</h3>
-  <ul id="listaDisciplinas"></ul>
-  <h3>Professores</h3>
-  <ul id="listaProfessores"></ul>
-</div>
+      <h4 style="margin:6px 0">Turmas</h4>
+      <ul id="listaTurmas"></ul>
 
-<!-- Aba Montar Horário -->
-<div id="montar" class="tab">
-  <h2>Montar Horário</h2>
+      <h4 style="margin:6px 0">Disciplinas</h4>
+      <ul id="listaDisciplinas"></ul>
 
-  <label>Selecionar Turma:</label>
-  <select id="turmaSelecionada" onchange="resetarGrade()"></select>
+      <h4 style="margin:6px 0">Professores</h4>
+      <ul id="listaProfessores" class="small-muted"></ul>
+    </div>
 
-  <h3>Prateleira de Aulas</h3>
-  <div id="prateleira" class="prateleira"></div>
+    <!-- RIGHT: Montar -->
+    <div>
+      <div class="card" id="montar" style="display:none">
+        <div class="space-between" style="margin-bottom:8px">
+          <div>
+            <h3 style="margin:0;color:var(--primary)">Montar Horário</h3>
+            <div class="small-muted">Escolha a turma e arraste aulas da prateleira para a grade</div>
+          </div>
+          <div class="small-muted">Duplo-clique em uma aula para removê-la • Arraste para mover</div>
+        </div>
 
-  <h3>Grade Semanal</h3>
-  <table>
-    <thead>
-      <tr>
-        <th>Horário</th>
-        <th>Segunda</th>
-        <th>Terça</th>
-        <th>Quarta</th>
-        <th>Quinta</th>
-        <th>Sexta</th>
-      </tr>
-    </thead>
-    <tbody id="grade"></tbody>
-  </table>
-</div>
+        <div class="controls">
+          <label style="font-weight:700">Turma:</label>
+          <select id="turmaSelecionada" style="padding:8px;border-radius:8px;border:1px solid #dbe6f2" onchange="resetarGrade()"></select>
+          <div style="flex:1"></div>
+          <button class="btn-ghost" onclick="exportJSON()">Exportar JSON</button>
+          <button class="btn-ghost" onclick="importExample()">Importar Exemplo</button>
+        </div>
 
-<!-- MODAL TURMA -->
-<div id="modalTurma" class="modal">
-  <div class="modal-content">
-    <h3>Cadastrar Turma</h3>
-    <input type="text" id="nomeTurma" placeholder="Nome da Turma">
-    <br><br>
-    <button onclick="cadastrarTurma()">Salvar</button>
-    <button onclick="closeModal('modalTurma')">Cancelar</button>
+        <div style="margin-bottom:12px">
+          <div class="shelf" id="shelf"></div>
+        </div>
+
+        <div class="grid-wrap card" style="padding:8px">
+          <table class="schedule" aria-label="Grade semanal">
+            <thead>
+              <tr>
+                <th>Horário</th>
+                <th>Segunda</th>
+                <th>Terça</th>
+                <th>Quarta</th>
+                <th>Quinta</th>
+                <th>Sexta</th>
+              </tr>
+            </thead>
+            <tbody id="grade"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- MODAL DISCIPLINA -->
-<div id="modalDisciplina" class="modal">
-  <div class="modal-content">
-    <h3>Cadastrar Disciplina</h3>
-    <input type="text" id="nomeDisciplina" placeholder="Nome da Disciplina">
-    <br><br>
-    <button onclick="cadastrarDisciplina()">Salvar</button>
-    <button onclick="closeModal('modalDisciplina')">Cancelar</button>
+<!-- MODALS -->
+<!-- Turma -->
+<div class="modal" id="modalTurma">
+  <div class="modal-card">
+    <div class="space-between"><h3 style="margin:0">Nova Turma</h3><button class="btn-ghost" onclick="closeModal('modalTurma')">Fechar</button></div>
+    <div style="margin-top:10px">
+      <label>Nome da Turma</label>
+      <input type="text" id="inputTurma" placeholder="Ex: 6ºA">
+      <div style="margin-top:10px;display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn-ghost" onclick="closeModal('modalTurma')">Cancelar</button>
+        <button onclick="cadastrarTurma()">Salvar Turma</button>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- MODAL PROFESSOR (WIZARD) -->
-<div id="modalProfessor" class="modal">
-  <div class="modal-content">
-    <h3>Cadastrar Professor</h3>
+<!-- Disciplina -->
+<div class="modal" id="modalDisciplina">
+  <div class="modal-card">
+    <div class="space-between"><h3 style="margin:0">Nova Disciplina</h3><button class="btn-ghost" onclick="closeModal('modalDisciplina')">Fechar</button></div>
+    <div style="margin-top:10px">
+      <label>Nome da Disciplina</label>
+      <input type="text" id="inputDisciplina" placeholder="Ex: Matemática">
+      <div style="margin-top:10px;display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn-ghost" onclick="closeModal('modalDisciplina')">Cancelar</button>
+        <button onclick="cadastrarDisciplina()">Salvar Disciplina</button>
+      </div>
+    </div>
+  </div>
+</div>
 
-    <div id="step1" class="wizard-step active">
-      <label>Nome:</label><br>
-      <input type="text" id="nomeProfessor"><br><br>
-      <button onclick="nextStep(2)">Próximo</button>
+<!-- Professor wizard -->
+<div class="modal" id="modalProfessor">
+  <div class="modal-card">
+    <div class="space-between">
+      <h3 style="margin:0">Cadastrar Professor</h3>
+      <button class="btn-ghost" onclick="closeModal('modalProfessor')">Fechar</button>
     </div>
 
-    <div id="step2" class="wizard-step">
-      <label>Disciplinas:</label><br>
-      <select id="disciplinasProfessor" multiple></select><br><br>
-      <label>Meta de aulas:</label><br>
-      <input type="number" id="metaAulas"><br><br>
-      <button onclick="prevStep(1)">Voltar</button>
-      <button onclick="nextStep(3)">Próximo</button>
-    </div>
+    <div style="margin-top:10px">
+      <div class="wizard-steps">
+        <div class="wizard-step-pill" id="wiz-pill-1">1. Dados</div>
+        <div class="wizard-step-pill" id="wiz-pill-2">2. Disciplinas & Meta</div>
+        <div class="wizard-step-pill" id="wiz-pill-3">3. Disponibilidade</div>
+      </div>
 
-    <div id="step3" class="wizard-step">
-      <label>Disponibilidade (dias):</label><br>
-      <label><input type="checkbox" value="Segunda">Segunda</label>
-      <label><input type="checkbox" value="Terça">Terça</label>
-      <label><input type="checkbox" value="Quarta">Quarta</label>
-      <label><input type="checkbox" value="Quinta">Quinta</label>
-      <label><input type="checkbox" value="Sexta">Sexta</label><br><br>
-      <button onclick="prevStep(2)">Voltar</button>
-      <button onclick="finalizarProfessor()">Finalizar</button>
+      <div id="wiz-1" class="wizard-step active">
+        <label>Nome completo</label>
+        <input type="text" id="profNome" placeholder="Ex: Maria Silva">
+        <div style="margin-top:12px;text-align:right">
+          <button class="btn-ghost" onclick="closeModal('modalProfessor')">Cancelar</button>
+          <button onclick="wizNext(2)">Próximo</button>
+        </div>
+      </div>
+
+      <div id="wiz-2" class="wizard-step" style="display:none">
+        <label>Disciplina</label>
+        <select id="profDiscSelect"></select>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <input type="number" id="profMeta" placeholder="Meta de aulas" min="1" style="width:140px">
+          <button onclick="addProfDisc()">Adicionar</button>
+        </div>
+        <ul id="profDiscList" class="small-muted" style="margin-top:8px"></ul>
+        <div style="margin-top:12px;text-align:right">
+          <button class="btn-ghost" onclick="wizPrev(1)">Voltar</button>
+          <button onclick="wizNext(3)">Próximo</button>
+        </div>
+      </div>
+
+      <div id="wiz-3" class="wizard-step" style="display:none">
+        <label>Disponibilidade por dia (adicione intervalos)</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <select id="dispDia" style="width:140px;padding:8px;border-radius:8px;border:1px solid #dbe6f2">
+            <option>Segunda</option><option>Terça</option><option>Quarta</option><option>Quinta</option><option>Sexta</option>
+          </select>
+          <input type="time" id="dispInicio" value="07:00" style="width:120px">
+          <input type="time" id="dispFim" value="12:00" style="width:120px">
+          <button onclick="addProfDisp()">Adicionar período</button>
+        </div>
+        <ul id="profDispList" class="small-muted" style="margin-top:8px"></ul>
+
+        <div style="margin-top:12px;text-align:right">
+          <button class="btn-ghost" onclick="wizPrev(2)">Voltar</button>
+          <button onclick="saveProfessor()">Finalizar</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
 <script>
-  let turmas = [];
-  let disciplinas = [];
-  let professores = [];
-  let horarios = []; // {professor, disciplina, dia, hora, turma}
+/* ===== Dados em memória ===== */
+let turmas = [];
+let disciplinas = [];
+let professores = []; // {nome, disciplinasMeta:[{disciplina,meta}], disponibilidades:[{dia,inicio,fim}]}
+let horarios = [];    // {id, turma, dia, inicio, fim, disciplina, professor}
 
-  function showTab(tab) {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.getElementById(tab).classList.add('active');
-    if(tab === 'montar') {
-      atualizarPrateleira();
-      atualizarTurmasSelect();
-    }
-  }
+/* temporários do wizard */
+let wizard = {discs:[], disps:[]};
 
-  function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-  function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+/* utilitários tempo */
+function timeToMinutes(t){ if(!t) return null; const [hh,mm]=t.split(':').map(Number); return hh*60+mm; }
+function minutesToTime(m){ return String(Math.floor(m/60)).padStart(2,'0') + ':' + String(m%60).padStart(2,'0'); }
+function uid(){ return 'id'+Math.random().toString(36).slice(2,9); }
+function intervalsOverlap(aStart,aEnd,bStart,bEnd){ return Math.max(aStart,bStart) < Math.min(aEnd,bEnd); }
 
-  function cadastrarTurma() {
-    const nome = document.getElementById('nomeTurma').value.trim();
-    if(nome && !turmas.includes(nome)) {
-      turmas.push(nome);
-      document.getElementById('listaTurmas').innerHTML += `<li>${nome}</li>`;
-      document.getElementById('nomeTurma').value = '';
-      closeModal('modalTurma');
-      atualizarTurmasSelect();
-    }
-  }
+/* ================== UI: tabs & modal ================== */
+document.getElementById('btn-cad').addEventListener('click', ()=>{ showTab('cadastro'); });
+document.getElementById('btn-mont').addEventListener('click', ()=>{ showTab('montar'); });
 
-  function cadastrarDisciplina() {
-    const nome = document.getElementById('nomeDisciplina').value.trim();
-    if(nome && !disciplinas.includes(nome)) {
-      disciplinas.push(nome);
-      document.getElementById('listaDisciplinas').innerHTML += `<li>${nome}</li>`;
-      document.getElementById('nomeDisciplina').value = '';
-      closeModal('modalDisciplina');
-      atualizarSelecoes();
-    }
-  }
+function showTab(id){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  if(id==='cadastro') document.getElementById('btn-cad').classList.add('active');
+  else document.getElementById('btn-mont').classList.add('active');
 
-  function nextStep(n) {
-    document.querySelectorAll('.wizard-step').forEach(s => s.classList.remove('active'));
-    document.getElementById('step'+n).classList.add('active');
-  }
-  function prevStep(n) { nextStep(n); }
-
-  function finalizarProfessor() {
-    const nome = document.getElementById('nomeProfessor').value.trim();
-    const selDisciplinas = Array.from(document.getElementById('disciplinasProfessor').selectedOptions).map(o => o.value);
-    const meta = parseInt(document.getElementById('metaAulas').value);
-    const disponibilidade = Array.from(document.querySelectorAll('#step3 input[type=checkbox]:checked')).map(c => c.value);
-
-    if(nome && selDisciplinas.length && meta > 0 && disponibilidade.length) {
-      professores.push({ nome, disciplinas: selDisciplinas, metaAulas: meta, disponibilidade, aulasDadas: 0 });
-      document.getElementById('listaProfessores').innerHTML += `<li>${nome} - ${selDisciplinas.join(', ')} (Meta: ${meta})</li>`;
-      closeModal('modalProfessor');
-      atualizarSelecoes();
-    } else {
-      alert('Preencha todos os campos!');
-    }
-  }
-
-  function atualizarSelecoes() {
-    const disciplinasProfessor = document.getElementById('disciplinasProfessor');
-    disciplinasProfessor.innerHTML = disciplinas.map(d => `<option value="${d}">${d}</option>`).join('');
-  }
-
-  function atualizarTurmasSelect() {
-    const select = document.getElementById('turmaSelecionada');
-    select.innerHTML = turmas.map(t => `<option value="${t}">${t}</option>`).join('');
+  document.getElementById('cadastro').style.display = id==='cadastro' ? 'block' : 'none';
+  document.getElementById('montar').style.display = id==='montar' ? 'block' : 'none';
+  if(id==='montar') {
+    atualizarTurmaSelect();
+    renderShelf();
     resetarGrade();
   }
+}
 
-  const horariosBase = ["07:00","08:00","09:00","10:00","11:00","12:00"];
-  const dias = ["Segunda","Terça","Quarta","Quinta","Sexta"];
+/* modal helpers */
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
 
-  function resetarGrade() {
-    const grade = document.getElementById('grade');
-    grade.innerHTML = "";
-    horariosBase.forEach(hora => {
-      let row = `<tr><td>${hora}</td>`;
-      dias.forEach(d => row += `<td class="dropzone" data-dia="${d}" data-hora="${hora}" ondrop="drop(event)" ondragover="allowDrop(event)"></td>`);
-      row += "</tr>";
-      grade.innerHTML += row;
+/* ========== CADASTROS ========== */
+function cadastrarTurma(){
+  const v = document.getElementById('inputTurma').value.trim();
+  if(!v){ alert('Informe nome da turma'); return; }
+  if(turmas.includes(v)){ alert('Turma já existe'); return; }
+  turmas.push(v);
+  renderTurmas(); document.getElementById('inputTurma').value=''; closeModal('modalTurma'); atualizarTurmaSelect(); renderShelf();
+}
+function renderTurmas(){ document.getElementById('listaTurmas').innerHTML = turmas.map(t=>`<li>${t}</li>`).join('') || '<li class="small-muted">Nenhuma turma</li>'; }
+
+function cadastrarDisciplina(){
+  const v = document.getElementById('inputDisciplina').value.trim();
+  if(!v){ alert('Informe disciplina'); return; }
+  if(disciplinas.includes(v)){ alert('Disciplina já existe'); return; }
+  disciplinas.push(v);
+  renderDisciplinas(); document.getElementById('inputDisciplina').value=''; closeModal('modalDisciplina'); atualizarDiscSelects(); renderShelf();
+}
+function renderDisciplinas(){ document.getElementById('listaDisciplinas').innerHTML = disciplinas.map(d=>`<li>${d}</li>`).join('') || '<li class="small-muted">Nenhuma disciplina</li>'; }
+function atualizarDiscSelects(){
+  const sel = document.getElementById('profDiscSelect');
+  sel.innerHTML = `<option value="">-- selecione --</option>` + disciplinas.map(d=>`<option value="${d}">${d}</option>`).join('');
+}
+
+/* ========== WIZARD PROFESSOR (2: discs + meta, 3: disponibilidade intervals) ========== */
+function wizNext(n){
+  document.querySelectorAll('#modalProfessor .wizard-step').forEach(s=>s.style.display='none');
+  document.getElementById('wiz-'+n).style.display='block';
+  document.querySelectorAll('.wizard-step-pill').forEach(p=>p.style.opacity=0.5);
+  document.getElementById('wiz-pill-'+n).style.opacity=1;
+}
+function wizPrev(n){ wizNext(n); }
+
+function addProfDisc(){
+  const sel = document.getElementById('profDiscSelect').value;
+  const meta = parseInt(document.getElementById('profMeta').value,10);
+  if(!sel){ alert('Selecione disciplina'); return; }
+  if(!meta || meta <= 0){ alert('Informe meta válida'); return; }
+  if(wizard.discs.some(x=>x.disciplina===sel)){ alert('Disciplina já adicionada'); return; }
+  wizard.discs.push({disciplina:sel, meta});
+  renderWizardDiscs();
+  document.getElementById('profMeta').value='';
+}
+function renderWizardDiscs(){
+  document.getElementById('profDiscList').innerHTML = wizard.discs.map(d=>`<li>${d.disciplina} — meta: ${d.meta} <button onclick="remWizardDisc('${d.disciplina}')">Rem</button></li>`).join('') || '<li class="small-muted">Nenhuma disciplina adicionada</li>';
+}
+function remWizardDisc(d){ wizard.discs = wizard.discs.filter(x=>x.disciplina!==d); renderWizardDiscs(); }
+
+function addProfDisp(){
+  const dia = document.getElementById('dispDia').value;
+  const inicio = document.getElementById('dispInicio').value;
+  const fim = document.getElementById('dispFim').value;
+  if(!inicio || !fim){ alert('Informe intervalo'); return; }
+  if(timeToMinutes(inicio) >= timeToMinutes(fim)){ alert('Início deve ser antes do fim'); return; }
+  wizard.disps.push({dia, inicio, fim});
+  renderWizardDisps();
+}
+function renderWizardDisps(){
+  // group by day
+  const g = {};
+  wizard.disps.forEach(d=>{ g[d.dia] = g[d.dia] || []; g[d.dia].push(`${d.inicio}-${d.fim}`); });
+  document.getElementById('profDispList').innerHTML = Object.keys(g).length ? Object.keys(g).map(k=>`<li>${k}: ${g[k].join(', ')} <button onclick="remWizardDisp('${k}')">Rem</button></li>`).join('') : '<li class="small-muted">Nenhum período adicionado</li>';
+}
+function remWizardDisp(day){ wizard.disps = wizard.disps.filter(d=>d.dia!==day); renderWizardDisps(); }
+
+function saveProfessor(){
+  const nome = document.getElementById('profNome').value.trim();
+  if(!nome){ alert('Informe nome'); return; }
+  if(wizard.discs.length===0){ alert('Adicione ao menos 1 disciplina'); return; }
+  if(wizard.disps.length===0){ alert('Adicione ao menos 1 período de disponibilidade'); return; }
+  if(professores.some(p=>p.nome===nome)){ alert('Professor já cadastrado'); return; }
+  professores.push({nome, disciplinasMeta: JSON.parse(JSON.stringify(wizard.discs)), disponibilidades: JSON.parse(JSON.stringify(wizard.disps))});
+  // limpar wizard
+  wizard.discs = []; wizard.disps = [];
+  document.getElementById('profNome').value=''; document.getElementById('profMeta').value=''; document.getElementById('profDiscList').innerHTML=''; document.getElementById('profDispList').innerHTML='';
+  closeModal('modalProfessor'); renderProfessores(); atualizarDiscSelects(); renderShelf(); resetarGrade();
+}
+
+/* render lista professores */
+function renderProfessores(){
+  const out = professores.map(p=>{
+    const discs = p.disciplinasMeta.map(d=>`${d.disciplina}(m:${d.meta})`).join('; ');
+    const disps = p.disponibilidades.map(d=>`${d.dia} ${d.inicio}-${d.fim}`).join('; ');
+    return `<li><strong>${p.nome}</strong><div class="small-muted">${discs}</div><div class="small-muted">${disps}</div></li>`;
+  }).join('') || '<li class="small-muted">Nenhum professor</li>';
+  document.getElementById('listaProfessores').innerHTML = out;
+}
+
+/* ========== PRATELEIRA (shelf) ========== */
+function countAssigned(profName, disciplina){
+  return horarios.filter(h=>h.professor===profName && h.disciplina===disciplina).length;
+}
+function renderShelf(){
+  const shelf = document.getElementById('shelf');
+  shelf.innerHTML = '';
+  // each professor-disc pair
+  const items = [];
+  professores.forEach(p=>{
+    p.disciplinasMeta.forEach(dm=>{
+      const atrib = countAssigned(p.nome, dm.disciplina);
+      const done = atrib >= dm.meta;
+      items.push({professor:p.nome, disciplina:dm.disciplina, atrib, meta:dm.meta, done});
     });
+  });
+  if(items.length===0){ shelf.innerHTML = '<div class="small-muted">Cadastre professores/disciplinas para ver itens aqui</div>'; return; }
+  items.forEach((it, idx)=>{
+    const el = document.createElement('div');
+    el.className = 'shelf-item' + (it.done ? ' done' : '');
+    el.draggable = true;
+    el.dataset.idx = idx;
+    el.dataset.prof = it.professor;
+    el.dataset.disc = it.disciplina;
+    el.innerHTML = `<div style="display:flex;align-items:center;gap:10px">
+      <div style="font-weight:700">${it.disciplina}</div>
+      <div class="meta">${it.professor}</div>
+    </div><div class="count-bubble">${it.atrib}/${it.meta}</div>`;
+    el.addEventListener('dragstart', shelfDrag);
+    shelf.appendChild(el);
+  });
+}
 
-    const turma = document.getElementById('turmaSelecionada').value;
-    horarios.filter(h => h.turma === turma).forEach(h => {
-      const cell = [...document.querySelectorAll('.dropzone')]
-        .find(c => c.dataset.dia === h.dia && c.dataset.hora === h.hora);
-      if(cell) addAulaToCell(cell, h);
+/* shelf drag */
+function shelfDrag(e){
+  const prof = e.currentTarget.dataset.prof;
+  const disc = e.currentTarget.dataset.disc;
+  e.dataTransfer.setData('application/json', JSON.stringify({origin:'shelf', professor:prof, disciplina:disc}));
+  e.dataTransfer.effectAllowed = 'copy';
+}
+
+/* ========== GRADE (render + drag/drop + move + delete) ==========
+   grade shows slots for 07:00-17:00 hourly on Mon-Fri
+*/
+const HOURS = ["07:00","08:00","09:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00"];
+const DAYS = ["Segunda","Terça","Quarta","Quinta","Sexta"];
+
+function atualizarTurmaSelect(){
+  const sel = document.getElementById('turmaSelecionada');
+  sel.innerHTML = turmas.length ? `<option value="">-- selecione turma --</option>` + turmas.map(t=>`<option value="${t}">${t}</option>`).join('') : `<option value="">-- sem turmas --</option>`;
+}
+
+function resetarGrade(){
+  const tbody = document.getElementById('grade');
+  tbody.innerHTML = '';
+  HOURS.forEach(h=>{
+    let row = document.createElement('tr');
+    let th = document.createElement('td'); th.textContent = h; row.appendChild(th);
+    DAYS.forEach(day=>{
+      const td = document.createElement('td');
+      td.className = 'slot';
+      td.dataset.day = day;
+      td.dataset.time = h;
+      td.addEventListener('dragover', slotAllowDrop);
+      td.addEventListener('dragleave', ()=>td.classList.remove('drag-over'));
+      td.addEventListener('drop', slotDrop);
+      row.appendChild(td);
+    });
+    tbody.appendChild(row);
+  });
+  // render lessons of selected turma
+  const turma = document.getElementById('turmaSelecionada').value;
+  if(turma) {
+    horarios.filter(h=>h.turma===turma).forEach(h=> {
+      const cell = [...document.querySelectorAll('.slot')].find(c=>c.dataset.day===h.dia && c.dataset.time===h.inicio);
+      if(cell) addLessonToCell(cell, h);
     });
   }
+}
 
-  function atualizarPrateleira() {
-    const prateleira = document.getElementById('prateleira');
-    prateleira.innerHTML = "";
-    professores.forEach(p => {
-      p.disciplinas.forEach(d => {
-        const item = document.createElement('div');
-        item.className = "item" + (p.aulasDadas >= p.metaAulas ? " verde" : "");
-        item.innerText = `${d} (${p.nome})`;
-        item.draggable = true;
-        item.dataset.professor = p.nome;
-        item.dataset.disciplina = d;
-        item.addEventListener('dragstart', drag);
-        prateleira.appendChild(item);
-      });
-    });
+/* slot drag/drop handlers */
+function slotAllowDrop(e){ e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
+function slotDrop(e){
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  const payload = JSON.parse(e.dataTransfer.getData('application/json') || 'null');
+  if(!payload) return;
+
+  const day = e.currentTarget.dataset.day;
+  const time = e.currentTarget.dataset.time;
+  const turma = document.getElementById('turmaSelecionada').value;
+  if(!turma){ alert('Selecione uma turma antes.'); return; }
+
+  // compute slot interval (hour long)
+  const inicio = time;
+  const fim = minutesToTime(timeToMinutes(time)+60);
+
+  // If payload.origin == 'shelf' => creating new lesson
+  if(payload.origin === 'shelf'){
+    const prof = professores.find(p=>p.nome===payload.professor);
+    if(!prof){ alert('Professor não encontrado'); return; }
+    // availability: must have interval in that day covering [inicio,fim)
+    const avail = prof.disponibilidades.some(d=> d.dia===day && timeToMinutes(inicio) >= timeToMinutes(d.inicio) && timeToMinutes(fim) <= timeToMinutes(d.fim));
+    if(!avail){ alert(`Professor ${prof.nome} não disponível em ${day} ${inicio}–${fim}`); return; }
+    // conflict: professor cannot be assigned to other turma at same day+start
+    const conflict = horarios.find(h=> h.professor===prof.nome && h.dia===day && h.inicio===inicio);
+    if(conflict){ alert(`Conflito: ${prof.nome} já está alocado em ${conflict.turma} (${conflict.inicio}–${conflict.fim})`); return; }
+    // cell must be empty for this turma
+    const existing = horarios.find(h=> h.turma===turma && h.dia===day && h.inicio===inicio);
+    if(existing){ alert('Esta célula já contém uma aula desta turma. Remova antes para mover.'); return; }
+    // add
+    const lesson = { id: uid(), turma, dia:day, inicio, fim, disciplina: payload.disciplina, professor: payload.professor };
+    horarios.push(lesson);
+    addLessonToCell(e.currentTarget, lesson);
+    renderShelf(); // update counts/colors
+    return;
   }
 
-  function allowDrop(ev) { ev.preventDefault(); }
-  function drag(ev) {
-    ev.dataTransfer.setData("text", JSON.stringify({
-      professor: ev.target.dataset.professor,
-      disciplina: ev.target.dataset.disciplina,
-      origem: ev.target.dataset.origem || "prateleira",
-      dia: ev.target.dataset.dia,
-      hora: ev.target.dataset.hora
-    }));
+  // If payload.origin == 'grade' => moving an existing lesson
+  if(payload.origin === 'grade'){
+    const lesson = horarios.find(h=>h.id === payload.id);
+    if(!lesson) return;
+    const prof = professores.find(p=>p.nome===lesson.professor);
+    if(!prof) return;
+    // availability must hold for new day/time
+    const avail2 = prof.disponibilidades.some(d=> d.dia===day && timeToMinutes(inicio) >= timeToMinutes(d.inicio) && timeToMinutes(fim) <= timeToMinutes(d.fim));
+    if(!avail2){ alert(`Professor ${prof.nome} não disponível em ${day} ${inicio}–${fim}`); return; }
+    // conflict: professor cannot be in other turma at same day/time (ignore the lesson being moved)
+    const conflict2 = horarios.find(h => h.professor===lesson.professor && h.dia===day && h.inicio===inicio && h.id !== lesson.id);
+    if(conflict2){ alert(`Conflito: ${lesson.professor} já está em ${conflict2.turma} nesse horário`); return; }
+    // cell must be empty for the target turma
+    const targetExisting = horarios.find(h=> h.turma===turma && h.dia===day && h.inicio===inicio && h.id !== lesson.id);
+    if(targetExisting){ alert('Célula ocupada pela mesma turma'); return; }
+    // move: update lesson.turma to current selected turma (we allow moving between turmas by selecting different turma before drop)
+    lesson.turma = turma;
+    lesson.dia = day;
+    lesson.inicio = inicio;
+    lesson.fim = fim;
+    resetarGrade(); renderShelf();
   }
+}
 
-  function drop(ev) {
-    ev.preventDefault();
-    const data = JSON.parse(ev.dataTransfer.getData("text"));
-    const dia = ev.target.dataset.dia;
-    const hora = ev.target.dataset.hora;
-    const turma = document.getElementById('turmaSelecionada').value;
+/* add lesson visual element inside a cell (and attach drag/dblclick handlers) */
+function addLessonToCell(cell, lesson){
+  cell.innerHTML = ''; // clear
+  const div = document.createElement('div');
+  div.className = 'lesson';
+  div.draggable = true;
+  div.dataset.id = lesson.id;
+  div.dataset.origin = 'grade';
+  div.innerHTML = `<strong>${lesson.disciplina}</strong><div class="small">${lesson.professor}</div><div class="small">(${lesson.inicio}–${lesson.fim})</div>`;
+  div.addEventListener('dragstart', lessonDrag);
+  div.addEventListener('dblclick', ()=>{
+    if(!confirm('Remover esta aula?')) return;
+    // remove from horarios
+    horarios = horarios.filter(h=>h.id !== lesson.id);
+    resetarGrade(); renderShelf();
+  });
+  cell.appendChild(div);
+}
 
-    const prof = professores.find(p => p.nome === data.professor);
+/* lesson drag start */
+function lessonDrag(e){
+  const id = e.currentTarget.dataset.id;
+  const lesson = horarios.find(h=>h.id===id);
+  if(!lesson) return;
+  e.dataTransfer.setData('application/json', JSON.stringify({origin:'grade', id: lesson.id}));
+  e.dataTransfer.effectAllowed = 'move';
+}
 
-    if(!prof.disponibilidade.includes(dia)) {
-      alert("Professor não disponível neste dia!");
-      return;
-    }
+/* ========== helpers: initial render & persistence optional ========= */
+function renderAll(){
+  renderTurmas(); renderDisciplinas(); renderProfessores(); renderShelf(); resetarGrade(); atualizarTurmaSelect();
+}
+function renderTurmas(){ document.getElementById('listaTurmas').innerHTML = turmas.map(t=>`<li>${t}</li>`).join('') || '<li class="small-muted">Nenhuma turma</li>'; }
+function renderDisciplinas(){ document.getElementById('listaDisciplinas').innerHTML = disciplinas.map(d=>`<li>${d}</li>`).join('') || '<li class="small-muted">Nenhuma disciplina</li>'; }
+function renderProfessores(){ document.getElementById('listaProfessores').innerHTML = professores.map(p=>`<li><strong>${p.nome}</strong><div class="small-muted">${p.disciplinasMeta.map(d=>d.disciplina+`(m:${d.meta})`).join('; ')}</div></li>`).join('') || '<li class="small-muted">Nenhum professor</li>'; }
 
-    const conflito = horarios.find(h => h.professor === data.professor && h.dia === dia && h.hora === hora);
-    if(conflito && (data.origem !== "grade" || conflito.turma !== turma)) {
-      alert(`Conflito: ${data.professor} já está em outra turma neste horário.`);
-      return;
-    }
+/* export/import helpers (small utilities) */
+function exportJSON(){
+  const data = {turmas, disciplinas, professores, horarios};
+  const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'horarios.json'; a.click(); URL.revokeObjectURL(url);
+}
+function importExample(){
+  // small demo to quickly populate
+  turmas = ['6ºA','6ºB'];
+  disciplinas = ['Matemática','Português','História','Ciências'];
+  professores = [
+    {nome:'Ana Souza', disciplinasMeta:[{disciplina:'Matemática',meta:6}], disponibilidades:[{dia:'Segunda',inicio:'07:00',fim:'12:00'},{day:'Terça',inicio:'07:00',fim:'12:00'}]},
+    {nome:'Carlos Lima', disciplinasMeta:[{disciplina:'Português',meta:5}], disponibilidades:[{dia:'Segunda',inicio:'08:00',fim:'17:00'},{dia:'Quarta',inicio:'07:00',fim:'12:00'}]}
+  ];
+  // fix potential property mistakes and unify
+  professores = professores.map(p=>{
+    // ensure disponibilidades items have proper keys (some example had 'day')
+    p.disponibilidades = (p.disponibilidades || []).map(d=>({dia:d.dia||d.day, inicio:d.inicio, fim:d.fim}));
+    return p;
+  });
+  horarios = [];
+  renderAll();
+  alert('Exemplo importado. Selecione uma turma e veja a prateleira.');
+}
 
-    // Se a origem for grade, remover do horário anterior
-    if(data.origem === "grade") {
-      horarios = horarios.filter(h => !(h.professor === data.professor && h.disciplina === data.disciplina && h.dia === data.dia && h.hora === data.hora && h.turma === turma));
-      resetarGrade();
-    } else {
-      prof.aulasDadas++;
-    }
+/* initial */
+renderAll();
 
-    horarios.push({ professor: data.professor, disciplina: data.disciplina, dia, hora, turma });
-    const cell = ev.target.closest(".dropzone");
-    addAulaToCell(cell, { professor: data.professor, disciplina: data.disciplina, dia, hora, turma });
-    atualizarPrateleira();
-  }
+/* convenience: when resizing or switching tabs ensure grade updates */
+window.addEventListener('resize', ()=>{ /* noop */ });
 
-  function addAulaToCell(cell, h) {
-    const aulaDiv = document.createElement("div");
-    aulaDiv.className = "aula";
-    aulaDiv.innerText = `${h.disciplina}\n${h.professor}`;
-    aulaDiv.draggable = true;
-    aulaDiv.dataset.professor = h.professor;
-    aulaDiv.dataset.disciplina = h.disciplina;
-    aulaDiv.dataset.origem = "grade";
-    aulaDiv.dataset.dia = h.dia;
-    aulaDiv.dataset.hora = h.hora;
-
-    aulaDiv.addEventListener("dragstart", drag);
-    aulaDiv.addEventListener("dblclick", () => {
-      if(confirm("Remover esta aula?")) {
-        horarios = horarios.filter(x => !(x.professor === h.professor && x.disciplina === h.disciplina && x.dia === h.dia && x.hora === h.hora && x.turma === h.turma));
-        const prof = professores.find(p => p.nome === h.professor);
-        if(prof) prof.aulasDadas--;
-        resetarGrade();
-        atualizarPrateleira();
-      }
-    });
-
-    cell.innerHTML = "";
-    cell.appendChild(aulaDiv);
-  }
 </script>
-
 </body>
 </html>
