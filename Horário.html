@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Horários Escolares — Persistência local</title>
+<title>Horários Escolares — Persistência Automática (corrigido)</title>
 <style>
 :root{
   --primary:#1768c6;
@@ -74,7 +74,7 @@ td.slot.drag-over{outline:4px dashed rgba(23,104,198,0.16)}
 </style>
 </head>
 <body>
-<header>Horários Escolares — Persistência Automática</header>
+<header>Horários Escolares — Persistência Automática (corrigido)</header>
 
 <div class="container">
   <div class="tabs">
@@ -267,7 +267,6 @@ function saveToStorage(){
   try {
     const payload = {turmas, disciplinas, professores, horarios};
     localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
-    // console.log('Saved');
   } catch(e) {
     console.error('Erro ao salvar localStorage', e);
   }
@@ -294,7 +293,7 @@ function loadFromStorage(){
   if(ok){
     renderAll();
   } else {
-    renderAll(); // still render empty UI
+    renderAll();
   }
 })();
 
@@ -365,7 +364,6 @@ function saveDisciplina(){
   if(!name){ alert('Informe nome da disciplina'); return; }
   if(editingDiscId){
     const d = disciplinas.find(x=>x.id===editingDiscId); if(d) d.name = name;
-    // update references in professors and horarios
     professores.forEach(p=>{
       p.disciplinasMeta.forEach(dm=>{ if(dm.discId===editingDiscId) dm.discName = name; });
     });
@@ -407,21 +405,28 @@ function deleteDisciplina(id){
   saveToStorage();
 }
 
-/* ===== PROFESSOR WIZARD CRUD ===== */
+/* ===== PROFESSOR WIZARD CRUD (corrigido disponibilidade) ===== */
 function openProfessorWizard(profId=null){
   wizardTemp = {discs: [], days: []};
   editingProfessorId = profId || null;
   document.getElementById('profName').value = '';
   document.getElementById('profDiscList').innerHTML = '';
+  // uncheck checkboxes first
   document.querySelectorAll('.disp-day').forEach(chk=>chk.checked=false);
   atualizarDiscSelects();
+
   if(profId){
     const p = professores.find(x=>x.id===profId);
     if(p){
       document.getElementById('profName').value = p.name;
       wizardTemp.discs = JSON.parse(JSON.stringify(p.disciplinasMeta || []));
       wizardTemp.days = JSON.parse(JSON.stringify(p.disponibilidades || []));
-      renderWizardDiscs(); renderWizardDays();
+      renderWizardDiscs();
+      renderWizardDays();
+      // mark the checkboxes according to wizardTemp.days
+      document.querySelectorAll('.disp-day').forEach(chk=>{
+        chk.checked = wizardTemp.days.includes(chk.value);
+      });
     }
   }
   showWizardStep(1);
@@ -481,9 +486,18 @@ function addProfDayFromCheckboxes(){
 }
 document.querySelectorAll('.disp-day').forEach(chk=>chk.addEventListener('change', ()=> addProfDayFromCheckboxes()));
 
+/* IMPORTANT FIX:
+   When saving professor, read checkboxes at that moment (so even if
+   wizardTemp wasn't updated for any reason, we take the real state)
+*/
 function saveProfessor(){
   const name = document.getElementById('profName').value.trim();
   if(!name){ alert('Informe nome'); return; }
+
+  // read checkboxes now (robust)
+  const checkedNow = [...document.querySelectorAll('.disp-day')].filter(c=>c.checked).map(c=>c.value);
+  if(checkedNow.length) wizardTemp.days = Array.from(new Set(checkedNow));
+
   if(wizardTemp.discs.length===0){ alert('Adicione pelo menos 1 disciplina'); return; }
   if(wizardTemp.days.length===0){ alert('Marque ao menos 1 dia de disponibilidade'); return; }
 
@@ -557,7 +571,7 @@ function renderShelf(){
   professores.forEach(p=>{
     p.disciplinasMeta.forEach(dm=>{
       const atrib = countAssigned(p.id, dm.discId);
-      const done = atrib >= dm.meta;
+      const done = attribOrFalse(atrib, dm.meta);
       items.push({profId:p.id, profName:p.name, discId:dm.discId, discName:dm.discName, atrib, meta:dm.meta, done});
     });
   });
@@ -577,6 +591,7 @@ function renderShelf(){
     el.appendChild(node);
   });
 }
+function attribOrFalse(a,b){ return a>=b; }
 function shelfDragStart(e){
   const profId = e.currentTarget.dataset.profId;
   const discId = e.currentTarget.dataset.discId;
@@ -701,9 +716,9 @@ function lessonDragStart(e){
 function renderAll(){
   renderTurmas(); renderDisciplinas(); renderProfessores(); renderShelf(); atualizarSelectTurma(); resetarGrade();
 }
-function renderTurmas(){ document.getElementById('listaTurmas').innerHTML = turmas.length ? turmas.map(t=>`<li><div style="display:flex;align-items:center;gap:10px"><strong>${t.name}</strong></div><div style="display:flex;gap:8px"><button class="btn ghost" onclick="editTurma('${t.id}')">Editar</button><button class="btn ghost" onclick="deleteTurma('${t.id}')">Excluir</button></div></li>`).join('') : '<li class="small-muted">Nenhuma turma</li>'; }
-function renderDisciplinas(){ document.getElementById('listaDisciplinas').innerHTML = disciplinas.length ? disciplinas.map(d=>`<li><div><strong>${d.name}</strong></div><div style="display:flex;gap:8px"><button class="btn ghost" onclick="editDisciplina('${d.id}')">Editar</button><button class="btn ghost" onclick="deleteDisciplina('${d.id}')">Excluir</button></div></li>`).join('') : '<li class="small-muted">Nenhuma disciplina</li>'; }
-function renderProfessores(){ document.getElementById('listaProfessores').innerHTML = professores.length ? professores.map(p=>`<li><div style="text-align:left"><strong>${p.name}</strong><div class="small-muted">${p.disciplinasMeta.map(dm=>dm.discName+`(m:${dm.meta})`).join('; ')}</div><div class="small-muted">Disponível: ${p.disponibilidades.join(', ')}</div></div><div style="display:flex;gap:8px"><button class="btn ghost" onclick="editProfessor('${p.id}')">Editar</button><button class="btn ghost" onclick="deleteProfessor('${p.id}')">Excluir</button></div></li>`).join('') : '<li class="small-muted">Nenhum professor</li>'; }
+function renderTurmas(){ const ul = document.getElementById('listaTurmas'); ul.innerHTML = turmas.length ? turmas.map(t=>`<li><div style="display:flex;align-items:center;gap:10px"><strong>${t.name}</strong></div><div style="display:flex;gap:8px"><button class="btn ghost" onclick="editTurma('${t.id}')">Editar</button><button class="btn ghost" onclick="deleteTurma('${t.id}')">Excluir</button></div></li>`).join('') : '<li class="small-muted">Nenhuma turma</li>'; }
+function renderDisciplinas(){ const ul = document.getElementById('listaDisciplinas'); ul.innerHTML = disciplinas.length ? disciplinas.map(d=>`<li><div><strong>${d.name}</strong></div><div style="display:flex;gap:8px"><button class="btn ghost" onclick="editDisciplina('${d.id}')">Editar</button><button class="btn ghost" onclick="deleteDisciplina('${d.id}')">Excluir</button></div></li>`).join('') : '<li class="small-muted">Nenhuma disciplina</li>'; }
+function renderProfessores(){ const ul = document.getElementById('listaProfessores'); ul.innerHTML = professores.length ? professores.map(p=>`<li><div style="text-align:left"><strong>${p.name}</strong><div class="small-muted">${p.disciplinasMeta.map(dm=>dm.discName+`(m:${dm.meta})`).join('; ')}</div><div class="small-muted">Disponível: ${p.disponibilidades.join(', ')}</div></div><div style="display:flex;gap:8px"><button class="btn ghost" onclick="editProfessor('${p.id}')">Editar</button><button class="btn ghost" onclick="deleteProfessor('${p.id}')">Excluir</button></div></li>`).join('') : '<li class="small-muted">Nenhum professor</li>'; }
 function atualizarSelectTurma(){ const sel = document.getElementById('selectTurma'); sel.innerHTML = turmas.length ? `<option value="">-- selecione --</option>` + turmas.map(t=>`<option value="${t.id}">${t.name}</option>`).join('') : `<option value="">-- sem turmas --</option>`; }
 
 /* ===== Export / Import example (also saves) ===== */
@@ -725,7 +740,7 @@ function importExample(){
   alert('Exemplo carregado — selecione uma turma para usar a grade.');
 }
 
-/* initial render if storage already loaded earlier */
+/* initial render (already called after load) */
 renderAll();
 
 </script>
