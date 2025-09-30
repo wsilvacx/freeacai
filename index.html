@@ -42,7 +42,7 @@
     align-items:start;
   }
 
-  /* Cabeçalho reformulado */
+  /* Cabeçalho */
   header{
     grid-column: 1 / -1;
     display:flex;
@@ -77,7 +77,7 @@
     font-size:0.92rem;
   }
 
-  /* Left column: escolhas */
+  /* Left column */
   .left {
     padding-top:6px;
   }
@@ -92,7 +92,7 @@
     font-size:0.98rem;
   }
 
-  /* tamanhos - cards */
+  /* tamanhos */
   .sizes {
     display:flex;
     justify-content:center;
@@ -150,7 +150,7 @@
     accent-color: var(--accent1);
   }
 
-  /* right column: resumo */
+  /* resumo */
   .right {
     position:relative;
   }
@@ -186,7 +186,7 @@
   }
   .btn-order:active{ transform:translateY(2px) }
 
-  /* footer small */
+  /* footer */
   .note { margin-top:12px; font-size:0.85rem; color:var(--muted) }
 
   /* responsive */
@@ -203,7 +203,7 @@
 <div class="app" role="application" aria-label="Montar açaí">
   <header>
     <div class="logo" aria-hidden="true">
-      <img src="Logo.jpg" alt="Logo AçaíFrre">
+      <img src="Logo.jpg" alt="Logo Freeacai">
     </div>
     <div>
       <h1>Freeacai</h1>
@@ -222,10 +222,13 @@
 
     <!-- Tamanhos -->
     <section class="section">
-     
       <div class="title">Tamanho</div>
       <div class="sizes" id="sizes">
-        <div class="size-card active" data-price="10" data-text="300 ml - R$ 10,00" onclick="selecionarTamanho(this)">
+        <div class="size-card active" data-price="8" data-text="200 ml - R$ 8,00" onclick="selecionarTamanho(this)">
+          <img src="Copo.jpg" alt="Copo 200ml">
+          <p>200 ml<br><small style="color:#6b6b6b;font-weight:600">R$ 8,00</small></p>
+        </div>
+        <div class="size-card" data-price="10" data-text="300 ml - R$ 10,00" onclick="selecionarTamanho(this)">
           <img src="Copo.jpg" alt="Copo 300ml">
           <p>300 ml<br><small style="color:#6b6b6b;font-weight:600">R$ 10,00</small></p>
         </div>
@@ -269,11 +272,11 @@
     <div class="summary" aria-live="polite">
       <h3>Resumo do pedido</h3>
 
-      <div class="line"><span class="small">Tamanho</span><span id="res-tamanho">300 ml - R$ 10,00</span></div>
+      <div class="line"><span class="small">Tamanho</span><span id="res-tamanho">200 ml - R$ 8,00</span></div>
       <div class="line"><span class="small">Fruta</span><span id="res-fruta">Uva</span></div>
       <div class="line"><span class="small">Adicionais</span><span id="res-adicionais">Nenhum</span></div>
 
-      <div class="line" style="margin-top:14px;"><span class="small">Total</span><span class="price" id="res-preco">R$ 10,00</span></div>
+      <div class="line" style="margin-top:14px;"><span class="small">Total</span><span class="price" id="res-preco">R$ 8,00</span></div>
 
       <button class="btn-order" id="btnOrder" onclick="finalizarPedido()">Enviar pedido pelo WhatsApp</button>
 
@@ -283,8 +286,8 @@
 </div>
 
 <script>
-  let precoAtual = 10;
-  let textoTamanho = "300 ml - R$ 10,00";
+  let precoAtual = 8;
+  let textoTamanho = "200 ml - R$ 8,00";
 
   function selecionarTamanho(card){
     document.querySelectorAll('.size-card').forEach(c => c.classList.remove('active'));
@@ -311,8 +314,8 @@
   document.addEventListener('DOMContentLoaded', function(){
     const first = document.querySelector('.size-card.active');
     if(first){
-      precoAtual = parseFloat(first.dataset.price || 10);
-      textoTamanho = first.dataset.text || '300 ml - R$ 10,00';
+      precoAtual = parseFloat(first.dataset.price || 8);
+      textoTamanho = first.dataset.text || '200 ml - R$ 8,00';
     }
     atualizarResumo();
   });
@@ -323,7 +326,7 @@
       .map(i => i.value);
 
     const mensagem = 
-      "Olá, gostária de fazer o seguinte pedido:" + "\n\n" + "*Pedido de Açaí* \n" +
+      "Olá, gostaria de fazer o seguinte pedido:" + "\n\n" + "*Pedido de Açaí* \n" +
       "*Tamanho:* " + textoTamanho + "\n" +
       "*Fruta:* " + fruta + "\n" +
       "*Adicionais:* " + (adicionais.length ? adicionais.join(', ') : 'Nenhum') + "\n" +
