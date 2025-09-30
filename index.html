@@ -3,310 +3,325 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Freeacai</title>
+  <title>Freeaçaí</title>
   <style>
     :root {
-      --primary: #4a148c;
-      --secondary: #7b1fa2;
-      --accent1: #ffca28;
-      --accent2: #ff7043;
-      --background: #f3e5f5;
+      --primary: #6a1b9a;
+      --secondary: #8e24aa;
+      --accent: #ff7043;
+      --light: #f3e5f5;
       --white: #fff;
-      --gray: #666;
       --radius: 16px;
+      --shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: var(--background);
+      background: var(--light);
       margin: 0;
-      padding: 0;
     }
     header {
       background: linear-gradient(135deg, var(--primary), var(--secondary));
-      padding: 1rem;
+      padding: 1.5rem;
       text-align: center;
       color: var(--white);
       border-radius: 0 0 var(--radius) var(--radius);
+      box-shadow: var(--shadow);
     }
     header img {
-      max-width: 120px;
+      width: 90px;
       border-radius: 50%;
       border: 3px solid var(--white);
     }
     header h1 {
       margin: 0.5rem 0 0;
-      font-size: 1.6rem;
     }
     .container {
-      display: grid;
-      grid-template-columns: 1fr 340px;
-      gap: 1.5rem;
-      max-width: 1200px;
-      margin: 1.5rem auto;
+      max-width: 1000px;
+      margin: 2rem auto;
       padding: 0 1rem;
     }
-    .left, .right {
+    .summary {
       background: var(--white);
-      padding: 1.2rem;
       border-radius: var(--radius);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    }
-    h2 {
-      font-size: 1.2rem;
-      margin-top: 0;
-      color: var(--primary);
-    }
-    .section {
-      margin-bottom: 1.5rem;
-    }
-    .title {
-      font-weight: bold;
-      margin-bottom: 0.8rem;
-      color: var(--secondary);
-    }
-    .sizes {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-    .size-card {
-      flex: 1;
-      min-width: 100px;
-      border: 2px solid #eee;
-      border-radius: var(--radius);
-      padding: 0.8rem;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.2s;
-      background: #fafafa;
-    }
-    .size-card.active {
-      border-color: var(--accent2);
-      background: #fff3e0;
-    }
-    .size-card img {
-      width: 60px;
-      margin-bottom: 0.5rem;
-    }
-    .radio-list, .check-list {
-      display: grid;
-      gap: 0.5rem;
-    }
-    label {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      cursor: pointer;
-      font-size: 0.95rem;
-    }
-    input[type="radio"], input[type="checkbox"] {
-      accent-color: var(--accent2);
-    }
-    .summary h3 {
-      margin-top: 0;
-      color: var(--primary);
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
     }
     .pedido {
-      background: #f9f9f9;
+      background: #fafafa;
+      padding: 1rem;
+      border-radius: 12px;
+      margin-bottom: 1rem;
       border: 1px solid #ddd;
-      border-radius: 10px;
-      padding: 8px;
-      margin-bottom: 8px;
-      font-size: 0.9rem;
+      position: relative;
     }
-    .price {
-      font-weight: bold;
-      color: var(--accent2);
+    .pedido-actions {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      display: flex;
+      gap: 6px;
     }
-    .btn-order, .btn-add {
-      background: var(--accent2);
-      color: white;
+    .pedido-actions button {
+      background: var(--accent);
       border: none;
-      padding: 0.9rem;
-      border-radius: var(--radius);
-      font-size: 1rem;
-      width: 100%;
+      padding: 6px 10px;
+      border-radius: 8px;
+      color: white;
       cursor: pointer;
-      margin-top: 0.8rem;
+      font-size: 0.8rem;
       transition: 0.2s;
     }
-    .btn-order:hover, .btn-add:hover {
+    .pedido-actions button:hover {
+      opacity: 0.8;
+    }
+    .btn {
+      background: var(--accent);
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: var(--radius);
+      width: 100%;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 1rem;
+      box-shadow: var(--shadow);
+      transition: 0.2s;
+    }
+    .btn:hover {
       background: #f4511e;
     }
-    .note {
-      font-size: 0.8rem;
-      color: var(--gray);
-      margin-top: 0.8rem;
+    .total {
+      font-weight: bold;
+      margin-top: 1rem;
+      text-align: right;
+      font-size: 1.2rem;
+      color: var(--primary);
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-content {
+      background: var(--white);
+      padding: 2rem;
+      border-radius: var(--radius);
+      width: 90%;
+      max-width: 500px;
+      box-shadow: var(--shadow);
+      position: relative;
+      animation: fadeIn 0.3s;
+    }
+    @keyframes fadeIn {
+      from {opacity: 0; transform: scale(0.9);}
+      to {opacity: 1; transform: scale(1);}
+    }
+    .close {
+      position: absolute;
+      right: 12px;
+      top: 12px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      color: var(--accent);
+      font-weight: bold;
+    }
+    .section {
+      margin-bottom: 1rem;
+    }
+    .section label {
+      display: block;
+      margin-bottom: 6px;
+    }
+    input[type="text"], select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
     }
   </style>
 </head>
 <body>
   <header>
-    <img src="Logo.jpg" alt="Logo Freeacai">
+    <img src="Logo.jpg" alt="Logo Freeaçaí">
     <h1>Monte seu Açaí</h1>
   </header>
 
   <div class="container">
-    <div class="left">
-      <!-- Tamanhos -->
-      <section class="section">
-        <div class="title">Tamanho</div>
-        <div class="sizes" id="sizes">
-          <div class="size-card active" data-price="8" data-text="200 ml - R$ 8,00" onclick="selecionarTamanho(this)">
-            <img src="Copo.jpg" alt="Copo 200ml">
-            <p>200 ml<br><small>R$ 8,00</small></p>
-          </div>
-          <div class="size-card" data-price="10" data-text="300 ml - R$ 10,00" onclick="selecionarTamanho(this)">
-            <img src="Copo.jpg" alt="Copo 300ml">
-            <p>300 ml<br><small>R$ 10,00</small></p>
-          </div>
-          <div class="size-card" data-price="12" data-text="400 ml - R$ 12,00" onclick="selecionarTamanho(this)">
-            <img src="Copo.jpg" alt="Copo 400ml">
-            <p>400 ml<br><small>R$ 12,00</small></p>
-          </div>
-          <div class="size-card" data-price="14" data-text="500 ml - R$ 14,00" onclick="selecionarTamanho(this)">
-            <img src="Copo.jpg" alt="Copo 500ml">
-            <p>500 ml<br><small>R$ 14,00</small></p>
-          </div>
-        </div>
-      </section>
-
-      <!-- Frutas -->
-      <section class="section">
-        <div class="title">Fruta</div>
-        <div class="radio-list">
-          <label><input type="radio" name="fruta" value="Uva" checked> Uva</label>
-          <label><input type="radio" name="fruta" value="Banana"> Banana</label>
-          <label><input type="radio" name="fruta" value="Morango"> Morango</label>
-        </div>
-      </section>
-
-      <!-- Adicionais -->
-      <section class="section">
-        <div class="title">Adicionais</div>
-        <div class="check-list">
-          <label><input type="checkbox" value="Leite em pó"> Leite em pó</label>
-          <label><input type="checkbox" value="Castanhas"> Castanhas</label>
-          <label><input type="checkbox" value="Leite condensado"> Leite condensado</label>
-          <label><input type="checkbox" value="Paçoca"> Paçoca</label>
-          <label><input type="checkbox" value="Granola"> Granola</label>
-          <label><input type="checkbox" value="Flocos de arroz"> Flocos de arroz</label>
-          <label><input type="checkbox" value="M&M colorido"> M&M colorido</label>
-        </div>
-      </section>
-
-      <!-- Nome do cliente -->
-      <section class="section">
-        <div class="title">Seu nome</div>
-        <input type="text" id="nomeCliente" placeholder="Digite seu nome" style="width:100%;padding:10px;border-radius:10px;border:1px solid #ccc;">
-      </section>
-
-      <!-- Forma de pagamento -->
-      <section class="section">
-        <div class="title">Forma de pagamento</div>
-        <div class="radio-list">
-          <label><input type="radio" name="pagamento" value="Pix" checked> Pix</label>
-          <label><input type="radio" name="pagamento" value="Cartão de crédito"> Cartão de crédito</label>
-          <label><input type="radio" name="pagamento" value="Espécie"> Espécie</label>
-        </div>
-      </section>
-
-      <!-- Botão para adicionar -->
-      <button class="btn-add" onclick="adicionarAcai()">Adicionar ao pedido</button>
+    <div class="summary">
+      <h2>Resumo do Pedido</h2>
+      <div id="listaPedidos"></div>
+      <div class="total" id="total">Total: R$ 0,00</div>
+      <button class="btn" onclick="abrirModal()">+ Adicionar Açaí</button>
+      <button class="btn" onclick="finalizarPedido()">Enviar pedido pelo WhatsApp</button>
     </div>
+  </div>
 
-    <aside class="right">
-      <div class="summary" aria-live="polite">
-        <h3>Resumo do pedido</h3>
-        <div id="listaPedidos"></div>
-        <div class="line" style="margin-top:14px;"><span>Total</span><span class="price" id="res-total">R$ 0,00</span></div>
-        <button class="btn-order" onclick="finalizarPedido()">Enviar pedido pelo WhatsApp</button>
-        <p class="note">Você pode montar vários açaís antes de enviar o pedido.</p>
+  <!-- Modal -->
+  <div class="modal" id="modalAcai">
+    <div class="modal-content">
+      <span class="close" onclick="fecharModal()">&times;</span>
+      <h2>Montar Açaí</h2>
+
+      <div class="section">
+        <label>Nome do cliente:</label>
+        <input type="text" id="nomeCliente">
       </div>
-    </aside>
+
+      <div class="section">
+        <label>Tamanho:</label>
+        <select id="tamanho">
+          <option value="200 ml - R$ 8,00" data-preco="8">200 ml - R$ 8,00</option>
+          <option value="300 ml - R$ 10,00" data-preco="10">300 ml - R$ 10,00</option>
+          <option value="400 ml - R$ 12,00" data-preco="12">400 ml - R$ 12,00</option>
+          <option value="500 ml - R$ 14,00" data-preco="14">500 ml - R$ 14,00</option>
+        </select>
+      </div>
+
+      <div class="section">
+        <label>Fruta:</label>
+        <select id="fruta">
+          <option>Uva</option>
+          <option>Banana</option>
+          <option>Morango</option>
+        </select>
+      </div>
+
+      <div class="section">
+        <label>Adicionais:</label>
+        <select id="adicionais" multiple>
+          <option>Leite em pó</option>
+          <option>Castanhas</option>
+          <option>Leite condensado</option>
+          <option>Paçoca</option>
+          <option>Granola</option>
+          <option>Flocos de arroz</option>
+          <option>M&M colorido</option>
+        </select>
+      </div>
+
+      <div class="section">
+        <label>Forma de pagamento:</label>
+        <select id="pagamento">
+          <option>Pix</option>
+          <option>Cartão de crédito</option>
+          <option>Espécie</option>
+        </select>
+      </div>
+
+      <button class="btn" onclick="salvarAcai()">Salvar</button>
+    </div>
   </div>
 
   <script>
-    let precoAtual = 8;
-    let textoTamanho = "200 ml - R$ 8,00";
     let pedidos = [];
+    let editIndex = -1;
 
-    function selecionarTamanho(card){
-      document.querySelectorAll('.size-card').forEach(c => c.classList.remove('active'));
-      card.classList.add('active');
-      precoAtual = parseFloat(card.dataset.price);
-      textoTamanho = card.dataset.text;
+    function abrirModal(index = -1){
+      document.getElementById('modalAcai').style.display = 'flex';
+      editIndex = index;
+
+      if(index >= 0){
+        // Editar pedido existente
+        const p = pedidos[index];
+        document.getElementById('nomeCliente').value = p.nome;
+        document.getElementById('tamanho').value = p.tamanho;
+        document.getElementById('fruta').value = p.fruta;
+        document.getElementById('pagamento').value = p.pagamento;
+
+        // Selecionar múltiplos adicionais
+        const adicionaisSelect = document.getElementById('adicionais');
+        Array.from(adicionaisSelect.options).forEach(opt => {
+          opt.selected = p.adicionais.includes(opt.value);
+        });
+      } else {
+        // Novo pedido
+        document.getElementById('nomeCliente').value = "";
+        document.getElementById('tamanho').selectedIndex = 0;
+        document.getElementById('fruta').selectedIndex = 0;
+        document.getElementById('pagamento').selectedIndex = 0;
+        Array.from(document.getElementById('adicionais').options).forEach(opt => opt.selected = false);
+      }
     }
 
-    function adicionarAcai(){
+    function fecharModal(){
+      document.getElementById('modalAcai').style.display = 'none';
+    }
+
+    function salvarAcai(){
       const nome = document.getElementById('nomeCliente').value || "Não informado";
-      const fruta = document.querySelector('input[name="fruta"]:checked').value;
-      const adicionais = Array.from(document.querySelectorAll('.check-list input[type="checkbox"]:checked')).map(i => i.value);
-      const pagamento = document.querySelector('input[name="pagamento"]:checked').value;
+      const tamanhoEl = document.getElementById('tamanho');
+      const tamanho = tamanhoEl.value;
+      const preco = parseFloat(tamanhoEl.selectedOptions[0].dataset.preco);
+      const fruta = document.getElementById('fruta').value;
+      const pagamento = document.getElementById('pagamento').value;
+      const adicionais = Array.from(document.getElementById('adicionais').selectedOptions).map(opt => opt.value);
 
-      const pedido = {
-        nome,
-        tamanho: textoTamanho,
-        fruta,
-        adicionais: adicionais.length ? adicionais.join(', ') : 'Nenhum',
-        pagamento,
-        preco: precoAtual
-      };
+      const pedido = { nome, tamanho, fruta, adicionais, pagamento, preco };
 
-      pedidos.push(pedido);
+      if(editIndex >= 0){
+        pedidos[editIndex] = pedido;
+      } else {
+        pedidos.push(pedido);
+      }
+
+      fecharModal();
       atualizarResumo();
-
-      // limpa os adicionais
-      document.querySelectorAll('.check-list input[type="checkbox"]').forEach(c => c.checked = false);
     }
 
     function atualizarResumo(){
       const lista = document.getElementById('listaPedidos');
-      lista.innerHTML = '';
+      lista.innerHTML = "";
       let total = 0;
 
       pedidos.forEach((p, i) => {
         total += p.preco;
         lista.innerHTML += `
           <div class="pedido">
+            <div class="pedido-actions">
+              <button onclick="abrirModal(${i})">✏️</button>
+              <button onclick="excluirAcai(${i})">❌</button>
+            </div>
             <strong>Açaí ${i+1}</strong><br>
             Cliente: ${p.nome}<br>
             ${p.tamanho} - ${p.fruta}<br>
-            Adicionais: ${p.adicionais}<br>
+            Adicionais: ${p.adicionais.length ? p.adicionais.join(', ') : "Nenhum"}<br>
             Pagamento: ${p.pagamento}<br>
-            <span class="price">R$ ${p.preco.toFixed(2)}</span>
+            <span style="color:var(--accent);font-weight:bold">R$ ${p.preco.toFixed(2)}</span>
           </div>
         `;
       });
 
-      document.getElementById('res-total').innerText = "R$ " + total.toFixed(2);
+      document.getElementById('total').innerText = "Total: R$ " + total.toFixed(2);
+    }
+
+    function excluirAcai(index){
+      pedidos.splice(index, 1);
+      atualizarResumo();
     }
 
     function finalizarPedido(){
       if(pedidos.length === 0){
-        alert("Adicione pelo menos um açaí ao pedido!");
+        alert("Adicione pelo menos um açaí!");
         return;
       }
-
-      let mensagem = "Olá, gostaria de fazer o seguinte pedido:\n\n*Pedido de Açaí* 🍧\n";
+      let mensagem = "🍧 *Pedido de Açaí* 🍧\n";
       let total = 0;
-
       pedidos.forEach((p, i) => {
-        mensagem += `\n*Açaí ${i+1}:*\n` +
-                    `Nome: ${p.nome}\n` +
-                    `Tamanho: ${p.tamanho}\n` +
-                    `Fruta: ${p.fruta}\n` +
-                    `Adicionais: ${p.adicionais}\n` +
-                    `Pagamento: ${p.pagamento}\n` +
-                    `Preço: R$ ${p.preco.toFixed(2)}\n`;
+        mensagem += `\n*Açaí ${i+1}:*\nCliente: ${p.nome}\nTamanho: ${p.tamanho}\nFruta: ${p.fruta}\nAdicionais: ${p.adicionais.length ? p.adicionais.join(', ') : "Nenhum"}\nPagamento: ${p.pagamento}\nPreço: R$ ${p.preco.toFixed(2)}\n`;
         total += p.preco;
       });
-
-      mensagem += `\n*Total geral:* R$ ${total.toFixed(2)}`;
-
-      const numero = "5599984001466";
-      const url = "https://wa.me/" + numero + "?text=" + encodeURIComponent(mensagem);
-      window.open(url, "_blank");
+      mensagem += `\n*Total:* R$ ${total.toFixed(2)}`;
+      window.open("https://wa.me/5599984001466?text=" + encodeURIComponent(mensagem), "_blank");
     }
   </script>
 </body>
