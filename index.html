@@ -76,7 +76,7 @@
     background: linear-gradient(180deg,var(--card), #fff);
     padding:18px;border-radius:14px;box-shadow:var(--shadow);position:sticky;top:28px;
   }
-  .summary h3{margin:0 0 8px 0;color:var(--primary)}
+  .summary h3{margin:0 0 10px 0;color:var(--primary)}
   #listaPedidos{max-height:52vh;overflow:auto;padding-right:6px}
   .pedido{
     background: #fbf8ff;border-radius:12px;padding:12px;margin-bottom:10px;border:1px solid #efe9f8;position:relative;
@@ -120,6 +120,7 @@
   .size-card-modal.active{box-shadow:0 12px 30px rgba(106,27,154,0.12);transform:translateY(-6px);border:2px solid rgba(255,112,67,0.14)}
   .size-qty{font-weight:700;color:var(--primary);margin-top:6px}
   .size-price{font-size:0.9rem;color:var(--muted);margin-top:4px}
+  .size-card-modal img{width:56px;height:56px;object-fit:cover;border-radius:8px;display:block;margin:0 auto 6px}
 
   /* frutas as pills */
   .pills{display:flex;gap:8px;flex-wrap:wrap}
@@ -203,19 +204,23 @@
             <label class="small">Tamanho</label>
             <div class="sizes-grid" id="sizesGrid">
               <div class="size-card-modal" data-price="8" data-text="200 ml - R$ 8,00" onclick="selectSize(this)">
-                <div style="font-size:0.95rem;font-weight:600">200 ml</div>
+                <img src="Copo200.jpg" alt="Copo 200ml">
+                <div class="size-qty">200 ml</div>
                 <div class="size-price">R$ 8,00</div>
               </div>
               <div class="size-card-modal active" data-price="10" data-text="300 ml - R$ 10,00" onclick="selectSize(this)">
-                <div style="font-size:0.95rem;font-weight:600">300 ml</div>
+                <img src="Copo300.jpg" alt="Copo 300ml">
+                <div class="size-qty">300 ml</div>
                 <div class="size-price">R$ 10,00</div>
               </div>
               <div class="size-card-modal" data-price="12" data-text="400 ml - R$ 12,00" onclick="selectSize(this)">
-                <div style="font-size:0.95rem;font-weight:600">400 ml</div>
+                <img src="Copo400.jpg" alt="Copo 400ml">
+                <div class="size-qty">400 ml</div>
                 <div class="size-price">R$ 12,00</div>
               </div>
               <div class="size-card-modal" data-price="14" data-text="500 ml - R$ 14,00" onclick="selectSize(this)">
-                <div style="font-size:0.95rem;font-weight:600">500 ml</div>
+                <img src="Copo500.jpg" alt="Copo 500ml">
+                <div class="size-qty">500 ml</div>
                 <div class="size-price">R$ 14,00</div>
               </div>
             </div>
@@ -299,7 +304,7 @@
       document.getElementById('inpNome').value = "";
       document.getElementById('obs').value = "";
       // tamanho default: 300 ml (o card com .active)
-      document.querySelectorAll('.size-card-modal').forEach((c,i)=> {
+      document.querySelectorAll('.size-card-modal').forEach((c)=> {
         c.classList.toggle('active', c.dataset.price === "10");
       });
       // fruta default
@@ -401,7 +406,8 @@
     const preco = tamanhoCard ? parseFloat(tamanhoCard.dataset.price) : 10;
     const fruta = document.querySelector('#pillsFruta .pill.active')?.textContent.trim() || "Uva";
     const adicionais = Array.from(document.querySelectorAll('#chipsAdicionais .chip.active')).map(c => c.textContent.trim());
-    const previewText = `${tamanhoCard ? tamanhoCard.querySelector('div').textContent.trim() : '300 ml'} • ${fruta} • ${adicionais.length ? adicionais.join(', ') : 'Nenhum'}`;
+    const tamanhoLabel = tamanhoCard ? tamanhoCard.querySelector('.size-qty').textContent.trim() : '300 ml';
+    const previewText = `${tamanhoLabel} • ${fruta} • ${adicionais.length ? adicionais.join(', ') : 'Nenhum'}`;
     document.getElementById('previewText').textContent = previewText;
     document.getElementById('previewPrice').textContent = `R$ ${preco.toFixed(2)}`;
   }
@@ -420,6 +426,7 @@
         <div class="actions">
           <button title="Editar" class="icon-btn" onclick="editarAcai(${i})">✏️</button>
           <button title="Excluir" class="icon-btn" onclick="excluirAcai(${i})">🗑️</button>
+          <button title="Duplicar" class="icon-btn" onclick="duplicarAcai(${i})">🔁</button>
         </div>
         <strong>Açaí ${i+1} — R$ ${p.preco.toFixed(2)}</strong>
         <div style="color:var(--muted);font-size:0.95rem;margin-top:6px">
@@ -447,6 +454,16 @@
     }
   }
 
+  // duplicar item
+  function duplicarAcai(index){
+    const original = pedidos[index];
+    if(!original) return;
+    // clonagem profunda simples
+    const copia = JSON.parse(JSON.stringify(original));
+    pedidos.push(copia);
+    atualizarLista();
+  }
+
   // finalizar pedido -> montar mensagem e abrir whatsapp
   function finalizarPedido(){
     if(pedidos.length === 0){ alert('Adicione pelo menos um açaí antes de enviar.'); return; }
@@ -461,7 +478,7 @@
     window.open("https://wa.me/" + numero + "?text=" + encodeURIComponent(msg), "_blank");
   }
 
-  // abre modal ao carregar para facilitar teste (opcional)
+  // opcional: abrir modal ao carregar para facilitar teste
   // abrirModal();
 
 </script>
