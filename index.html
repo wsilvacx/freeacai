@@ -1,342 +1,297 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Monte seu Açaí - Freeacai</title>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
-
-  :root{
-    --bg1: #7b1fa2;
-    --bg2: #512da8;
-    --accent1: #ff9800;
-    --card-bg: #fff;
-    --muted: #6b6b6b;
-    --radius: 16px;
-  }
-
-  *{box-sizing:border-box}
-  body{
-    margin:0;
-    font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-    background: linear-gradient(135deg,var(--bg1),var(--bg2));
-    -webkit-font-smoothing:antialiased;
-    color:#222;
-    padding:28px 16px;
-    display:flex;
-    justify-content:center;
-  }
-
-  .app {
-    width:100%;
-    max-width:940px;
-    background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,255,255,0.96));
-    border-radius:20px;
-    box-shadow: 0 12px 40px rgba(0,0,0,0.28);
-    padding:22px;
-    display:grid;
-    grid-template-columns: 1fr 360px;
-    gap:20px;
-    align-items:start;
-  }
-
-  /* Cabeçalho */
-  header{
-    grid-column: 1 / -1;
-    display:flex;
-    align-items:flex-start;
-    gap:16px;
-    background: linear-gradient(90deg, rgba(255,255,255,0.88), rgba(255,255,255,0.78));
-    padding: 14px;
-    border-radius: 14px;
-  }
-  .logo {
-    width:68px;
-    height:68px;
-    border-radius:14px;
-    overflow:hidden;
-    flex:0 0 68px;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
-  }
-  .logo img{width:100%;height:100%;object-fit:cover}
-  header h1{
-    margin:0;
-    font-size:1.6rem;
-    color:#3b115b;
-    font-weight:700;
-  }
-  header p{
-    margin:0;
-    font-size:0.9rem;
-  }
-  p.lead{
-    margin-bottom:2px 0 0 0;
-    color:var(--muted);
-    font-size:0.92rem;
-  }
-
-  /* Left column */
-  .left {
-    padding-top:6px;
-  }
-  .section {
-    background:transparent;
-    margin-bottom:18px;
-  }
-  .section .title {
-    font-weight:600;
-    color:#4b0073;
-    margin-bottom:10px;
-    font-size:0.98rem;
-  }
-
-  /* tamanhos */
-  .sizes {
-    display:flex;
-    justify-content:center;
-    gap:12px;
-    flex-wrap:nowrap;
-  }
-  .size-card {
-    width:120px;
-    border-radius:14px;
-    overflow:hidden;
-    background:var(--card-bg);
-    box-shadow: 0 6px 18px rgba(67,0,85,0.06);
-    cursor:pointer;
-    border:2px solid transparent;
-    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
-    text-align:center;
-  }
-  .size-card img{
-    width:100%;
-    height:100px;
-    object-fit:cover;
-    display:block;
-  }
-  .size-card p{ margin:10px 8px 14px; font-weight:600; color:#2b0b3b}
-  .size-card:hover{ transform:translateY(-6px); box-shadow: 0 10px 28px rgba(67,0,85,0.12)}
-  .size-card.active{ border-color:var(--accent1); box-shadow:0 10px 28px rgba(255,152,0,0.12)}
-
-  /* fruta & adicionais */
-  .choices {
-    display:flex;
-    gap:12px;
-    flex-wrap:wrap;
-  }
-  .choice {
-    flex:1 1 150px;
-  }
-  .radio-list, .check-list{
-    background: #fff;
-    padding:12px;
-    border-radius:12px;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
-  }
-  .radio-list label, .check-list label{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    margin-bottom:8px;
-    cursor:pointer;
-    user-select:none;
-    color:#2b2b2b;
-    font-weight:500;
-  }
-  .radio-list input[type="radio"], .check-list input[type="checkbox"]{
-    width:18px; height:18px;
-    accent-color: var(--accent1);
-  }
-
-  /* resumo */
-  .right {
-    position:relative;
-  }
-  .summary {
-    background: linear-gradient(180deg, #fff, #fff);
-    border-radius:14px;
-    padding:18px;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-    position:sticky;
-    top:24px;
-  }
-  .summary h3{ margin:0 0 6px 0; color:#3b115b }
-  .summary .line{ display:flex; justify-content:space-between; align-items:center; margin:10px 0; color:#444 }
-  .price {
-    font-size:1.5rem;
-    font-weight:700;
-    color:#2b0b3b;
-  }
-  .small{ font-size:0.88rem; color:var(--muted) }
-
-  .btn-order {
-    margin-top:14px;
-    width:100%;
-    padding:12px;
-    border-radius:12px;
-    background: linear-gradient(90deg,var(--accent1),#f57c00);
-    color:#fff;
-    font-weight:700;
-    border:none;
-    cursor:pointer;
-    box-shadow: 0 10px 30px rgba(255,152,0,0.12);
-    transition: transform .14s ease;
-  }
-  .btn-order:active{ transform:translateY(2px) }
-
-  /* footer */
-  .note { margin-top:12px; font-size:0.85rem; color:var(--muted) }
-
-  /* responsive */
-  @media (max-width:880px){
-    .app{ grid-template-columns: 1fr; padding:16px }
-    .right{ order: 2 }
-    .left{ order:1 }
-    .sizes { flex-wrap:wrap; }
-  }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Freeacai</title>
+  <style>
+    :root {
+      --primary: #4a148c;
+      --secondary: #7b1fa2;
+      --accent1: #ffca28;
+      --accent2: #ff7043;
+      --background: #f3e5f5;
+      --white: #fff;
+      --gray: #666;
+      --radius: 16px;
+    }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--background);
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      padding: 1rem;
+      text-align: center;
+      color: var(--white);
+      border-radius: 0 0 var(--radius) var(--radius);
+    }
+    header img {
+      max-width: 120px;
+      border-radius: 50%;
+      border: 3px solid var(--white);
+    }
+    header h1 {
+      margin: 0.5rem 0 0;
+      font-size: 1.6rem;
+    }
+    .container {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 1.5rem;
+      max-width: 1200px;
+      margin: 1.5rem auto;
+      padding: 0 1rem;
+    }
+    .left, .right {
+      background: var(--white);
+      padding: 1.2rem;
+      border-radius: var(--radius);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    h2 {
+      font-size: 1.2rem;
+      margin-top: 0;
+      color: var(--primary);
+    }
+    .section {
+      margin-bottom: 1.5rem;
+    }
+    .title {
+      font-weight: bold;
+      margin-bottom: 0.8rem;
+      color: var(--secondary);
+    }
+    .sizes {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .size-card {
+      flex: 1;
+      min-width: 100px;
+      border: 2px solid #eee;
+      border-radius: var(--radius);
+      padding: 0.8rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: #fafafa;
+    }
+    .size-card.active {
+      border-color: var(--accent2);
+      background: #fff3e0;
+    }
+    .size-card img {
+      width: 60px;
+      margin-bottom: 0.5rem;
+    }
+    .radio-list, .check-list {
+      display: grid;
+      gap: 0.5rem;
+    }
+    label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+    input[type="radio"], input[type="checkbox"] {
+      accent-color: var(--accent2);
+    }
+    .summary {
+      position: sticky;
+      top: 1rem;
+    }
+    .summary h3 {
+      margin-top: 0;
+      color: var(--primary);
+    }
+    .line {
+      display: flex;
+      justify-content: space-between;
+      margin: 0.4rem 0;
+      font-size: 0.95rem;
+    }
+    .price {
+      font-weight: bold;
+      color: var(--accent2);
+      font-size: 1.2rem;
+    }
+    .btn-order {
+      background: var(--accent2);
+      color: white;
+      border: none;
+      padding: 0.9rem;
+      border-radius: var(--radius);
+      font-size: 1rem;
+      width: 100%;
+      cursor: pointer;
+      margin-top: 1rem;
+      transition: 0.2s;
+    }
+    .btn-order:hover {
+      background: #f4511e;
+    }
+    .note {
+      font-size: 0.8rem;
+      color: var(--gray);
+      margin-top: 0.8rem;
+    }
+  </style>
 </head>
 <body>
-
-<div class="app" role="application" aria-label="Montar açaí">
   <header>
-    <div class="logo" aria-hidden="true">
-      <img src="Logo.jpg" alt="Logo Freeacai">
-    </div>
-    <div>
-      <h1>Freeacai</h1>
-      <p class="lead">Açaí que te surpreende!</p>
-      <p>📍 Rua Perimetral, Quadra A14, Casa 02, Vila Paraíso – Caxias-MA</p>
-      <p>🕒 Funcionamento: Dom a Sáb — 15h às 22h</p>
-      <p style="color:green;font-weight:600;">🚚 Entrega grátis no bairro Vila Paraíso!</p>
-    </div>
+    <img src="Logo.jpg" alt="Logo Freeacai">
+    <h1>Monte seu Açaí</h1>
   </header>
-   <div class="title">
-          <h1>Monte seu Açaí</h1>
-      <p class="lead">Escolha o tamanho, a fruta e os adicionais — finalize pelo WhatsApp.</p>
+
+  <div class="container">
+    <div class="left">
+      <!-- Tamanhos -->
+      <section class="section">
+        <div class="title">Tamanho</div>
+        <div class="sizes" id="sizes">
+          <div class="size-card active" data-price="8" data-text="200 ml - R$ 8,00" onclick="selecionarTamanho(this)">
+            <img src="Copo.jpg" alt="Copo 200ml">
+            <p>200 ml<br><small style="color:#6b6b6b;font-weight:600">R$ 8,00</small></p>
+          </div>
+          <div class="size-card" data-price="10" data-text="300 ml - R$ 10,00" onclick="selecionarTamanho(this)">
+            <img src="Copo.jpg" alt="Copo 300ml">
+            <p>300 ml<br><small style="color:#6b6b6b;font-weight:600">R$ 10,00</small></p>
+          </div>
+          <div class="size-card" data-price="12" data-text="400 ml - R$ 12,00" onclick="selecionarTamanho(this)">
+            <img src="Copo.jpg" alt="Copo 400ml">
+            <p>400 ml<br><small style="color:#6b6b6b;font-weight:600">R$ 12,00</small></p>
+          </div>
+          <div class="size-card" data-price="14" data-text="500 ml - R$ 14,00" onclick="selecionarTamanho(this)">
+            <img src="Copo.jpg" alt="Copo 500ml">
+            <p>500 ml<br><small style="color:#6b6b6b;font-weight:600">R$ 14,00</small></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Frutas -->
+      <section class="section">
+        <div class="title">Fruta</div>
+        <div class="radio-list">
+          <label><input type="radio" name="fruta" value="Uva" checked onchange="atualizarResumo()"> Uva</label>
+          <label><input type="radio" name="fruta" value="Banana" onchange="atualizarResumo()"> Banana</label>
+          <label><input type="radio" name="fruta" value="Morango" onchange="atualizarResumo()"> Morango</label>
+        </div>
+      </section>
+
+      <!-- Adicionais -->
+      <section class="section">
+        <div class="title">Adicionais</div>
+        <div class="check-list">
+          <label><input type="checkbox" value="Leite em pó" onchange="atualizarResumo()"> Leite em pó</label>
+          <label><input type="checkbox" value="Castanhas" onchange="atualizarResumo()"> Castanhas</label>
+          <label><input type="checkbox" value="Leite condensado" onchange="atualizarResumo()"> Leite condensado</label>
+          <label><input type="checkbox" value="Paçoca" onchange="atualizarResumo()"> Paçoca</label>
+          <label><input type="checkbox" value="Granola" onchange="atualizarResumo()"> Granola</label>
+          <label><input type="checkbox" value="Flocos de arroz" onchange="atualizarResumo()"> Flocos de arroz</label>
+          <label><input type="checkbox" value="M&M colorido" onchange="atualizarResumo()"> M&M colorido</label>
+        </div>
+      </section>
+
+      <!-- Nome do cliente -->
+      <section class="section">
+        <div class="title">Seu nome</div>
+        <input type="text" id="nomeCliente" placeholder="Digite seu nome" style="width:100%;padding:10px;border-radius:10px;border:1px solid #ccc;font-size:0.95rem;">
+      </section>
+
+      <!-- Forma de pagamento -->
+      <section class="section">
+        <div class="title">Forma de pagamento</div>
+        <div class="radio-list">
+          <label><input type="radio" name="pagamento" value="Pix" checked onchange="atualizarResumo()"> Pix</label>
+          <label><input type="radio" name="pagamento" value="Cartão de crédito" onchange="atualizarResumo()"> Cartão de crédito</label>
+          <label><input type="radio" name="pagamento" value="Espécie" onchange="atualizarResumo()"> Espécie</label>
+        </div>
+      </section>
     </div>
 
-  <div class="left">
+    <aside class="right">
+      <div class="summary" aria-live="polite">
+        <h3>Resumo do pedido</h3>
 
-    <!-- Tamanhos -->
-    <section class="section">
-      <div class="title">Tamanho</div>
-      <div class="sizes" id="sizes">
-        <div class="size-card active" data-price="8" data-text="200 ml - R$ 8,00" onclick="selecionarTamanho(this)">
-          <img src="Copo.jpg" alt="Copo 200ml">
-          <p>200 ml<br><small style="color:#6b6b6b;font-weight:600">R$ 8,00</small></p>
-        </div>
-        <div class="size-card" data-price="10" data-text="300 ml - R$ 10,00" onclick="selecionarTamanho(this)">
-          <img src="Copo.jpg" alt="Copo 300ml">
-          <p>300 ml<br><small style="color:#6b6b6b;font-weight:600">R$ 10,00</small></p>
-        </div>
-        <div class="size-card" data-price="12" data-text="400 ml - R$ 12,00" onclick="selecionarTamanho(this)">
-          <img src="Copo.jpg" alt="Copo 400ml">
-          <p>400 ml<br><small style="color:#6b6b6b;font-weight:600">R$ 12,00</small></p>
-        </div>
-        <div class="size-card" data-price="14" data-text="500 ml - R$ 14,00" onclick="selecionarTamanho(this)">
-          <img src="Copo.jpg" alt="Copo 500ml">
-          <p>500 ml<br><small style="color:#6b6b6b;font-weight:600">R$ 14,00</small></p>
-        </div>
-      </div>
-    </section>
+        <div class="line"><span class="small">Tamanho</span><span id="res-tamanho">200 ml - R$ 8,00</span></div>
+        <div class="line"><span class="small">Fruta</span><span id="res-fruta">Uva</span></div>
+        <div class="line"><span class="small">Adicionais</span><span id="res-adicionais">Nenhum</span></div>
+        <div class="line"><span class="small">Pagamento</span><span id="res-pagamento">Pix</span></div>
 
-    <!-- Frutas -->
-    <section class="section">
-      <div class="title">Fruta</div>
-      <div class="radio-list">
-        <label><input type="radio" name="fruta" value="Uva" checked onchange="atualizarResumo()"> Uva</label>
-        <label><input type="radio" name="fruta" value="Banana" onchange="atualizarResumo()"> Banana</label>
-        <label><input type="radio" name="fruta" value="Morango" onchange="atualizarResumo()"> Morango</label>
-      </div>
-    </section>
+        <div class="line" style="margin-top:14px;"><span class="small">Total</span><span class="price" id="res-preco">R$ 8,00</span></div>
 
-    <!-- Adicionais -->
-    <section class="section">
-      <div class="title">Adicionais</div>
-      <div class="check-list">
-        <label><input type="checkbox" value="Leite em pó" onchange="atualizarResumo()"> Leite em pó</label>
-        <label><input type="checkbox" value="Castanhas" onchange="atualizarResumo()"> Castanhas</label>
-        <label><input type="checkbox" value="Leite condensado" onchange="atualizarResumo()"> Leite condensado</label>
-        <label><input type="checkbox" value="Paçoca" onchange="atualizarResumo()"> Paçoca</label>
-        <label><input type="checkbox" value="Granola" onchange="atualizarResumo()"> Granola</label>
-        <label><input type="checkbox" value="Flocos de arroz" onchange="atualizarResumo()"> Flocos de arroz</label>
-        <label><input type="checkbox" value="M&M colorido" onchange="atualizarResumo()"> M&M colorido</label>
+        <button class="btn-order" id="btnOrder" onclick="finalizarPedido()">Enviar pedido pelo WhatsApp</button>
+
+        <p class="note">Ao enviar, o WhatsApp abrirá com a mensagem pronta para confirmar o pedido.</p>
       </div>
-    </section>
+    </aside>
   </div>
 
-  <aside class="right">
-    <div class="summary" aria-live="polite">
-      <h3>Resumo do pedido</h3>
+  <script>
+    let precoAtual = 8;
+    let textoTamanho = "200 ml - R$ 8,00";
 
-      <div class="line"><span class="small">Tamanho</span><span id="res-tamanho">200 ml - R$ 8,00</span></div>
-      <div class="line"><span class="small">Fruta</span><span id="res-fruta">Uva</span></div>
-      <div class="line"><span class="small">Adicionais</span><span id="res-adicionais">Nenhum</span></div>
+    function selecionarTamanho(card){
+      document.querySelectorAll('.size-card').forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
 
-      <div class="line" style="margin-top:14px;"><span class="small">Total</span><span class="price" id="res-preco">R$ 8,00</span></div>
+      precoAtual = parseFloat(card.getAttribute('data-price'));
+      textoTamanho = card.getAttribute('data-text');
 
-      <button class="btn-order" id="btnOrder" onclick="finalizarPedido()">Enviar pedido pelo WhatsApp</button>
-
-      <p class="note">Ao enviar, o WhatsApp abrirá com a mensagem pronta para confirmar o pedido.</p>
-    </div>
-  </aside>
-</div>
-
-<script>
-  let precoAtual = 8;
-  let textoTamanho = "200 ml - R$ 8,00";
-
-  function selecionarTamanho(card){
-    document.querySelectorAll('.size-card').forEach(c => c.classList.remove('active'));
-    card.classList.add('active');
-
-    precoAtual = parseFloat(card.getAttribute('data-price'));
-    textoTamanho = card.getAttribute('data-text');
-
-    document.getElementById('res-tamanho').innerText = textoTamanho;
-    atualizarResumo();
-  }
-
-  function atualizarResumo(){
-    const fruta = document.querySelector('input[name="fruta"]:checked').value;
-    document.getElementById('res-fruta').innerText = fruta;
-
-    const adicionais = Array.from(document.querySelectorAll('.check-list input[type="checkbox"]:checked'))
-      .map(i => i.value);
-    document.getElementById('res-adicionais').innerText = adicionais.length ? adicionais.join(', ') : 'Nenhum';
-
-    document.getElementById('res-preco').innerText = 'R$ ' + precoAtual.toFixed(2);
-  }
-
-  document.addEventListener('DOMContentLoaded', function(){
-    const first = document.querySelector('.size-card.active');
-    if(first){
-      precoAtual = parseFloat(first.dataset.price || 8);
-      textoTamanho = first.dataset.text || '200 ml - R$ 8,00';
+      document.getElementById('res-tamanho').innerText = textoTamanho;
+      atualizarResumo();
     }
-    atualizarResumo();
-  });
 
-  function finalizarPedido(){
-    const fruta = document.querySelector('input[name="fruta"]:checked').value;
-    const adicionais = Array.from(document.querySelectorAll('.check-list input[type="checkbox"]:checked'))
-      .map(i => i.value);
+    function atualizarResumo(){
+      const fruta = document.querySelector('input[name="fruta"]:checked').value;
+      document.getElementById('res-fruta').innerText = fruta;
 
-    const mensagem = 
-      "Olá, gostaria de fazer o seguinte pedido:" + "\n\n" + "*Pedido de Açaí* \n" +
-      "*Tamanho:* " + textoTamanho + "\n" +
-      "*Fruta:* " + fruta + "\n" +
-      "*Adicionais:* " + (adicionais.length ? adicionais.join(', ') : 'Nenhum') + "\n" +
-      "*Total:* R$ " + precoAtual.toFixed(2);
+      const adicionais = Array.from(document.querySelectorAll('.check-list input[type="checkbox"]:checked'))
+        .map(i => i.value);
+      document.getElementById('res-adicionais').innerText = adicionais.length ? adicionais.join(', ') : 'Nenhum';
 
-    const numero = "5599984001466";
-    const url = "https://wa.me/" + numero + "?text=" + encodeURIComponent(mensagem);
-    window.open(url, "_blank");
-  }
-</script>
+      const pagamento = document.querySelector('input[name="pagamento"]:checked').value;
+      document.getElementById('res-pagamento').innerText = pagamento;
 
+      document.getElementById('res-preco').innerText = 'R$ ' + precoAtual.toFixed(2);
+    }
+
+    document.addEventListener('DOMContentLoaded', function(){
+      const first = document.querySelector('.size-card.active');
+      if(first){
+        precoAtual = parseFloat(first.dataset.price || 8);
+        textoTamanho = first.dataset.text || '200 ml - R$ 8,00';
+      }
+      atualizarResumo();
+    });
+
+    function finalizarPedido(){
+      const nome = document.getElementById('nomeCliente').value || "Não informado";
+      const fruta = document.querySelector('input[name="fruta"]:checked').value;
+      const adicionais = Array.from(document.querySelectorAll('.check-list input[type="checkbox"]:checked'))
+        .map(i => i.value);
+      const pagamento = document.querySelector('input[name="pagamento"]:checked').value;
+
+      const mensagem = 
+        "Olá, gostaria de fazer o seguinte pedido:\n\n" +
+        "*Pedido de Açaí*\n" +
+        "*Nome:* " + nome + "\n" +
+        "*Tamanho:* " + textoTamanho + "\n" +
+        "*Fruta:* " + fruta + "\n" +
+        "*Adicionais:* " + (adicionais.length ? adicionais.join(', ') : 'Nenhum') + "\n" +
+        "*Forma de pagamento:* " + pagamento + "\n" +
+        "*Total:* R$ " + precoAtual.toFixed(2);
+
+      const numero = "5599984001466";
+      const url = "https://wa.me/" + numero + "?text=" + encodeURIComponent(mensagem);
+      window.open(url, "_blank");
+    }
+  </script>
 </body>
 </html>
