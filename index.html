@@ -16,9 +16,6 @@
       padding:15px;
       text-align:center;
     }
-    header img {
-      max-height:60px;
-    }
     main { padding:20px; }
 
     .summary {
@@ -29,10 +26,8 @@
       margin-bottom:20px;
     }
     .summary h3 { margin-top:0; }
-    .line {
-      margin:10px 0;
-    }
-    .line span { display:block; }
+    .line { margin:10px 0; }
+    .line span { display:inline-block; }
     .price { font-weight:bold; color:#7a1fa2; }
     .btn-order {
       display:block;
@@ -146,19 +141,34 @@
 </header>
 
 <main>
-  <!-- Resumo do Pedido -->
+
+  <!-- Dados do Cliente -->
   <div class="summary">
-    <h3>Resumo do pedido</h3>
+    <h3>📋 Dados do Cliente</h3>
+
+    <div class="line">
+      <span class="small">Nome do cliente:</span>
+      <span id="res-nome">Não informado</span>
+      <a href="javascript:void(0)" onclick="editarNome()" style="font-size:12px;color:#7a1fa2;margin-left:6px;">✏️ Editar</a>
+    </div>
+
+    <div class="line">
+      <span class="small">Endereço:</span>
+      <span id="res-endereco">Não informado</span>
+      <a href="javascript:void(0)" onclick="editarEndereco()" style="font-size:12px;color:#7a1fa2;margin-left:6px;">✏️ Editar</a>
+    </div>
+
+    <div class="line">
+      <span class="small">Forma de Pagamento:</span>
+      <span id="res-pagamento">Não informado</span>
+      <a href="javascript:void(0)" onclick="editarPagamento()" style="font-size:12px;color:#7a1fa2;margin-left:6px;">✏️ Editar</a>
+    </div>
+  </div>
+
+  <!-- Lista de Açaís -->
+  <div class="summary">
+    <h3>🍧 Meus Açaís</h3>
     <div id="lista-pedidos"></div>
-
-    <div class="line"><span class="small">Nome do cliente</span><br><span id="res-nome">Não informado</span></div>
-    <button class="btn-order" onclick="editarNome()">Editar Nome</button>
-
-    <div class="line"><span class="small">Endereço</span><br><span id="res-endereco">Não informado</span></div>
-    <button class="btn-order" onclick="editarEndereco()">Editar Endereço</button>
-
-    <div class="line"><span class="small">Forma de Pagamento</span><br><span id="res-pagamento">Não informado</span></div>
-    <button class="btn-order" onclick="editarPagamento()">Editar Pagamento</button>
 
     <button class="btn-order" style="background:#aaa;margin-bottom:8px;" onclick="novoPedido()">🗑️ Novo Pedido</button>
 
@@ -301,7 +311,6 @@ function atualizarResumo(){
 }
 
 function editarItem(i){
-  let p=pedidos[i];
   pedidos.splice(i,1);
   atualizarResumo();
   abrirModal();
