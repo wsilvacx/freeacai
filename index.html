@@ -4,11 +4,13 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Monte seu Açaí - Freeacai</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <style>
-  body {
+  body{
     margin:0;
     font-family: 'Inter', sans-serif;
     background: linear-gradient(135deg,#7b1fa2,#512da8);
+    -webkit-font-smoothing:antialiased;
     color:#222;
     padding:28px 16px;
     display:flex;
@@ -18,26 +20,50 @@
   .app {
     width:100%;
     max-width:940px;
-    background:#fff;
+    background: #fff;
     border-radius:20px;
     box-shadow: 0 12px 40px rgba(0,0,0,0.28);
     padding:22px;
-    display:grid;
-    grid-template-columns: 1fr 360px;
-    gap:20px;
   }
 
-  header {
-    grid-column:1/-1;
+  header{
     display:flex;
+    align-items:flex-start;
     gap:16px;
-    align-items:center;
-    margin-bottom:16px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.88), rgba(255,255,255,0.78));
+    padding: 14px;
+    border-radius: 14px;
+    margin-bottom:20px;
   }
-  .logo img {width:68px;height:68px;border-radius:12px;object-fit:cover}
+  .logo { width:68px; height:68px; border-radius:14px; overflow:hidden; flex:0 0 68px; }
+  .logo img{width:100%;height:100%;object-fit:cover}
+  header h1{ margin:0; font-size:1.6rem; color:#3b115b; font-weight:700; }
 
+  .summary {
+    background:#fff;
+    border-radius:14px;
+    padding:18px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+  }
+  .summary h3{ margin:0 0 12px 0; color:#3b115b; }
+  .pedido-item {
+    border:1px solid #eee;
+    padding:10px;
+    border-radius:10px;
+    margin-bottom:10px;
+    background:#fafafa;
+  }
+  .pedido-item strong { color:#4b0073; }
+  .pedido-acoes button {
+    background:none;
+    border:none;
+    cursor:pointer;
+    margin-right:8px;
+    font-size:0.9rem;
+    color:#512da8;
+  }
   .btn-order {
-    margin-top:10px;
+    margin-top:14px;
     width:100%;
     padding:12px;
     border-radius:12px;
@@ -46,42 +72,86 @@
     font-weight:700;
     border:none;
     cursor:pointer;
+    transition: transform .14s ease;
   }
+  .btn-order:active{ transform:translateY(2px) }
 
-  .summary {
-    background:#fafafa;
-    border-radius:14px;
-    padding:16px;
-    box-shadow:0 8px 30px rgba(0,0,0,0.08);
-    position:sticky;
-    top:20px;
-  }
-  .summary h3 {margin:0 0 12px;color:#3b115b}
-  .pedido-item {background:#fff;padding:10px;border-radius:10px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,0.05);}
-  .actions button{margin-right:6px;padding:4px 8px;border:none;border-radius:6px;cursor:pointer;background:#eee}
-  .price {font-size:1.4rem;font-weight:700;color:#2b0b3b}
-
-  /* Modal */
+  /* Modal flutuante */
   .modal {
     display:none;
     position:fixed;
-    inset:0;
+    top:0; left:0; right:0; bottom:0;
     background:rgba(0,0,0,0.6);
+    z-index:999;
     justify-content:center;
     align-items:center;
-    z-index:999;
+    padding:20px;
   }
   .modal-content {
     background:#fff;
-    padding:20px;
-    border-radius:16px;
-    width:90%;
-    max-width:400px;
-    box-shadow:0 8px 30px rgba(0,0,0,0.25);
+    border-radius:18px;
+    max-width:520px;
+    width:100%;
+    padding:24px;
+    position:relative;
+    box-shadow:0 12px 40px rgba(0,0,0,0.3);
+    animation:slideUp 0.3s ease;
+  }
+  .modal-content h2 { margin-top:0; color:#4b0073; }
+  .close {
+    position:absolute;
+    top:12px; right:16px;
+    font-size:28px;
+    cursor:pointer;
+    color:#666;
+  }
+  .modal-section { margin-bottom:20px; }
+  .modal-section h3 { margin:0 0 10px; color:#333; }
+
+  .sizes {
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  .size-card {
+    flex:1 1 45%;
+    border:2px solid transparent;
+    border-radius:12px;
+    overflow:hidden;
+    text-align:center;
+    cursor:pointer;
+    background:#fafafa;
+    transition:0.2s;
+  }
+  .size-card img{ width:100%; height:90px; object-fit:cover; }
+  .size-card p{ margin:8px 0; font-weight:600; }
+  .size-card.active{ border-color:#ff9800; background:#fff3e0; }
+
+  .radio-list, .check-list{
+    background:#fafafa;
+    padding:12px;
+    border-radius:12px;
+  }
+  .radio-list label, .check-list label{
+    display:block;
+    margin-bottom:6px;
+    cursor:pointer;
   }
 
-  @media(max-width:880px){
-    .app{grid-template-columns:1fr}
+  .modal-footer {
+    text-align:center;
+    padding-top:12px;
+    border-top:1px solid #eee;
+  }
+
+  @media(max-width:600px){
+    .modal-content { padding:16px; }
+    .size-card { flex:1 1 48%; }
+  }
+
+  @keyframes slideUp {
+    from {transform:translateY(40px); opacity:0;}
+    to {transform:translateY(0); opacity:1;}
   }
 </style>
 </head>
@@ -89,7 +159,7 @@
 
 <div class="app">
   <header>
-    <div class="logo"><img src="Logo.jpg" alt="Logo Freeacai"></div>
+    <div class="logo"><img src="Logo.jpg" alt="Logo Açaí"></div>
     <div>
       <h1>Freeacai</h1>
       <p>📍 Rua Perimetral, Quadra A14, Casa 02, Vila Paraíso – Caxias-MA</p>
@@ -98,175 +168,164 @@
     </div>
   </header>
 
-  <div class="left">
-    <button class="btn-order" onclick="abrirModalAcai()">➕ Adicionar Açaí</button>
+  <button class="btn-order" onclick="abrirModal()">+ Adicionar Açaí</button>
+
+  <div class="summary">
+    <h3>Resumo do pedido</h3>
+    <div id="lista-pedidos"></div>
+
+    <div class="line"><span class="small">Endereço</span><br><span id="res-endereco">Não informado</span></div>
+    <button class="btn-order" style="background:#673ab7;margin-top:8px;" onclick="editarEndereco()">Editar Endereço</button>
+
+    <button class="btn-order" style="background:#aaa;margin-top:8px;" onclick="novoPedido()">🗑️ Novo Pedido</button>
+
+    <div class="line" style="margin-top:14px;">
+      <span class="small">Total</span><br><span class="price" id="res-preco">R$ 0,00</span>
+    </div>
+
+    <button class="btn-order" onclick="finalizarPedido()">Enviar pedido pelo WhatsApp</button>
   </div>
+</div>
 
-  <aside class="right">
-    <div class="summary">
-      <h3>Resumo do pedido</h3>
-      <div id="lista-pedidos"></div>
+<!-- Modal -->
+<div class="modal" id="pedidoModal">
+  <div class="modal-content">
+    <span class="close" onclick="fecharModal()">&times;</span>
+    <h2>🍧 Montar Açaí</h2>
 
-      <div class="line"><span class="small">Endereço</span><br><span id="res-endereco">Não informado</span></div>
-      <button class="btn-order" onclick="editarEndereco()">Editar Endereço</button>
-
-      <div class="line" style="margin-top:14px;">
-        <span class="small">Total</span><br><span class="price" id="res-preco">R$ 0,00</span>
+    <div class="modal-section">
+      <h3>Tamanho</h3>
+      <div class="sizes">
+        <div class="size-card" data-price="8" data-text="200 ml - R$ 8,00" onclick="selecionarTamanhoModal(this)">
+          <img src="copo200.png" alt="200ml">
+          <p>200 ml<br><small>R$ 8,00</small></p>
+        </div>
+        <div class="size-card active" data-price="10" data-text="300 ml - R$ 10,00" onclick="selecionarTamanhoModal(this)">
+          <img src="copo300.png" alt="300ml">
+          <p>300 ml<br><small>R$ 10,00</small></p>
+        </div>
+        <div class="size-card" data-price="12" data-text="400 ml - R$ 12,00" onclick="selecionarTamanhoModal(this)">
+          <img src="copo400.png" alt="400ml">
+          <p>400 ml<br><small>R$ 12,00</small></p>
+        </div>
+        <div class="size-card" data-price="14" data-text="500 ml - R$ 14,00" onclick="selecionarTamanhoModal(this)">
+          <img src="copo500.png" alt="500ml">
+          <p>500 ml<br><small>R$ 14,00</small></p>
+        </div>
       </div>
-
-      <button class="btn-order" onclick="finalizarPedido()">Enviar pedido pelo WhatsApp</button>
-    </div>
-  </aside>
-</div>
-
-<!-- Modal Montar Açaí -->
-<div class="modal" id="modalAcai">
-  <div class="modal-content">
-    <h3>Monte seu Açaí</h3>
-
-    <div>
-      <label><b>Tamanho:</b></label><br>
-      <select id="inputTamanho">
-        <option value="200 ml - R$ 8,00" data-price="8">200 ml - R$ 8,00</option>
-        <option value="300 ml - R$ 10,00" data-price="10">300 ml - R$ 10,00</option>
-        <option value="400 ml - R$ 12,00" data-price="12">400 ml - R$ 12,00</option>
-        <option value="500 ml - R$ 14,00" data-price="14">500 ml - R$ 14,00</option>
-      </select>
     </div>
 
-    <div>
-      <label><b>Fruta:</b></label><br>
-      <label><input type="radio" name="fruta" value="Uva" checked> Uva</label>
-      <label><input type="radio" name="fruta" value="Banana"> Banana</label>
-      <label><input type="radio" name="fruta" value="Morango"> Morango</label>
+    <div class="modal-section">
+      <h3>Fruta</h3>
+      <div class="radio-list">
+        <label><input type="radio" name="modal-fruta" value="Uva" checked> Uva</label>
+        <label><input type="radio" name="modal-fruta" value="Banana"> Banana</label>
+        <label><input type="radio" name="modal-fruta" value="Morango"> Morango</label>
+      </div>
     </div>
 
-    <div>
-      <label><b>Adicionais:</b></label><br>
-      <label><input type="checkbox" value="Leite em pó"> Leite em pó</label>
-      <label><input type="checkbox" value="Castanhas"> Castanhas</label>
-      <label><input type="checkbox" value="Leite condensado"> Leite condensado</label>
-      <label><input type="checkbox" value="Paçoca"> Paçoca</label>
-      <label><input type="checkbox" value="Granola"> Granola</label>
-      <label><input type="checkbox" value="Flocos de arroz"> Flocos de arroz</label>
-      <label><input type="checkbox" value="M&M colorido"> M&M colorido</label>
-      <label><input type="checkbox" value="Amendoim"> Amendoim</label>
+    <div class="modal-section">
+      <h3>Adicionais</h3>
+      <div class="check-list">
+        <label><input type="checkbox" value="Leite em pó"> Leite em pó</label>
+        <label><input type="checkbox" value="Castanhas"> Castanhas</label>
+        <label><input type="checkbox" value="Leite condensado"> Leite condensado</label>
+        <label><input type="checkbox" value="Paçoca"> Paçoca</label>
+        <label><input type="checkbox" value="Granola"> Granola</label>
+        <label><input type="checkbox" value="Flocos de arroz"> Flocos de arroz</label>
+        <label><input type="checkbox" value="M&M colorido"> M&M colorido</label>
+        <label><input type="checkbox" value="Amendoim"> Amendoim</label>
+      </div>
     </div>
 
-    <div>
-      <label><b>Pagamento:</b></label><br>
-      <label><input type="radio" name="pagamento" value="Pix" checked> Pix</label>
-      <label><input type="radio" name="pagamento" value="Cartão de crédito"> Cartão de crédito</label>
-      <label><input type="radio" name="pagamento" value="Espécie"> Espécie</label>
-    </div>
-
-    <div style="margin-top:12px;text-align:right;">
-      <button onclick="salvarAcai()" class="btn-order">Salvar</button>
-      <button onclick="fecharModalAcai()" style="margin-left:6px;">Cancelar</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal Endereço -->
-<div class="modal" id="modalEndereco">
-  <div class="modal-content">
-    <h3>Endereço de entrega</h3>
-    <textarea id="inputEndereco" rows="3" style="width:100%;padding:10px;border-radius:10px;border:1px solid #ccc;"></textarea>
-    <div style="margin-top:10px;text-align:right;">
-      <button onclick="salvarEndereco()" class="btn-order">Salvar</button>
+    <div class="modal-footer">
+      <button class="btn-order" onclick="confirmarAcai()">✅ Adicionar ao Pedido</button>
     </div>
   </div>
 </div>
 
 <script>
-let pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
+let pedidos = JSON.parse(localStorage.getItem("pedidos") || "[]");
 let enderecoEntrega = localStorage.getItem("enderecoEntrega") || "";
+let precoAtual = 10;
+let textoTamanho = "300 ml - R$ 10,00";
 
-// --- Modal controle ---
-function abrirModalAcai(){document.getElementById("modalAcai").style.display="flex";}
-function fecharModalAcai(){document.getElementById("modalAcai").style.display="none";}
+function abrirModal(){ document.getElementById("pedidoModal").style.display="flex"; }
+function fecharModal(){ document.getElementById("pedidoModal").style.display="none"; }
 
-// --- Salvar açaí ---
-function salvarAcai(){
-  const select = document.getElementById("inputTamanho");
-  const tamanho = select.value;
-  const preco = parseFloat(select.selectedOptions[0].dataset.price);
+function selecionarTamanhoModal(card){
+  document.querySelectorAll('.size-card').forEach(c => c.classList.remove('active'));
+  card.classList.add('active');
+  precoAtual = parseFloat(card.getAttribute('data-price'));
+  textoTamanho = card.getAttribute('data-text');
+}
 
-  const fruta = document.querySelector('input[name="fruta"]:checked').value;
-  const adicionais = Array.from(document.querySelectorAll('#modalAcai input[type="checkbox"]:checked')).map(i=>i.value);
-  const pagamento = document.querySelector('input[name="pagamento"]:checked').value;
-
-  pedidos.push({tamanho, preco, fruta, adicionais, pagamento});
-  fecharModalAcai();
+function confirmarAcai(){
+  const fruta = document.querySelector('input[name="modal-fruta"]:checked').value;
+  const adicionais = Array.from(document.querySelectorAll('.check-list input[type="checkbox"]:checked')).map(i => i.value);
+  pedidos.push({ tamanho:textoTamanho, preco:precoAtual, fruta, adicionais });
+  localStorage.setItem("pedidos", JSON.stringify(pedidos));
+  fecharModal();
   atualizarResumo();
 }
 
-// --- Editar / Excluir / Duplicar ---
-function removerPedido(i){ pedidos.splice(i,1); atualizarResumo();}
-function editarPedido(i){
-  const p=pedidos[i];
-  abrirModalAcai();
-  document.getElementById("inputTamanho").value=p.tamanho;
-  document.querySelectorAll('#modalAcai input[name="fruta"]').forEach(r=>r.checked=(r.value===p.fruta));
-  document.querySelectorAll('#modalAcai input[type="checkbox"]').forEach(c=>c.checked=p.adicionais.includes(c.value));
-  document.querySelectorAll('#modalAcai input[name="pagamento"]').forEach(r=>r.checked=(r.value===p.pagamento));
-  pedidos.splice(i,1);
-}
-function duplicarPedido(i){ pedidos.push({...pedidos[i]}); atualizarResumo();}
-
-// --- Endereço ---
-function editarEndereco(){
-  document.getElementById("inputEndereco").value=enderecoEntrega;
-  document.getElementById("modalEndereco").style.display="flex";
-}
-function salvarEndereco(){
-  enderecoEntrega=document.getElementById("inputEndereco").value.trim();
-  document.getElementById("modalEndereco").style.display="none";
-  atualizarResumo();
-}
-
-// --- Atualizar Resumo ---
 function atualizarResumo(){
-  const lista=document.getElementById("lista-pedidos");
+  const lista = document.getElementById("lista-pedidos");
   lista.innerHTML="";
   let total=0;
-
   pedidos.forEach((p,i)=>{
     total+=p.preco;
     const div=document.createElement("div");
     div.className="pedido-item";
-    div.innerHTML=`
-      <p><b>${p.tamanho}</b> - ${p.fruta}<br>
-      Adicionais: ${p.adicionais.length?p.adicionais.join(", "):"Nenhum"}<br>
-      Pagamento: ${p.pagamento}</p>
-      <div class="actions">
-        <button onclick="duplicarPedido(${i})">Duplicar</button>
-        <button onclick="editarPedido(${i})">Editar</button>
-        <button onclick="removerPedido(${i})">Excluir</button>
-      </div>
-    `;
+    div.innerHTML=`<strong>${p.tamanho}</strong><br>
+    Fruta: ${p.fruta}<br>
+    Adicionais: ${p.adicionais.length?p.adicionais.join(", "):"Nenhum"}
+    <div class="pedido-acoes">
+      <button onclick="duplicarPedido(${i})">➕ Duplicar</button>
+      <button onclick="excluirPedido(${i})">❌ Excluir</button>
+    </div>`;
     lista.appendChild(div);
   });
-
   document.getElementById("res-preco").innerText="R$ "+total.toFixed(2);
   document.getElementById("res-endereco").innerText=enderecoEntrega||"Não informado";
-
-  localStorage.setItem("pedidos",JSON.stringify(pedidos));
-  localStorage.setItem("enderecoEntrega",enderecoEntrega);
 }
 
-// --- Finalizar ---
+function duplicarPedido(i){
+  pedidos.push({...pedidos[i]});
+  localStorage.setItem("pedidos", JSON.stringify(pedidos));
+  atualizarResumo();
+}
+function excluirPedido(i){
+  pedidos.splice(i,1);
+  localStorage.setItem("pedidos", JSON.stringify(pedidos));
+  atualizarResumo();
+}
+function novoPedido(){
+  if(confirm("Tem certeza que deseja começar um novo pedido?")){
+    pedidos=[]; enderecoEntrega="";
+    localStorage.removeItem("pedidos");
+    localStorage.removeItem("enderecoEntrega");
+    atualizarResumo();
+  }
+}
+function editarEndereco(){
+  const novo=prompt("Digite o endereço de entrega:", enderecoEntrega);
+  if(novo!==null){ enderecoEntrega=novo; localStorage.setItem("enderecoEntrega",enderecoEntrega); atualizarResumo(); }
+}
 function finalizarPedido(){
-  if(pedidos.length===0){alert("Adicione pelo menos um açaí!");return;}
-  let mensagem=pedidos.map((p,i)=>
-    `🍧 *Açaí ${i+1}*\n- Tamanho: ${p.tamanho}\n- Fruta: ${p.fruta}\n- Adicionais: ${p.adicionais.length?p.adicionais.join(", "):"Nenhum"}\n- Pagamento: ${p.pagamento}\n`
-  ).join("\n");
-  const textoFinal="Olá, gostaria de fazer um pedido:\n\n"+mensagem+`\n📍 *Endereço:* ${enderecoEntrega||"Não informado"}\n💰 *Total:* R$ ${pedidos.reduce((a,p)=>a+p.preco,0).toFixed(2)}`;
-  const numero="5599984001466";
-  window.open("https://wa.me/"+numero+"?text="+encodeURIComponent(textoFinal),"_blank");
+  if(pedidos.length==0){ alert("Adicione pelo menos um açaí!"); return; }
+  let msg="*Pedido de Açaí Freeacai*%0A%0A";
+  pedidos.forEach((p,i)=>{
+    msg+=`➡️ *Açaí ${i+1}*%0A${p.tamanho}%0AFruta: ${p.fruta}%0AAdicionais: ${p.adicionais.length?p.adicionais.join(", "):"Nenhum"}%0A%0A`;
+  });
+  msg+=`📍 Endereço: ${enderecoEntrega||"Não informado"}%0A`;
+  const total=pedidos.reduce((s,p)=>s+p.preco,0);
+  msg+=`💰 Total: R$ ${total.toFixed(2)}`;
+  window.open("https://wa.me/5599984001466?text="+msg,"_blank");
 }
 
-document.addEventListener("DOMContentLoaded",atualizarResumo);
+document.addEventListener("DOMContentLoaded", atualizarResumo);
 </script>
+
 </body>
 </html>
