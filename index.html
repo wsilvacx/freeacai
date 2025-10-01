@@ -1,215 +1,370 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Monte seu Açaí - Freeacai</title>
-<style>
-  body{
-    margin:0;
-    font-family: 'Inter', sans-serif;
-    background: linear-gradient(135deg,#7b1fa2,#512da8);
-    -webkit-font-smoothing:antialiased;
-    color:#222;
-    padding:28px 16px;
-    display:flex;
-    justify-content:center;
-  }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Freeaçaí 🍧</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <style>
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body {
+      font-family:'Inter', sans-serif;
+      background:#f7f5fb;
+      color:#333;
+    }
+    header {
+      position:sticky;
+      top:0;
+      z-index:10;
+      background:#7a1fa2;
+      color:#fff;
+      padding:15px 20px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      box-shadow:0 2px 6px rgba(0,0,0,0.1);
+    }
+    header h1 { font-size:20px; font-weight:600; }
+    header button {
+      background:#fff; color:#7a1fa2;
+      border:none; border-radius:6px;
+      padding:6px 12px; font-weight:600;
+      cursor:pointer;
+    }
 
-  .app {
-    width:100%;
-    max-width:940px;
-    background:#fff;
-    border-radius:20px;
-    box-shadow: 0 12px 40px rgba(0,0,0,0.28);
-    padding:22px;
-    display:flex;
-    flex-direction:column;
-    gap:20px;
-  }
+    main { padding:20px; }
 
-  header{
-    display:flex;
-    align-items:flex-start;
-    gap:16px;
-    background: linear-gradient(90deg, rgba(255,255,255,0.9), rgba(255,255,255,0.8));
-    padding: 14px;
-    border-radius: 14px;
-  }
-  .logo {
-    width:68px;
-    height:68px;
-    border-radius:14px;
-    overflow:hidden;
-    flex:0 0 68px;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
-  }
-  .logo img{width:100%;height:100%;object-fit:cover}
-  header h1{margin:0;font-size:1.6rem;color:#3b115b;font-weight:700}
-  header p{margin:0;font-size:0.9rem}
-  .lead{color:#6b6b6b;font-size:0.92rem}
+    .card {
+      background:#fff;
+      border-radius:12px;
+      padding:16px;
+      margin-bottom:20px;
+      box-shadow:0 2px 6px rgba(0,0,0,0.05);
+    }
+    .card h3 {
+      margin-bottom:12px;
+      font-size:18px;
+      color:#7a1fa2;
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
 
-  .summary{
-    background:#fafafa;
-    border-radius:14px;
-    padding:18px;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.06);
-  }
-  .summary h3{margin:0 0 10px;color:#3b115b}
-  .line{display:flex;align-items:center;justify-content:space-between;margin:8px 0}
-  .line span{color:#333}
-  .line a{font-size:12px;color:#7a1fa2;margin-left:6px;text-decoration:none}
+    .info-line {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin:8px 0;
+      font-size:14px;
+    }
+    .info-line span { flex:1; }
+    .edit-icon {
+      color:#7a1fa2;
+      font-size:18px;
+      cursor:pointer;
+    }
 
-  #lista-pedidos div{
-    background:#fff;
-    margin:6px 0;
-    padding:10px;
-    border-radius:10px;
-    box-shadow:0 2px 6px rgba(0,0,0,0.06);
-  }
+    .pedido-item {
+      background:#faf7fd;
+      border-radius:10px;
+      padding:10px;
+      margin-bottom:10px;
+      font-size:14px;
+      position:relative;
+    }
+    .pedido-actions {
+      position:absolute;
+      top:8px; right:8px;
+      display:flex; gap:6px;
+    }
+    .pedido-actions i {
+      font-size:18px;
+      cursor:pointer;
+      color:#7a1fa2;
+    }
 
-  .btn-order {
-    margin-top:14px;
-    padding:12px 18px;
-    border-radius:12px;
-    background: linear-gradient(90deg,#ff9800,#f57c00);
-    color:#fff;
-    font-weight:700;
-    border:none;
-    cursor:pointer;
-    box-shadow: 0 10px 30px rgba(255,152,0,0.12);
-    transition: transform .14s ease;
-  }
-  .btn-order:active{ transform:translateY(2px) }
+    .btn-main {
+      width:100%;
+      padding:12px;
+      background:linear-gradient(135deg,#7a1fa2,#e040fb);
+      color:#fff;
+      font-weight:600;
+      border:none;
+      border-radius:8px;
+      font-size:16px;
+      margin-top:12px;
+      cursor:pointer;
+    }
 
-  /* Barra de resumo */
-  .summary-bar{
-    margin-top:20px;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:12px;
-    padding:14px;
-    background:linear-gradient(90deg,#fff,#f9f9f9);
-    border-radius:12px;
-    box-shadow:0 6px 20px rgba(0,0,0,0.08);
-    position:sticky;
-    bottom:10px;
-  }
-  .summary-bar .price{
-    font-size:1.4rem;
-    font-weight:700;
-    color:#2b0b3b;
-  }
-  .summary-bar select {
-    padding:8px 10px;
-    border:2px solid #7a1fa2;
-    border-radius:8px;
-    font-weight:600;
-    color:#7a1fa2;
-    background:#fff;
-    cursor:pointer;
-  }
-  .summary-bar select:focus {
-    outline:none;
-    border-color:#e040fb;
-  }
-</style>
+    /* Modal */
+    .modal {
+      display:none;
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,0.5);
+      justify-content:center;
+      align-items:center;
+      padding:20px;
+      z-index:20;
+    }
+    .modal-content {
+      background:#fff;
+      border-radius:16px;
+      padding:20px;
+      width:100%; max-width:420px;
+      animation:fadeUp .3s ease;
+      position:relative;
+    }
+    .modal h2 { margin-bottom:16px; font-size:20px; color:#7a1fa2; }
+    .close { position:absolute; top:12px; right:12px; cursor:pointer; font-size:24px; color:#666; }
+
+    .progress {
+      display:flex; justify-content:center; margin-bottom:16px; gap:8px;
+    }
+    .circle {
+      width:12px; height:12px; border-radius:50%;
+      background:#ddd;
+    }
+    .circle.active { background:#7a1fa2; }
+
+    .sizes {
+      display:flex; gap:10px; flex-wrap:wrap;
+    }
+    .size-card {
+      flex:1 1 45%;
+      text-align:center;
+      border:2px solid #ddd;
+      border-radius:10px;
+      padding:10px;
+      cursor:pointer;
+      background:#fff;
+    }
+    .size-card.active {
+      border-color:#7a1fa2;
+      background:#f3e5f5;
+    }
+    .size-card img {
+      max-width:50px;
+      display:block;
+      margin:0 auto 5px;
+    }
+    .modal-footer {
+      margin-top:16px;
+      text-align:right;
+    }
+    .modal-footer button {
+      background:#7a1fa2;
+      color:#fff;
+      border:none;
+      border-radius:6px;
+      padding:8px 14px;
+      cursor:pointer;
+    }
+
+    .summary-bar {
+      position:sticky;
+      bottom:0;
+      background:#fff;
+      border-top:1px solid #eee;
+      padding:12px 20px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      box-shadow:0 -2px 6px rgba(0,0,0,0.05);
+    }
+    .summary-bar span { font-weight:600; color:#7a1fa2; }
+    .summary-bar button {
+      background:linear-gradient(135deg,#7a1fa2,#e040fb);
+      border:none;
+      border-radius:8px;
+      padding:10px 14px;
+      color:#fff; font-weight:600; cursor:pointer;
+    }
+
+    @keyframes fadeUp {
+      from { transform:translateY(30px); opacity:0; }
+      to { transform:translateY(0); opacity:1; }
+    }
+  </style>
 </head>
 <body>
 
-<div class="app">
+<header>
+  <h1>🍧 Freeaçaí</h1>
+  <button onclick="novoPedido()">Novo Pedido</button>
+</header>
 
-  <header>
-    <div class="logo"><img src="Logo.jpg" alt="Logo Freeacai"></div>
-    <div>
-      <h1>Freeacai</h1>
-      <p class="lead">Açaí que te surpreende!</p>
-      <p>📍 Rua Perimetral, Quadra A14, Casa 02, Vila Paraíso – Caxias-MA</p>
-      <p>🕒 Funcionamento: Dom a Sáb — 15h às 22h</p>
-      <p style="color:green;font-weight:600;">🚚 Entrega grátis no bairro Vila Paraíso!</p>
-    </div>
-  </header>
-
+<main>
   <!-- Dados do Cliente -->
-  <div class="summary">
-    <h3>📋 Dados do Cliente</h3>
-    <div class="line">
-      <span class="small">Nome:</span>
-      <span id="res-nome">Não informado</span>
-      <a href="javascript:void(0)" onclick="editarNome()">✏️ Editar</a>
+  <div class="card">
+    <h3><i class="material-icons">person</i> Dados do Cliente</h3>
+    <div class="info-line">
+      <span id="res-nome">Nome: Não informado</span>
+      <i class="material-icons edit-icon" onclick="editarNome()">edit</i>
     </div>
-    <div class="line">
-      <span class="small">Endereço:</span>
-      <span id="res-endereco">Não informado</span>
-      <a href="javascript:void(0)" onclick="editarEndereco()">✏️ Editar</a>
+    <div class="info-line">
+      <span id="res-endereco">Endereço: Não informado</span>
+      <i class="material-icons edit-icon" onclick="editarEndereco()">edit</i>
+    </div>
+    <div class="info-line">
+      <span id="res-pagamento">Pagamento: Não informado</span>
+      <i class="material-icons edit-icon" onclick="editarPagamento()">edit</i>
     </div>
   </div>
 
-  <!-- Meus Açaís -->
-  <div class="summary">
-    <h3>🍧 Meus Açaís</h3>
+  <!-- Pedidos -->
+  <div class="card">
+    <h3><i class="material-icons">shopping_cart</i> Meus Açaís</h3>
     <div id="lista-pedidos"></div>
-    <button class="btn-order" style="background:#aaa" onclick="novoPedido()">🗑️ Novo Pedido</button>
+    <button class="btn-main" onclick="abrirModal()">+ Adicionar Açaí</button>
   </div>
+</main>
 
-  <!-- Barra de resumo com pagamento -->
-  <div class="summary-bar">
-    <span class="price" id="res-preco">R$ 0,00</span>
-    <div style="display:flex; gap:8px; align-items:center;">
-      <select id="selectPagamento" onchange="mudarPagamento(this.value)">
-        <option value="">Pagamento</option>
-        <option value="Pix">Pix</option>
-        <option value="Cartão de crédito">Cartão de crédito</option>
-        <option value="Espécie">Espécie</option>
-      </select>
-      <button class="btn-order" onclick="finalizarPedido()">Finalizar Pedido</button>
+<!-- Barra de resumo -->
+<div class="summary-bar">
+  <span id="res-preco">R$ 0,00</span>
+  <button onclick="finalizarPedido()">Finalizar Pedido</button>
+</div>
+
+<!-- Modal -->
+<div class="modal" id="pedidoModal">
+  <div class="modal-content">
+    <span class="close" onclick="fecharModal()">&times;</span>
+    <h2>Montar Açaí</h2>
+    <div class="progress">
+      <div class="circle active" id="c1"></div>
+      <div class="circle" id="c2"></div>
+      <div class="circle" id="c3"></div>
+    </div>
+
+    <!-- Passos -->
+    <div class="step" id="step1">
+      <h3>Tamanho</h3>
+      <div class="sizes">
+        <div class="size-card" data-price="8" data-text="200 ml - R$ 8,00" onclick="selecionarTamanho(this)">
+          <img src="copo200.png"><p>200ml<br><small>R$8</small></p>
+        </div>
+        <div class="size-card active" data-price="10" data-text="300 ml - R$ 10,00" onclick="selecionarTamanho(this)">
+          <img src="copo300.png"><p>300ml<br><small>R$10</small></p>
+        </div>
+        <div class="size-card" data-price="12" data-text="400 ml - R$ 12,00" onclick="selecionarTamanho(this)">
+          <img src="copo400.png"><p>400ml<br><small>R$12</small></p>
+        </div>
+        <div class="size-card" data-price="14" data-text="500 ml - R$ 14,00" onclick="selecionarTamanho(this)">
+          <img src="copo500.png"><p>500ml<br><small>R$14</small></p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button onclick="proximoPasso(2)">Próximo</button>
+      </div>
+    </div>
+
+    <div class="step" id="step2" style="display:none;">
+      <h3>Fruta</h3>
+      <label><input type="radio" name="fruta" value="Uva" checked> Uva</label><br>
+      <label><input type="radio" name="fruta" value="Banana"> Banana</label><br>
+      <label><input type="radio" name="fruta" value="Morango"> Morango</label>
+      <div class="modal-footer">
+        <button onclick="proximoPasso(1)">Voltar</button>
+        <button onclick="proximoPasso(3)">Próximo</button>
+      </div>
+    </div>
+
+    <div class="step" id="step3" style="display:none;">
+      <h3>Adicionais</h3>
+      <label><input type="checkbox" value="Leite em pó"> Leite em pó</label><br>
+      <label><input type="checkbox" value="Castanhas"> Castanhas</label><br>
+      <label><input type="checkbox" value="Leite condensado"> Leite condensado</label><br>
+      <label><input type="checkbox" value="Paçoca"> Paçoca</label><br>
+      <label><input type="checkbox" value="Granola"> Granola</label><br>
+      <label><input type="checkbox" value="Flocos de arroz"> Flocos de arroz</label><br>
+      <label><input type="checkbox" value="M&M"> M&M</label><br>
+      <label><input type="checkbox" value="Amendoim"> Amendoim</label>
+      <div class="modal-footer">
+        <button onclick="proximoPasso(2)">Voltar</button>
+        <button onclick="confirmarAcai()">Confirmar</button>
+      </div>
     </div>
   </div>
-
 </div>
 
 <script>
-let formaPagamento = "";
+let pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
+let nomeCliente = localStorage.getItem("nomeCliente") || "";
+let enderecoEntrega = localStorage.getItem("enderecoEntrega") || "";
+let formaPagamento = localStorage.getItem("formaPagamento") || "";
+let precoAtual=10, textoTamanho="300 ml - R$ 10,00";
 
-function editarNome(){
-  const nome = prompt("Digite o nome do cliente:");
-  if(nome){
-    document.getElementById('res-nome').innerText = nome;
-    localStorage.setItem("nomeCliente", nome);
-  }
-}
-function editarEndereco(){
-  const end = prompt("Digite o endereço de entrega:");
-  if(end){
-    document.getElementById('res-endereco').innerText = end;
-    localStorage.setItem("enderecoCliente", end);
-  }
-}
-function mudarPagamento(valor){
-  formaPagamento = valor;
-  localStorage.setItem("pagamentoCliente", valor);
-}
+function atualizarResumo(){
+  document.getElementById("res-nome").innerText="Nome: "+(nomeCliente||"Não informado");
+  document.getElementById("res-endereco").innerText="Endereço: "+(enderecoEntrega||"Não informado");
+  document.getElementById("res-pagamento").innerText="Pagamento: "+(formaPagamento||"Não informado");
 
+  let lista=document.getElementById("lista-pedidos"); lista.innerHTML="";
+  let total=0;
+  pedidos.forEach((p,i)=>{
+    total+=p.preco;
+    lista.innerHTML+=`
+      <div class="pedido-item">
+        <div><b>${p.tamanho}</b> - ${p.fruta}</div>
+        <small>${p.adicionais.join(", ")||"Sem adicionais"}</small>
+        <div class="pedido-actions">
+          <i class="material-icons" onclick="editarItem(${i})">edit</i>
+          <i class="material-icons" onclick="duplicarItem(${i})">content_copy</i>
+          <i class="material-icons" onclick="excluirItem(${i})">delete</i>
+        </div>
+      </div>`;
+  });
+  document.getElementById("res-preco").innerText="R$ "+total.toFixed(2);
+}
+function salvar(){
+  localStorage.setItem("pedidos",JSON.stringify(pedidos));
+  localStorage.setItem("nomeCliente",nomeCliente);
+  localStorage.setItem("enderecoEntrega",enderecoEntrega);
+  localStorage.setItem("formaPagamento",formaPagamento);
+}
+function abrirModal(){ proximoPasso(1); document.getElementById("pedidoModal").style.display="flex"; }
+function fecharModal(){ document.getElementById("pedidoModal").style.display="none"; }
+function selecionarTamanho(el){
+  document.querySelectorAll(".size-card").forEach(c=>c.classList.remove("active"));
+  el.classList.add("active");
+  precoAtual=parseFloat(el.dataset.price);
+  textoTamanho=el.dataset.text;
+}
+function proximoPasso(n){
+  document.querySelectorAll(".step").forEach(s=>s.style.display="none");
+  document.getElementById("step"+n).style.display="block";
+  document.querySelectorAll(".circle").forEach((c,i)=>c.classList.toggle("active",i+1===n));
+}
+function confirmarAcai(){
+  let fruta=document.querySelector('input[name="fruta"]:checked').value;
+  let adicionais=Array.from(document.querySelectorAll('#step3 input[type="checkbox"]:checked')).map(c=>c.value);
+  pedidos.push({tamanho:textoTamanho, fruta, adicionais, preco:precoAtual});
+  salvar(); atualizarResumo(); fecharModal();
+}
+function editarItem(i){ pedidos.splice(i,1); salvar(); atualizarResumo(); abrirModal(); }
+function duplicarItem(i){ pedidos.push({...pedidos[i]}); salvar(); atualizarResumo(); }
+function excluirItem(i){ pedidos.splice(i,1); salvar(); atualizarResumo(); }
+function editarNome(){ let novo=prompt("Digite o nome:",nomeCliente); if(novo!==null){nomeCliente=novo; salvar(); atualizarResumo();} }
+function editarEndereco(){ let novo=prompt("Digite o endereço:",enderecoEntrega); if(novo!==null){enderecoEntrega=novo; salvar(); atualizarResumo();} }
+function editarPagamento(){ let novo=prompt("Digite a forma de pagamento:",formaPagamento); if(novo!==null){formaPagamento=novo; salvar(); atualizarResumo();} }
 function finalizarPedido(){
-  const nome = localStorage.getItem("nomeCliente") || "Não informado";
-  const end = localStorage.getItem("enderecoCliente") || "Não informado";
-  const pagamento = localStorage.getItem("pagamentoCliente") || "Não informado";
-
-  const mensagem = 
-  "📋 *Dados do Cliente*\n" +
-  "Nome: " + nome + "\n" +
-  "Endereço: " + end + "\n" +
-  "Pagamento: " + pagamento + "\n\n" +
-  "🍧 *Pedido de Açaí*\n" +
-  "(Itens listados aqui...)\n\n" +
-  "💰 Total: " + document.getElementById("res-preco").innerText;
-
-  const numero = "5599984001466";
-  const url = "https://wa.me/" + numero + "?text=" + encodeURIComponent(mensagem);
-  window.open(url, "_blank");
+  if(pedidos.length==0){alert("Adicione um açaí!"); return;}
+  let msg="🍧 *Pedido de Açaí* 🍧\n\n";
+  pedidos.forEach((p,i)=>{ msg+=`*Açaí ${i+1}:* ${p.tamanho}\nFruta: ${p.fruta}\nAdicionais: ${p.adicionais.join(", ")||"Nenhum"}\nPreço: R$${p.preco.toFixed(2)}\n\n`; });
+  msg+=`*Cliente:* ${nomeCliente}\n*Endereço:* ${enderecoEntrega}\n*Pagamento:* ${formaPagamento}\n\n`;
+  let total=pedidos.reduce((t,p)=>t+p.preco,0);
+  msg+=`*Total:* R$${total.toFixed(2)}`;
+  window.open("https://wa.me/5599984557326?text="+encodeURIComponent(msg),"_blank");
 }
+function novoPedido(){
+  if(confirm("Limpar pedido atual?")){
+    pedidos=[]; nomeCliente=""; enderecoEntrega=""; formaPagamento="";
+    localStorage.clear(); atualizarResumo();
+  }
+}
+atualizarResumo();
 </script>
-
 </body>
 </html>
