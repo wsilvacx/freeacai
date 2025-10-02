@@ -356,7 +356,7 @@ function finalizarPedido(){
   msg+=`*Cliente:* ${nomeCliente}\n*Endereço:* ${enderecoEntrega}\n*Pagamento:* ${formaPagamento}\n\n`;
   let total=pedidos.reduce((t,p)=>t+p.preco,0);
   msg+=`*Total:* R$${total.toFixed(2)}`;
-  window.open("https://wa.me/5599984557326?text="+encodeURIComponent(msg),"_blank");
+  window.open("https://wa.me/5599984001466?text="+encodeURIComponent(msg),"_blank");
 }
 function novoPedido(){
   if(confirm("Limpar pedido atual?")){
