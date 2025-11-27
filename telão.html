@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Placar da Gincana</title>
+<style>
+    body { 
+        background: #111; 
+        color: white; 
+        font-family: Arial; 
+        text-align: center; 
+        padding-top: 70px;
+    }
+    h1 { font-size: 60px; }
+    .placar { font-size: 120px; margin: 40px; }
+</style>
+</head>
+<body>
+
+<h1>PLACAR AO VIVO</h1>
+
+<div class="placar">
+    Equipe 1: <span id="t1">0</span>
+</div>
+
+<div class="placar">
+    Equipe 2: <span id="t2">0</span>
+</div>
+
+<script>
+function updateScreen() {
+    let saved = localStorage.getItem("gincanaPlacar");
+    if (saved) {
+        let score = JSON.parse(saved);
+        document.getElementById("t1").innerText = score.team1;
+        document.getElementById("t2").innerText = score.team2;
+    }
+}
+
+// Atualiza automaticamente quando o admin mudar os pontos
+window.addEventListener("storage", updateScreen);
+
+// Atualiza a cada 500ms (garantia extra)
+setInterval(updateScreen, 500);
+
+updateScreen();
+</script>
+
+</body>
+</html>
