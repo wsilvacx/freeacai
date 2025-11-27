@@ -1,66 +1,195 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<title>Admin - Controle de Pontos</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Admin — Placar Gincana (Realtime Firebase)</title>
 <style>
-    body { font-family: Arial; padding: 20px; }
-    input { margin: 5px; }
-    .team { margin-bottom: 20px; }
+  :root{--accent:#2563eb;--muted:#6b7280}
+  body{font-family:Inter,Arial,sans-serif;margin:18px;background:#f7fbff;color:#0b1220}
+  h1{margin:0 0 10px 0}
+  .card{background:#fff;padding:14px;border-radius:10px;box-shadow:0 6px 18px rgba(15,30,50,0.06);max-width:980px}
+  .row{display:flex;gap:8px;align-items:center}
+  input[type="text"]{padding:8px;border-radius:8px;border:1px solid #e6eef8;flex:1}
+  button{background:var(--accent);color:#fff;padding:8px 10px;border:0;border-radius:8px;cursor:pointer}
+  button.ghost{background:transparent;color:var(--accent);border:1px solid rgba(37,99,235,0.12)}
+  .team{display:flex;align-items:center;justify-content:space-between;padding:10px;border-radius:8px;border:1px solid #eef6ff;margin-top:8px}
+  .controls{display:flex;gap:6px}
+  .danger{background:#e53e3e}
+  .small{color:var(--muted);font-size:0.9rem;margin-top:6px}
 </style>
 </head>
 <body>
+  <h1>Admin — Placar Gincana (Realtime)</h1>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <strong>Conectar ao Firebase</strong>
+        <div class="small">Projeto: <em>gincana-placar</em></div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button id="btnExport" class="ghost">Exportar CSV</button>
+        <button id="btnReset" class="ghost danger">Resetar tudo</button>
+      </div>
+    </div>
 
-<h2>Admin - Atualizar Pontos</h2>
+    <hr style="margin:12px 0">
 
-<div class="team">
-    <h3>Equipe 1</h3>
-    <button onclick="add('team1', 1)">+1</button>
-    <button onclick="add('team1', 5)">+5</button>
-    <button onclick="add('team1', -1)">-1</button>
-    <p>Pontos: <span id="s1">0</span></p>
-</div>
+    <div>
+      <label><strong>Adicionar equipe</strong></label>
+      <div class="row" style="margin-top:8px">
+        <input id="teamName" placeholder="Nome da equipe (ex: Equipe Azul)" type="text" />
+        <input id="teamEmoji" placeholder="Emoji opcional" type="text" style="width:80px" maxlength="2"/>
+        <input id="teamColor" type="color" value="#2563eb" title="Cor da equipe"/>
+        <button id="btnAdd">Adicionar</button>
+      </div>
+      <div class="small">Clique no nome da equipe para editar. Use os botões para alterar pontos.</div>
+    </div>
 
-<div class="team">
-    <h3>Equipe 2</h3>
-    <button onclick="add('team2', 1)">+1</button>
-    <button onclick="add('team2', 5)">+5</button>
-    <button onclick="add('team2', -1)">-1</button>
-    <p>Pontos: <span id="s2">0</span></p>
-</div>
+    <div id="teamsList" style="margin-top:12px"></div>
 
-<script>
-let score = {
-    team1: 0,
-    team2: 0
-};
+    <div class="small" style="margin-top:10px">
+      <strong>Dica:</strong> abra <code>telao.html</code> em outro dispositivo para ver o placar ao vivo.
+    </div>
+  </div>
 
-function load() {
-    let saved = localStorage.getItem("gincanaPlacar");
-    if (saved) {
-        score = JSON.parse(saved);
-        update();
-    }
-}
+  <!-- Firebase SDKs (compat mode para código simples) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
-function save() {
-    localStorage.setItem("gincanaPlacar", JSON.stringify(score));
-}
+  <script>
+  // === COLE O firebaseConfig que você enviou ===
+  const firebaseConfig = {
+    apiKey: "AIzaSyA7YV4gp_vbnkbirg5ypG0Y8yASlNrfFNY",
+    authDomain: "gincana-placar.firebaseapp.com",
+    projectId: "gincana-placar",
+    storageBucket: "gincana-placar.firebasestorage.app",
+    messagingSenderId: "846259743430",
+    appId: "1:846259743430:web:b9d1781e4a4ad6ab4145c7",
+    measurementId: "G-3W641L1SJV"
+  };
+  // =============================================
 
-function add(team, value) {
-    score[team] += value;
-    if (score[team] < 0) score[team] = 0;
-    update();
-    save();
-}
+  // Init Firebase (compat)
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
 
-function update() {
-    document.getElementById("s1").innerText = score.team1;
-    document.getElementById("s2").innerText = score.team2;
-}
+  // collection reference
+  const teamsCol = db.collection('teams');
 
-load();
-</script>
+  const teamNameEl = document.getElementById('teamName');
+  const teamEmojiEl = document.getElementById('teamEmoji');
+  const teamColorEl = document.getElementById('teamColor');
+  const btnAdd = document.getElementById('btnAdd');
+  const teamsList = document.getElementById('teamsList');
+  const btnReset = document.getElementById('btnReset');
+  const btnExport = document.getElementById('btnExport');
 
+  // add team
+  btnAdd.addEventListener('click', async ()=>{
+    const name = teamNameEl.value.trim();
+    if(!name) return alert('Informe o nome da equipe.');
+    const emoji = teamEmojiEl.value.trim();
+    const color = teamColorEl.value;
+    await teamsCol.add({
+      name, emoji, color,
+      score: 0,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    teamNameEl.value=''; teamEmojiEl.value='';
+  });
+
+  // render teams - realtime listener
+  teamsCol.orderBy('score','desc').onSnapshot(snapshot=>{
+    teamsList.innerHTML = '';
+    if(snapshot.empty){ teamsList.innerHTML = '<div class="small">Nenhuma equipe ainda.</div>'; return; }
+    snapshot.forEach(doc=>{
+      const t = doc.data();
+      const id = doc.id;
+      const wrap = document.createElement('div'); wrap.className='team';
+      const left = document.createElement('div');
+      const badge = document.createElement('span'); badge.style.background = t.color || '#2563eb';
+      badge.style.color='white'; badge.style.padding='6px 10px'; badge.style.borderRadius='8px'; badge.style.marginRight='8px';
+      badge.textContent = t.emoji ? t.emoji : (t.name? t.name.charAt(0).toUpperCase():'#');
+      left.appendChild(badge);
+      const name = document.createElement('strong'); name.textContent = ' ' + (t.name||'Equipe'); name.style.cursor='pointer';
+      left.appendChild(name);
+      const small = document.createElement('div'); small.className='small'; small.textContent = 'ID: ' + id;
+      left.appendChild(document.createElement('br'));
+      left.appendChild(small);
+      wrap.appendChild(left);
+
+      // controls
+      const right = document.createElement('div'); right.className='controls';
+      const s = document.createElement('div'); s.style.fontWeight='800'; s.style.marginRight='8px'; s.textContent = (t.score||0);
+      right.appendChild(s);
+      ['+1','+5','-1'].forEach(lbl=>{
+        const b = document.createElement('button'); b.textContent = lbl;
+        b.addEventListener('click', ()=> changeScore(id, Number(lbl)));
+        right.appendChild(b);
+      });
+      const edit = document.createElement('button'); edit.className='ghost'; edit.textContent='Editar';
+      edit.addEventListener('click', ()=> editTeam(id, t));
+      right.appendChild(edit);
+      const del = document.createElement('button'); del.className='ghost danger'; del.textContent='Remover';
+      del.addEventListener('click', ()=> removeTeam(id));
+      right.appendChild(del);
+
+      wrap.appendChild(right);
+      teamsList.appendChild(wrap);
+    });
+  });
+
+  // change score with transaction (safe)
+  async function changeScore(id, delta){
+    const docRef = teamsCol.doc(id);
+    await db.runTransaction(async tx=>{
+      const doc = await tx.get(docRef);
+      if(!doc.exists) return;
+      const cur = doc.data().score || 0;
+      const next = Math.max(0, cur + delta);
+      tx.update(docRef, { score: next, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    });
+  }
+
+  async function editTeam(id, data){
+    const newName = prompt('Editar nome da equipe:', data.name || '');
+    if(newName === null) return;
+    const newEmoji = prompt('Emoji (opcional):', data.emoji || '');
+    if(newEmoji === null) return;
+    const newColor = prompt('Cor hex (ex: #2563eb):', data.color || '#2563eb');
+    if(newColor === null) return;
+    await teamsCol.doc(id).update({ name: newName.trim()||data.name, emoji: newEmoji.trim()||data.emoji, color: newColor || data.color });
+  }
+
+  async function removeTeam(id){
+    if(!confirm('Remover essa equipe?')) return;
+    await teamsCol.doc(id).delete();
+  }
+
+  // reset all (danger)
+  btnReset.addEventListener('click', async ()=>{
+    if(!confirm('Resetar tudo (remover todas as equipes)?')) return;
+    const snap = await teamsCol.get();
+    const batch = db.batch();
+    snap.forEach(d => batch.delete(d.ref));
+    await batch.commit();
+  });
+
+  // export CSV
+  btnExport.addEventListener('click', async ()=>{
+    const snap = await teamsCol.orderBy('score','desc').get();
+    const rows = [['Nome','Score','ID','Emoji','Cor']];
+    snap.forEach(d=>{
+      const r = d.data();
+      rows.push([r.name||'', r.score||0, d.id, r.emoji||'', r.color||'']);
+    });
+    const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+    const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href=url; a.download='placar_gincana.csv'; a.click(); URL.revokeObjectURL(url);
+  });
+
+  </script>
 </body>
 </html>
