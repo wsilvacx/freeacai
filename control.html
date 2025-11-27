@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Painel da Gincana</title>
+    <style>
+        body { font-family: Arial; background: #eef; padding: 20px; }
+        .card {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            box-shadow: 0 0 10px #aaa;
+        }
+        button { margin: 5px; }
+    </style>
+</head>
+<body>
+
+<h1>Controle de Pontos</h1>
+
+<h3>Cadastrar Equipe</h3>
+<input id="nome" placeholder="Nome da equipe">
+<button onclick="addEquipe()">Adicionar</button>
+
+<hr>
+
+<h2>Equipes</h2>
+<div id="lista"></div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+
+    // CONFIG DO SEU FIREBASE
+    const firebaseConfig = {
+        apiKey: "AIzaSyA7YV4gp_vbnkbirg5ypG0Y8yASlNrfFNY",
+        authDomain: "gincana-placar.firebaseapp.com",
+        projectId: "gincana-placar",
+        storageBucket: "gincana-placar.firebasestorage.app",
+        messagingSenderId: "846259743430",
+        appId: "1:846259743430:web:ffbb0c0c6db400bd4145c7",
+        measurementId: "G-N3FTJ8ZX3G"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const lista = document.getElementById("lista");
+
+    // Cadastrar equipe
+    window.addEquipe = async () => {
+        const nome = document.getElementById("nome").value;
+        if (nome.trim() === "") return alert("Digite um nome!");
+        await addDoc(collection(db, "equipes"), { nome: nome, pontos: 0 });
+        document.getElementById("nome").value = "";
+    };
+
+    // Atualizar em tempo real
+    onSnapshot(collection(db, "equipes"), (snapshot) => {
+        lista.innerHTML = "";
+        snapshot.forEach(docSnap => {
+            const eq = docSnap.data();
+            const id = docSnap.id;
+
+            lista.innerHTML += `
+                <div class="card">
+                    <h3>${eq.nome}</h3>
+                    <p>Pontos: <strong>${eq.pontos}</strong></p>
+                    <button onclick="alterar('${id}', ${eq.pontos + 1})">+1</button>
+                    <button onclick="alterar('${id}', ${eq.pontos - 1})">-1</button>
+                    <button onclick="remover('${id}')">Excluir</button>
+                </div>
+            `;
+        });
+    });
+
+    // Funções globais
+    window.alterar = async (id, novosPontos) => {
+        const ref = doc(db, "equipes", id);
+        await updateDoc(ref, { pontos: novosPontos });
+    };
+
+    window.remover = async (id) => {
+        const ref = doc(db, "equipes", id);
+        await deleteDoc(ref);
+    };
+</script>
+
+</body>
+</html>
