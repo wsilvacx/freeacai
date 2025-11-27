@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Admin - Controle de Pontos</title>
+<style>
+    body { font-family: Arial; padding: 20px; }
+    input { margin: 5px; }
+    .team { margin-bottom: 20px; }
+</style>
+</head>
+<body>
+
+<h2>Admin - Atualizar Pontos</h2>
+
+<div class="team">
+    <h3>Equipe 1</h3>
+    <button onclick="add('team1', 1)">+1</button>
+    <button onclick="add('team1', 5)">+5</button>
+    <button onclick="add('team1', -1)">-1</button>
+    <p>Pontos: <span id="s1">0</span></p>
+</div>
+
+<div class="team">
+    <h3>Equipe 2</h3>
+    <button onclick="add('team2', 1)">+1</button>
+    <button onclick="add('team2', 5)">+5</button>
+    <button onclick="add('team2', -1)">-1</button>
+    <p>Pontos: <span id="s2">0</span></p>
+</div>
+
+<script>
+let score = {
+    team1: 0,
+    team2: 0
+};
+
+function load() {
+    let saved = localStorage.getItem("gincanaPlacar");
+    if (saved) {
+        score = JSON.parse(saved);
+        update();
+    }
+}
+
+function save() {
+    localStorage.setItem("gincanaPlacar", JSON.stringify(score));
+}
+
+function add(team, value) {
+    score[team] += value;
+    if (score[team] < 0) score[team] = 0;
+    update();
+    save();
+}
+
+function update() {
+    document.getElementById("s1").innerText = score.team1;
+    document.getElementById("s2").innerText = score.team2;
+}
+
+load();
+</script>
+
+</body>
+</html>
