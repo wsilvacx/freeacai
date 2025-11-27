@@ -37,13 +37,11 @@ function updateScreen() {
     }
 }
 
-// Atualiza automaticamente quando o admin mudar os pontos
-window.addEventListener("storage", updateScreen);
-
-// Atualiza a cada 500ms (garantia extra)
-setInterval(updateScreen, 500);
-
+// Atualiza o placar quando carrega
 updateScreen();
+
+// Recarrega automaticamente a página a cada 1 segundo
+setInterval(() => location.reload(), 1000);
 </script>
 
 </body>
