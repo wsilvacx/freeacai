@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Placar da Gincana</title>
+    <style>
+        body { font-family: Arial; text-align: center; background: #f2f2f2; }
+        h1 { margin-top: 20px; }
+        .card {
+            background: white;
+            padding: 15px;
+            margin: 10px auto;
+            width: 300px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px #aaa;
+        }
+        .points { font-size: 32px; font-weight: bold; color: #333; }
+    </style>
+</head>
+<body>
+
+<h1>Placar da Gincana</h1>
+<div id="lista"></div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+    import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+
+    // CONFIG DO SEU FIREBASE
+    const firebaseConfig = {
+        apiKey: "AIzaSyA7YV4gp_vbnkbirg5ypG0Y8yASlNrfFNY",
+        authDomain: "gincana-placar.firebaseapp.com",
+        projectId: "gincana-placar",
+        storageBucket: "gincana-placar.firebasestorage.app",
+        messagingSenderId: "846259743430",
+        appId: "1:846259743430:web:ffbb0c0c6db400bd4145c7",
+        measurementId: "G-N3FTJ8ZX3G"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const lista = document.getElementById("lista");
+
+    // Atualiza em tempo real
+    onSnapshot(collection(db, "equipes"), (snapshot) => {
+        lista.innerHTML = "";
+        snapshot.forEach(doc => {
+            const eq = doc.data();
+            lista.innerHTML += `
+                <div class="card">
+                    <h2>${eq.nome}</h2>
+                    <div class="points">${eq.pontos}</div>
+                </div>
+            `;
+        });
+    });
+</script>
+
+</body>
+</html>
