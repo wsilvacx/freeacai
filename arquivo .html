@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Teste Firestore</title>
+</head>
+<body>
+    <h1>🔥 Teste de Conexão com Firebase Firestore</h1>
+
+    <button id="btn">Adicionar equipe teste</button>
+    <div id="saida"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot }
+            from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA7YV4gp_vbnkbirg5ypG0Y8yASlNrfFNY",
+            authDomain: "gincana-placar.firebaseapp.com",
+            projectId: "gincana-placar",
+            storageBucket: "gincana-placar.firebasestorage.app",
+            messagingSenderId: "846259743430",
+            appId: "1:846259743430:web:ffbb0c0c6db400bd4145c7",
+            measurementId: "G-N3FTJ8ZX3G"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const equipesRef = collection(db, "teste");
+
+        document.getElementById("btn").onclick = async () => {
+            await addDoc(equipesRef, {
+                nome: "Equipe Teste",
+                criado_em: new Date()
+            });
+            alert("Equipe adicionada! Veja no Firestore.");
+        };
+
+        // Escuta em tempo real
+        onSnapshot(equipesRef, (snapshot) => {
+            const div = document.getElementById("saida");
+            div.innerHTML = "<h3>Documentos no Firestore:</h3>";
+
+            snapshot.forEach((doc) => {
+                const d = doc.data();
+                div.innerHTML += `
+                    <p><b>${d.nome}</b> — ${d.criado_em.toDate()}</p>
+                `;
+            });
+        });
+    </script>
+</body>
+</html>
