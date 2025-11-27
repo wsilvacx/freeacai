@@ -1,0 +1,571 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Placar Gincana — Placar Fácil</title>
+<style>
+  :root{
+    --bg:#f6f8fb;
+    --card:#ffffff;
+    --muted:#61707a;
+    --accent:#2b6cb0;
+    --danger:#e53e3e;
+    --success:#2f855a;
+    --glass: rgba(255,255,255,0.6);
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:linear-gradient(180deg,var(--bg),#eef4fb 60%);
+    min-height:100vh;
+    color:#172023;
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+    padding:18px;
+  }
+
+  header{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    justify-content:space-between;
+  }
+  header h1{font-size:1.25rem; margin:0}
+  header .brand-sub{color:var(--muted); font-size:0.85rem}
+
+  main{display:grid; grid-template-columns: 360px 1fr; gap:16px; align-items:start;}
+  @media(max-width:880px){ main{grid-template-columns:1fr;} }
+
+  /* left panel */
+  .card{
+    background:var(--card);
+    border-radius:12px;
+    padding:14px;
+    box-shadow:0 6px 18px rgba(20,30,40,0.06);
+  }
+  .small{font-size:0.9rem; color:var(--muted)}
+  label{display:block; font-weight:600; margin-bottom:6px; font-size:0.9rem}
+
+  form.row{display:flex; gap:8px; align-items:center}
+  input[type="text"]{
+    flex:1; padding:10px 12px; border-radius:8px; border:1px solid #d8e2ef;
+    background:#fff; font-size:0.95rem;
+  }
+  input[type="color"]{width:44px; height:40px; border-radius:8px; border:0; padding:0}
+  button{
+    background:var(--accent); color:white; border:0; padding:10px 12px; border-radius:8px;
+    cursor:pointer; font-weight:600;
+  }
+  button.ghost{background:transparent; color:var(--accent); border:1px solid rgba(43,108,176,0.12)}
+  .team-list{margin-top:12px; display:flex; flex-direction:column; gap:8px; max-height:48vh; overflow:auto; padding-right:6px}
+
+  .team{
+    display:flex; gap:10px; align-items:center; justify-content:space-between;
+    padding:8px; border-radius:10px; border:1px solid #eef4f9;
+  }
+  .team .left{display:flex; gap:10px; align-items:center}
+  .avatar{
+    width:44px; height:44px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:700;
+    color:white; font-size:1.1rem;
+  }
+  .team-name{font-weight:700}
+  .team-score{font-size:1.1rem; font-weight:800; min-width:72px; text-align:right}
+
+  .controls{display:flex; gap:8px; margin-top:10px; flex-wrap:wrap}
+  .controls button{padding:8px 10px; border-radius:8px; font-weight:700}
+  .danger{background:var(--danger)}
+  .telao{background:#111; color:#fff}
+
+  /* right panel: placar big */
+  .placar{
+    display:flex; flex-direction:column; gap:12px;
+  }
+  .placar-display{
+    display:grid; gap:8px;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
+  .placar-card{
+    background:linear-gradient(180deg, rgba(255,255,255,0.9), var(--card));
+    border-radius:12px; padding:12px; display:flex; flex-direction:column; gap:6px;
+    align-items:flex-start;
+  }
+  .placar-card .top{display:flex; gap:8px; align-items:center; width:100%; justify-content:space-between}
+  .placar-card .name{font-weight:800}
+  .placar-card .score{font-size:1.6rem; font-weight:900}
+
+  /* footer / small */
+  footer{display:flex; gap:8px; align-items:center; justify-content:space-between; color:var(--muted)}
+  .muted{color:var(--muted); font-size:0.9rem}
+
+  /* telão overlay */
+  .tela-full{
+    position:fixed; inset:0; background:#0f1724; color:white; display:none; align-items:center; justify-content:center;
+    z-index:9999; padding:18px;
+  }
+  .tela-full.active{display:flex}
+  .tela-grid{display:grid; gap:14px; width:100%; max-width:1400px; grid-template-columns: repeat(auto-fill,minmax(220px,1fr))}
+  .tela-card{background:transparent; border-radius:12px; padding:22px; display:flex; flex-direction:column; gap:10px; align-items:flex-start}
+  .tela-card .name{font-size:1.4rem; font-weight:800}
+  .tela-card .score{font-size:3.5rem; font-weight:900}
+
+  /* history */
+  .history{max-height:28vh; overflow:auto; padding:8px; border-radius:8px; border:1px dashed #e6eef8; background:linear-gradient(180deg,#fff, #fbfdff)}
+  .history-item{font-size:0.92rem; color:var(--muted); margin-bottom:6px}
+
+  .empty{color:var(--muted); text-align:center; padding:18px; border-radius:10px; background:linear-gradient(180deg,#fff,#fcfdff)}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Placar Fácil — Gincana</h1>
+    <div class="brand-sub">Controle rápido de pontos | Salva localmente (offline)</div>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center">
+    <button id="btnTelao" class="telao" title="Abrir modo telão">Telão</button>
+    <button id="btnReset" class="ghost" title="Apagar tudo (localStorage)">Reset</button>
+  </div>
+</header>
+
+<main>
+  <!-- Left: controls -->
+  <section class="card" aria-labelledby="lefttitle">
+    <h2 id="lefttitle" style="margin:0 0 10px 0">Equipes & Controles</h2>
+
+    <div>
+      <label for="teamName">Adicionar equipe</label>
+      <form id="formAdd" class="row" onsubmit="return false">
+        <input id="teamName" type="text" placeholder="Nome da equipe (ex: Equipe Azul)" required>
+        <input id="teamColor" type="color" value="#2563eb" title="Escolher cor">
+        <input id="teamEmoji" type="text" placeholder="Emoji (opcional)" style="width:84px">
+        <button id="addTeamBtn">Adicionar</button>
+      </form>
+      <div class="small" style="margin-top:8px">Dica: clique no nome da equipe para editar ou no placar dela para ajustar pontos.</div>
+    </div>
+
+    <div style="margin-top:12px">
+      <label>Equipes</label>
+      <div id="teams" class="team-list" aria-live="polite"></div>
+      <div id="emptyTeams" class="empty" style="display:none">Nenhuma equipe. Crie uma acima.</div>
+    </div>
+
+    <div style="margin-top:12px">
+      <label>Controles rápidos</label>
+      <div class="controls">
+        <button data-add="1">+1</button>
+        <button data-add="5">+5</button>
+        <button data-add="10">+10</button>
+        <button data-add="-5" class="danger">-5</button>
+        <button id="customBtn" class="ghost">Valor</button>
+        <button id="undoBtn" title="Desfazer última alteração" class="ghost">Desfazer</button>
+      </div>
+
+      <div style="margin-top:10px">
+        <label>Histórico</label>
+        <div id="history" class="history"></div>
+      </div>
+    </div>
+
+    <footer style="margin-top:12px">
+      <div class="muted">Funciona offline • Salvo automaticamente</div>
+      <div style="font-size:0.85rem;color:var(--muted)">v1.0</div>
+    </footer>
+  </section>
+
+  <!-- Right: placar -->
+  <aside class="placar">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <h2 style="margin:0">Placar</h2>
+          <div class="small">Ordenado por pontos (maior no topo)</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button id="exportBtn" class="ghost">Exportar CSV</button>
+          <button id="screenshotBtn" class="ghost">Copiar imagem</button>
+        </div>
+      </div>
+
+      <div id="placarCards" class="placar-display" style="margin-top:12px"></div>
+
+      <div style="margin-top:12px" class="small">
+        Clique no card de uma equipe para abrir o painel de ajuste rápido.
+      </div>
+    </div>
+
+    <!-- optional small instructions or credits -->
+    <div class="card small">
+      <strong>Atalhos e dicas:</strong>
+      <ul style="margin:8px 0 0 18px;padding:0">
+        <li>Selecionar uma equipe ativa: clique no card ou no botão "Editar" na lista.</li>
+        <li>Telão: abre visão para projetor; pressione Esc para sair.</li>
+        <li>Reset apaga tudo do armazenamento local — use com cuidado.</li>
+      </ul>
+    </div>
+  </aside>
+</main>
+
+<!-- Tela telão -->
+<div id="telaFull" class="tela-full" role="dialog" aria-modal="true" aria-hidden="true">
+  <div style="width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div style="font-weight:900;font-size:1.25rem">Placar — Telão</div>
+      <div style="display:flex;gap:8px">
+        <button id="exitFull" class="ghost">Sair</button>
+        <button id="fsBtn" class="ghost">Tela cheia</button>
+      </div>
+    </div>
+    <div id="telaGrid" class="tela-grid"></div>
+  </div>
+</div>
+
+<script>
+/*
+  Placar Gincana - single file app
+  - Teams stored in localStorage under key 'placar_gincana_v1'
+  - Features: add team, edit, quick add points, history, telão, export CSV, copy image (via html2canvas if available)
+*/
+
+/* ---------- Utilities ---------- */
+const storageKey = 'placar_gincana_v1';
+
+function saveState(state){
+  localStorage.setItem(storageKey, JSON.stringify(state));
+}
+function loadState(){
+  try{
+    return JSON.parse(localStorage.getItem(storageKey)) || {teams:[], history:[]};
+  }catch(e){ return {teams:[], history:[]}; }
+}
+function nowStr(){
+  const d = new Date();
+  return d.toLocaleString();
+}
+
+/* ---------- App State ---------- */
+let state = loadState();
+
+/* ---------- DOM refs ---------- */
+const teamsEl = document.getElementById('teams');
+const placarCards = document.getElementById('placarCards');
+const historyEl = document.getElementById('history');
+const emptyTeams = document.getElementById('emptyTeams');
+const btnTelao = document.getElementById('btnTelao');
+const telaFull = document.getElementById('telaFull');
+const telaGrid = document.getElementById('telaGrid');
+const exitFull = document.getElementById('exitFull');
+const fsBtn = document.getElementById('fsBtn');
+const btnReset = document.getElementById('btnReset');
+const exportBtn = document.getElementById('exportBtn');
+const screenshotBtn = document.getElementById('screenshotBtn');
+const undoBtn = document.getElementById('undoBtn');
+
+/* ---------- Render ---------- */
+function render(){
+  // sort teams by points desc
+  const teams = [...state.teams].sort((a,b) => b.score - a.score || a.name.localeCompare(b.name));
+
+  // teams list (left)
+  teamsEl.innerHTML = '';
+  if(teams.length === 0){ emptyTeams.style.display='block'; } else { emptyTeams.style.display='none'; }
+  teams.forEach(team => {
+    const wrap = document.createElement('div');
+    wrap.className = 'team';
+    wrap.dataset.id = team.id;
+
+    const left = document.createElement('div'); left.className='left';
+    const avatar = document.createElement('div'); avatar.className='avatar';
+    avatar.style.background = team.color || '#2563eb';
+    avatar.textContent = team.emoji ? team.emoji : team.name.charAt(0).toUpperCase();
+    left.appendChild(avatar);
+
+    const info = document.createElement('div');
+    const name = document.createElement('div'); name.className='team-name'; name.textContent = team.name;
+    const small = document.createElement('div'); small.className='small muted'; small.textContent = 'ID: ' + team.id;
+    small.style.fontSize='0.78rem';
+    info.appendChild(name);
+    info.appendChild(small);
+    left.appendChild(info);
+
+    const right = document.createElement('div'); right.style.display='flex'; right.style.alignItems='center'; right.style.gap='8px';
+    const score = document.createElement('div'); score.className='team-score'; score.textContent = team.score;
+    right.appendChild(score);
+    const editBtn = document.createElement('button'); editBtn.className='ghost'; editBtn.textContent='Editar';
+    editBtn.addEventListener('click', ()=> openEdit(team.id));
+    right.appendChild(editBtn);
+
+    wrap.appendChild(left);
+    wrap.appendChild(right);
+
+    // click on whole card to open quick adjust
+    wrap.addEventListener('click', (ev)=>{
+      // avoid triggering when Edit clicked (event bubbling)
+      if(ev.target === editBtn) return;
+      openQuickAdjust(team.id);
+    });
+
+    teamsEl.appendChild(wrap);
+  });
+
+  // placar cards (right)
+  placarCards.innerHTML = '';
+  if(teams.length === 0){
+    placarCards.innerHTML = '<div class="empty">Sem equipes — adicione no painel à esquerda.</div>';
+  }else{
+    teams.forEach(team => {
+      const card = document.createElement('div'); card.className='placar-card';
+      card.style.border = '1px solid rgba(43,108,176,0.06)';
+      const top = document.createElement('div'); top.className='top';
+      const name = document.createElement('div'); name.className='name'; name.textContent = team.name;
+      const score = document.createElement('div'); score.className='score'; score.textContent = team.score;
+      top.appendChild(name); top.appendChild(score);
+
+      const meta = document.createElement('div'); meta.className='small'; meta.textContent = 'Última alteração: ' + (team.lastUpdate || '-');
+      card.appendChild(top); card.appendChild(meta);
+
+      // click to quick adjust
+      card.addEventListener('click', ()=> openQuickAdjust(team.id));
+
+      placarCards.appendChild(card);
+    });
+  }
+
+  // history
+  historyEl.innerHTML = '';
+  if(state.history.length === 0){
+    historyEl.innerHTML = '<div class="small muted">Sem histórico</div>';
+  }else{
+    state.history.slice().reverse().forEach(h=>{
+      const div = document.createElement('div'); div.className='history-item';
+      div.textContent = `[${h.time}] ${h.teamName} ${h.change>0?'+':''}${h.change} — ${h.reason || 'ajuste'}`;
+      historyEl.appendChild(div);
+    });
+  }
+
+  // telão
+  renderTela();
+  saveState(state);
+}
+
+/* ---------- Team management ---------- */
+function uid(){ return Math.random().toString(36).slice(2,9); }
+
+document.getElementById('addTeamBtn').addEventListener('click', ()=>{
+  const name = document.getElementById('teamName').value.trim();
+  const color = document.getElementById('teamColor').value;
+  const emoji = document.getElementById('teamEmoji').value.trim();
+  if(!name) return alert('Informe um nome para a equipe.');
+  const t = { id: uid(), name, color, emoji, score:0, lastUpdate: null };
+  state.teams.push(t);
+  document.getElementById('teamName').value = '';
+  document.getElementById('teamEmoji').value = '';
+  render();
+});
+
+function findTeam(id){ return state.teams.find(t=>t.id===id); }
+
+function openEdit(id){
+  const t = findTeam(id);
+  if(!t) return;
+  const newName = prompt('Editar nome da equipe:', t.name);
+  if(newName === null) return;
+  const newColor = prompt('Cor (hex) da equipe:', t.color);
+  if(newColor === null) return;
+  t.name = newName.trim() || t.name;
+  t.color = /^#([0-9A-F]{3}){1,2}$/i.test(newColor) ? newColor : t.color;
+  render();
+}
+
+/* ---------- Quick adjust panel (modal-like) ---------- */
+function openQuickAdjust(id){
+  const t = findTeam(id);
+  if(!t) return;
+  const val = prompt(`Equipe: ${t.name}\nPontos atuais: ${t.score}\n\nDigite o valor para somar (use '-' para subtrair), ou deixe vazio para cancelar. Exemplos: 10  -5`, '');
+  if(val === null || val.trim()==='') return;
+  // sanitize numeric input
+  const parsed = Number(val);
+  if(Number.isNaN(parsed)) return alert('Valor inválido. Use somente números (ex: 5 ou -3)');
+  applyChange(t, parsed, 'ajuste manual');
+}
+
+/* ---------- Apply change and history ---------- */
+function applyChange(team, change, reason='ajuste'){
+  // careful arithmetic using Number (integers expected). We'll coerce to Number.
+  // Ensure no floating rounding: use integers
+  const cur = Number(team.score) || 0;
+  const next = cur + Number(change);
+  team.score = Math.round(next);
+  team.lastUpdate = nowStr();
+  state.history.push({ teamId: team.id, teamName: team.name, change: Number(change), reason, time: team.lastUpdate });
+  render();
+  lastAction = {type:'change', teamId:team.id, change};
+}
+
+/* ---------- Quick controls (buttons) ---------- */
+let selectedTeamId = null; // used by buttons when a team is selected by clicking (we instead open prompt)
+let lastAction = null;
+
+document.querySelectorAll('[data-add]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const value = Number(btn.dataset.add);
+    // choose last modified team or if only one team, use it
+    if(state.teams.length === 1){
+      applyChange(state.teams[0], value, 'controle rápido');
+      return;
+    }
+    // ask which team
+    const teamName = prompt(`Digite o nome exato da equipe que receberá ${value>0?'+':''}${value} (ex: Equipe Azul):`);
+    if(!teamName) return;
+    const team = state.teams.find(t => t.name.toLowerCase() === teamName.trim().toLowerCase());
+    if(!team) return alert('Equipe não encontrada com esse nome.');
+    applyChange(team, value, 'controle rápido');
+  });
+});
+
+document.getElementById('customBtn').addEventListener('click', ()=>{
+  const txt = prompt('Digite o valor para somar/remover (ex: 8 ou -5):');
+  if(txt === null) return;
+  const n = Number(txt);
+  if(Number.isNaN(n)) return alert('Valor inválido.');
+  // choose team
+  if(state.teams.length === 1) { applyChange(state.teams[0], n, 'valor personalizado'); return; }
+  const teamName = prompt('Digite o nome exato da equipe que receberá a alteração:');
+  if(!teamName) return;
+  const team = state.teams.find(t => t.name.toLowerCase() === teamName.trim().toLowerCase());
+  if(!team) return alert('Equipe não encontrada com esse nome.');
+  applyChange(team, n, 'valor personalizado');
+});
+
+/* ---------- Undo ---------- */
+undoBtn.addEventListener('click', ()=>{
+  if(!lastAction) return alert('Nada para desfazer.');
+  if(lastAction.type === 'change'){
+    const team = findTeam(lastAction.teamId);
+    if(!team) return alert('Equipe não encontrada.');
+    team.score = Number(team.score) - Number(lastAction.change);
+    team.lastUpdate = nowStr();
+    state.history.push({ teamId: team.id, teamName: team.name, change: -Number(lastAction.change), reason: 'desfazer', time: team.lastUpdate });
+    lastAction = null;
+    render();
+  }
+});
+
+/* ---------- Telão ---------- */
+btnTelao.addEventListener('click', ()=> {
+  telaFull.classList.add('active');
+  telaFull.setAttribute('aria-hidden','false');
+});
+exitFull.addEventListener('click', ()=> closeTelao());
+document.addEventListener('keydown', (e)=> {
+  if(e.key === 'Escape') closeTelao();
+});
+function closeTelao(){
+  telaFull.classList.remove('active');
+  telaFull.setAttribute('aria-hidden','true');
+  if(document.fullscreenElement) document.exitFullscreen().catch(()=>{/*ignore*/});
+}
+fsBtn.addEventListener('click', ()=> {
+  if(!document.fullscreenElement){
+    telaFull.requestFullscreen?.().catch(()=>{/*ignore*/});
+  } else {
+    document.exitFullscreen().catch(()=>{/*ignore*/});
+  }
+});
+
+function renderTela(){
+  const teams = [...state.teams].sort((a,b)=>b.score-a.score);
+  telaGrid.innerHTML = '';
+  if(teams.length === 0){
+    telaGrid.innerHTML = '<div style="color:#9aa3ad">Sem equipes</div>';
+    return;
+  }
+  teams.forEach(t=>{
+    const c = document.createElement('div'); c.className='tela-card';
+    c.style.border = '2px solid rgba(255,255,255,0.04)';
+    c.style.padding = '18px';
+    const name = document.createElement('div'); name.className='name'; name.textContent = t.name;
+    const score = document.createElement('div'); score.className='score'; score.textContent = t.score;
+    c.appendChild(name); c.appendChild(score);
+    telaGrid.appendChild(c);
+  });
+}
+
+/* ---------- Export CSV ---------- */
+exportBtn.addEventListener('click', ()=>{
+  const rows = [['Nome','Pontuação','ID','Cor','Emoji','Última alteração']];
+  state.teams.forEach(t => rows.push([t.name, String(t.score), t.id, t.color || '', t.emoji||'', t.lastUpdate||'']));
+  const csv = rows.map(r => r.map(cell => `"${String(cell).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'placar_gincana.csv'; document.body.appendChild(a); a.click();
+  a.remove(); URL.revokeObjectURL(url);
+});
+
+/* ---------- Reset ---------- */
+btnReset.addEventListener('click', ()=>{
+  if(!confirm('Resetar tudo? Isso apagará equipes e histórico do armazenamento local.')) return;
+  state = {teams:[], history:[]};
+  lastAction = null;
+  saveState(state);
+  render();
+});
+
+/* ---------- Screenshot / copy image ---------- */
+/* Note: to keep this single-file and without external libs, we'll try to use the experimental
+   HTMLCanvas API via CSS paint? Not reliable. Instead we'll attempt to use the browser's
+   "toBlob" of an SVG rendering of the placar for copy. This provides a quick snapshot.
+*/
+screenshotBtn.addEventListener('click', async ()=>{
+  try{
+    const clone = placarCards.cloneNode(true);
+    // simple SVG wrapper
+    const width = Math.min(1200, window.innerWidth-40);
+    const lineHeight = 90;
+    const teams = Array.from(clone.children);
+    const h = Math.max(teams.length * 120, 200);
+    const svgParts = [];
+    svgParts.push(`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${h}" viewBox="0 0 ${width} ${h}">`);
+    svgParts.push(`<style>text{font-family: Arial, Helvetica, sans-serif; fill:#102027} .name{font-weight:700; font-size:18px;} .score{font-weight:900; font-size:32px; fill:#0b3b66}</style>`);
+    let y = 20;
+    state.teams.sort((a,b)=>b.score-a.score).forEach((t,i)=>{
+      const rectW = width - 40;
+      svgParts.push(`<rect x="20" y="${y}" width="${rectW}" height="80" rx="10" fill="#fff" stroke="#e6f0fb"/>`);
+      svgParts.push(`<text class="name" x="40" y="${y+32}">${escapeXml(t.name)}</text>`);
+      svgParts.push(`<text class="score" x="${width-60}" y="${y+52}" text-anchor="end">${t.score}</text>`);
+      y += 100;
+    });
+    svgParts.push('</svg>');
+    const svgStr = svgParts.join('');
+    const blob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+
+    // open new tab with image so user can save or right click (most compatible)
+    window.open(url, '_blank');
+    setTimeout(()=> URL.revokeObjectURL(url), 20000);
+  }catch(e){
+    alert('Erro ao gerar imagem: ' + e.message);
+  }
+});
+
+function escapeXml(unsafe) {
+  return String(unsafe).replace(/[<>&'"]/g, function (c) {
+    switch (c) {
+      case '<': return '&lt;';
+      case '>': return '&gt;';
+      case '&': return '&amp;';
+      case "'": return '&apos;';
+      case '"': return '&quot;';
+    }
+  });
+}
+
+/* ---------- Init ---------- */
+render();
+
+</script>
+</body>
+</html>
