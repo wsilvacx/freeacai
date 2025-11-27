@@ -1,47 +1,75 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<title>Placar da Gincana</title>
+<title>Placar Ao Vivo</title>
 <style>
-    body { 
-        background: #111; 
-        color: white; 
-        font-family: Arial; 
-        text-align: center; 
-        padding-top: 70px;
+    body {
+        background: #111;
+        color: white;
+        font-family: Arial, sans-serif;
+        text-align: center;
+        padding: 30px;
     }
-    h1 { font-size: 60px; }
-    .placar { font-size: 120px; margin: 40px; }
+    h1 {
+        font-size: 50px;
+        margin-bottom: 40px;
+    }
+    .placar {
+        font-size: 40px;
+        margin: 20px 0;
+        padding: 20px;
+        background: #222;
+        border-radius: 10px;
+    }
 </style>
 </head>
 <body>
 
 <h1>PLACAR AO VIVO</h1>
 
-<div class="placar">
-    Equipe 1: <span id="t1">0</span>
-</div>
+<div class="placar" id="eq1">Equipe 1: 0</div>
+<div class="placar" id="eq2">Equipe 2: 0</div>
+<div class="placar" id="eq3">Equipe 3: 0</div>
+<div class="placar" id="eq4">Equipe 4: 0</div>
 
-<div class="placar">
-    Equipe 2: <span id="t2">0</span>
-</div>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
+import { getDatabase, ref, onValue, set } 
+from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
 
-<script>
-function updateScreen() {
-    let saved = localStorage.getItem("gincanaPlacar");
-    if (saved) {
-        let score = JSON.parse(saved);
-        document.getElementById("t1").innerText = score.team1;
-        document.getElementById("t2").innerText = score.team2;
-    }
+const firebaseConfig = {
+  apiKey: "AIzaSyA7YV4gp_vbnkbirg5ypG0Y8yASlNrfFNY",
+  authDomain: "gincana-placar.firebaseapp.com",
+  projectId: "gincana-placar",
+  storageBucket: "gincana-placar.firebasestorage.app",
+  messagingSenderId: "846259743430",
+  appId: "1:846259743430:web:b9d1781e4a4ad6ab4145c7",
+  measurementId: "G-3W641L1SJV"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+// Atualiza o placar ao vivo
+function atualizar(eq, valor) {
+    document.getElementById("eq" + eq).innerText = "Equipe " + eq + ": " + valor;
 }
 
-// Atualiza o placar quando carrega
-updateScreen();
+// Escutar mudanças
+for (let i = 1; i <= 4; i++) {
+    onValue(ref(db, "pontos/equipe" + i), (snap) => {
+        atualizar(i, snap.val());
+    });
+}
 
-// Recarrega automaticamente a página a cada 1 segundo
-setInterval(() => location.reload(), 1000);
+// Marcar telão como ONLINE
+set(ref(db, "status/telao"), "online");
+
+// Quando fechar, marcar como OFFLINE
+window.addEventListener("beforeunload", () => {
+    set(ref(db, "status/telao"), "offline");
+});
 </script>
 
 </body>
