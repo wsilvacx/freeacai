@@ -5,6 +5,7 @@
 <title>Controle de Parcelas PRO+</title>
 
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
 body {
@@ -18,6 +19,13 @@ body {
     padding: 20px;
 }
 
+/* MELHOR PARA PDF */
+#relatorio {
+    background: white;
+    padding: 15px;
+    border-radius: 12px;
+}
+
 .header {
     background: linear-gradient(135deg, #1e73be, #155a96);
     color: white;
@@ -29,7 +37,6 @@ body {
 .dataTopo {
     font-size: 14px;
     margin-top: 5px;
-    opacity: 0.9;
 }
 
 .card {
@@ -44,7 +51,6 @@ h3 {
     margin-top: 15px;
 }
 
-/* NOME MAIOR */
 .nome {
     text-align: left;
     font-weight: 700;
@@ -56,7 +62,7 @@ h3 {
     color: #666;
 }
 
-/* CHECKBOX MODERNO */
+/* CHECKBOX PREMIUM */
 .checkbox {
     width: 22px;
     height: 22px;
@@ -142,6 +148,10 @@ button {
     border-radius: 10px;
     cursor: pointer;
 }
+
+button:hover {
+    background: #155a96;
+}
 </style>
 </head>
 
@@ -176,6 +186,8 @@ Relatório gerado em: <span id="dataRodape"></span>
 
 </div>
 
+<button onclick="gerarImagem()">📸 Gerar Imagem</button>
+<button onclick="gerarPDF()">📄 Gerar PDF</button>
 <button onclick="resetar()">🧹 Resetar Tudo</button>
 
 <script>
@@ -233,7 +245,7 @@ function criarGrupo(lista, id){
 
             html += `<td>
                 <div class="checkbox ${pago?'pago':''}" 
-                onclick="toggle(this,'${key}',${p.valor})"></div>
+                onclick="toggle(this,'${key}')"></div>
             </td>`;
         });
 
@@ -278,6 +290,39 @@ function calcular(){
     document.getElementById("pendente").innerText = (totalGeral-total).toFixed(2);
 }
 
+/* 📸 IMAGEM */
+function gerarImagem(){
+    html2canvas(document.querySelector("#relatorio")).then(canvas=>{
+        let link = document.createElement("a");
+        link.download = "relatorio.png";
+        link.href = canvas.toDataURL();
+        link.click();
+    });
+}
+
+/* 📄 PDF */
+async function gerarPDF(){
+    const { jsPDF } = window.jspdf;
+
+    const elemento = document.getElementById("relatorio");
+
+    const canvas = await html2canvas(elemento, { scale: 2 });
+
+    const imgData = canvas.toDataURL("image/png");
+
+    const pdf = new jsPDF("p", "mm", "a4");
+
+    const largura = 210;
+    const altura = (canvas.height * largura) / canvas.width;
+
+    pdf.addImage(imgData, "PNG", 0, 0, largura, altura);
+
+    let data = new Date().toLocaleString("pt-BR")
+        .replace(/[\/:]/g, "-");
+
+    pdf.save(`relatorio-${data}.pdf`);
+}
+
 function resetar(){
     if(confirm("Apagar tudo?")){
         localStorage.removeItem("pagamentos");
@@ -286,14 +331,11 @@ function resetar(){
     }
 }
 
-/* DATA E HORA */
+/* DATA */
 function atualizarData(){
-    let agora = new Date();
-
-    let dataHora = agora.toLocaleString('pt-BR');
-
-    document.getElementById("dataTopo").innerText = dataHora;
-    document.getElementById("dataRodape").innerText = dataHora;
+    let agora = new Date().toLocaleString('pt-BR');
+    document.getElementById("dataTopo").innerText = agora;
+    document.getElementById("dataRodape").innerText = agora;
 }
 
 function iniciar(){
