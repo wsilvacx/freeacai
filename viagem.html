@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<title>Controle de Parcelas</title>
+<title>Controle de Parcelas PRO</title>
 
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
@@ -51,14 +51,10 @@ body {
 .total { background: #d4edda; }
 .pendente { background: #ffeeba; }
 
-h3 {
-    margin-top: 15px;
-}
-
 table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 14px;
+    font-size: 13px;
 }
 
 th {
@@ -78,52 +74,36 @@ td {
     font-weight: 500;
 }
 
-/* NOVO CHECKBOX */
 .checkbox {
-    width: 22px;
-    height: 22px;
+    width: 20px;
+    height: 20px;
     border-radius: 6px;
     border: 2px solid #ccc;
     cursor: pointer;
-    display: inline-block;
-    position: relative;
-    transition: 0.2s;
 }
 
 .checkbox.pago {
     background: #28a745;
-    border-color: #28a745;
 }
 
-.checkbox.pago::after {
-    content: "✔";
-    color: white;
-    font-size: 14px;
-    position: absolute;
-    top: 1px;
-    left: 4px;
-}
-
-.checkbox:hover {
-    transform: scale(1.1);
+tr.pago-linha {
+    background: #e6f7ec;
 }
 
 button {
     width: 100%;
-    margin-top: 15px;
+    margin-top: 10px;
     padding: 12px;
     background: #1e73be;
     color: white;
     border: none;
     border-radius: 10px;
-    font-size: 16px;
     cursor: pointer;
 }
 
-.footer {
-    text-align: right;
+.resumoPessoa {
     font-size: 12px;
-    margin-top: 10px;
+    color: #555;
 }
 </style>
 </head>
@@ -133,89 +113,114 @@ button {
 <div class="container" id="relatorio">
 
 <div class="header">
-<h2>📊 Controle de Parcelas</h2>
-<div id="data"></div>
+<h2>📊 Controle de Parcelas PRO</h2>
 </div>
 
 <div class="card summary">
-<div class="box total">💰 Arrecadado<br>R$ <span id="arrecadado">0.00</span></div>
-<div class="box pendente">📌 Pendente<br>R$ <span id="pendente">0.00</span></div>
+<div class="box total">💰 Arrecadado<br>R$ <span id="arrecadado">0</span></div>
+<div class="box pendente">📌 Pendente<br>R$ <span id="pendente">0</span></div>
 </div>
 
 <div class="card">
-
-<h3>🚐 Hospedagem + Transporte</h3>
-<table><tbody id="g1"></tbody></table>
-
-<h3>🧒 Criança (metade)</h3>
-<table><tbody id="g2"></tbody></table>
-
-<h3>🏠 Só hospedagem</h3>
-<table><tbody id="g3"></tbody></table>
-
-</div>
-
-<div class="footer">
-Relatório gerado em: <span id="dataRodape"></span>
+<table><tbody id="tabela"></tbody></table>
 </div>
 
 </div>
 
 <button onclick="gerarImagem()">📸 Gerar Imagem</button>
+<button onclick="gerarWhats()">📲 WhatsApp</button>
+<button onclick="resetar()">🧹 Resetar Tudo</button>
 
 <script>
 
 const meses = ["Mar","Abr","Mai","Jun","Jul","Ago","Set"];
 
-const grupo1 = ["Wanderson","Rayssa","Mauricelio","Raniely","Welyda","Wilker","Inês","Leo","Paty","Cleane","Laércio","Neta","Erick"];
-const grupo2 = ["Cecilia","Guilherme"];
-const grupo3 = ["Raimundo","Bia","Rudson","Letícia","Dázim"];
+const pessoas = [
+    {nome:"Wanderson", valor:43.50},
+    {nome:"Rayssa", valor:43.50},
+    {nome:"Mauricelio", valor:43.50},
+    {nome:"Raniely", valor:43.50},
+    {nome:"Welyda", valor:43.50},
+    {nome:"Wilker", valor:43.50},
+    {nome:"Inês", valor:43.50},
+    {nome:"Leo", valor:43.50},
+    {nome:"Paty", valor:43.50},
+    {nome:"Cleane", valor:43.50},
+    {nome:"Laércio", valor:43.50},
+    {nome:"Neta", valor:43.50},
+    {nome:"Erick", valor:43.50},
 
-function criar(lista, valor, id){
-    let html = "<tr><th>Nome</th><th>Parcela</th>";
+    {nome:"Cecilia", valor:21.64},
+    {nome:"Guilherme", valor:21.64},
 
-    meses.forEach(m => html += `<th>${m}</th>`);
-    html += "</tr>";
+    {nome:"Raimundo", valor:12.50},
+    {nome:"Bia", valor:12.50},
+    {nome:"Rudson", valor:12.50},
+    {nome:"Letícia", valor:12.50},
+    {nome:"Dázim", valor:12.50}
+];
 
-    lista.forEach(nome=>{
-        html += `<tr>`;
-        html += `<td class="nome">${nome}</td>`;
-        html += `<td>R$ ${valor.toFixed(2)}</td>`;
+let estado = JSON.parse(localStorage.getItem("pagamentos")) || {};
 
-        meses.forEach(()=>{
-            html += `<td><div class="checkbox" onclick="toggle(this, ${valor})"></div></td>`;
-        });
-
-        html += "</tr>";
-    });
-
-    document.getElementById(id).innerHTML = html;
+function salvar(){
+    localStorage.setItem("pagamentos", JSON.stringify(estado));
 }
 
-criar(grupo1, 43.50, "g1");
-criar(grupo2, 21.64, "g2");
-criar(grupo3, 12.50, "g3");
+function criar(){
+    let html = "<tr><th>Nome</th><th>Parcela</th>";
+    meses.forEach(m => html += `<th>${m}</th>`);
+    html += "<th>Total Pago</th></tr>";
 
-function toggle(el, valor){
+    pessoas.forEach(p=>{
+        html += `<tr>`;
+        html += `<td class="nome">${p.nome}<div class="resumoPessoa" id="r_${p.nome}"></div></td>`;
+        html += `<td>R$ ${p.valor}</td>`;
+
+        meses.forEach((m,i)=>{
+            let key = p.nome+"_"+i;
+            let pago = estado[key];
+
+            html += `<td>
+                <div class="checkbox ${pago?'pago':''}" 
+                onclick="toggle(this,'${key}',${p.valor})"></div>
+            </td>`;
+        });
+
+        html += `<td id="total_${p.nome}">0</td>`;
+        html += `</tr>`;
+    });
+
+    document.getElementById("tabela").innerHTML = html;
+    calcular();
+}
+
+function toggle(el,key,valor){
     el.classList.toggle("pago");
+    estado[key] = el.classList.contains("pago");
+    salvar();
     calcular();
 }
 
 function calcular(){
     let total = 0;
 
-    document.querySelectorAll(".checkbox.pago").forEach(cb=>{
-        let valor = parseFloat(cb.parentElement.parentElement.children[1].innerText.replace("R$",""));
-        total += valor;
+    pessoas.forEach(p=>{
+        let pago = 0;
+        meses.forEach((m,i)=>{
+            if(estado[p.nome+"_"+i]){
+                total += p.valor;
+                pago++;
+            }
+        });
+
+        document.getElementById("total_"+p.nome).innerText = "R$ " + (pago*p.valor).toFixed(2);
+        document.getElementById("r_"+p.nome).innerText = `${pago}/7 parcelas`;
     });
 
-    let totalGeral =
-        grupo1.length * 7 * 43.50 +
-        grupo2.length * 7 * 21.64 +
-        grupo3.length * 7 * 12.50;
+    let totalGeral = pessoas.reduce((s,p)=>s+(p.valor*7),0);
 
     document.getElementById("arrecadado").innerText = total.toFixed(2);
-    document.getElementById("pendente").innerText = (totalGeral - total).toFixed(2);
+    document.getElementById("pendente").innerText = (totalGeral-total).toFixed(2);
 }
 
 function gerarImagem(){
@@ -227,9 +232,20 @@ function gerarImagem(){
     });
 }
 
-let hoje = new Date().toLocaleDateString();
-document.getElementById("data").innerText = hoje;
-document.getElementById("dataRodape").innerText = hoje;
+function gerarWhats(){
+    let msg = `📊 RELATÓRIO\n💰 Arrecadado: R$ ${arrecadado.innerText}\n📌 Pendente: R$ ${pendente.innerText}`;
+    window.open("https://wa.me/?text="+encodeURIComponent(msg));
+}
+
+function resetar(){
+    if(confirm("Apagar tudo?")){
+        localStorage.removeItem("pagamentos");
+        estado = {};
+        criar();
+    }
+}
+
+criar();
 
 </script>
 
