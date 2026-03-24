@@ -14,7 +14,7 @@ body {
 }
 
 .container {
-    max-width: 1000px;
+    max-width: 1100px;
     margin: auto;
     padding: 20px;
 }
@@ -37,14 +37,12 @@ body {
 
 .summary {
     display: flex;
-    justify-content: space-around;
-    flex-wrap: wrap;
     gap: 10px;
+    flex-wrap: wrap;
 }
 
 .box {
     flex: 1;
-    min-width: 200px;
     padding: 10px;
     border-radius: 10px;
     text-align: center;
@@ -54,16 +52,19 @@ body {
 .total { background: #d4edda; }
 .pendente { background: #fff3cd; }
 
+h3 {
+    margin-top: 15px;
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 14px;
 }
 
 th {
     background: #1e73be;
     color: white;
-    padding: 8px;
+    padding: 6px;
 }
 
 td {
@@ -77,7 +78,7 @@ td.nome {
     font-weight: 500;
 }
 
-td.click {
+.click {
     cursor: pointer;
     border-radius: 6px;
 }
@@ -102,7 +103,6 @@ button {
     text-align: right;
     font-size: 12px;
     margin-top: 10px;
-    color: #666;
 }
 </style>
 </head>
@@ -112,26 +112,38 @@ button {
 <div class="container" id="relatorio">
 
 <div class="header">
-    <h2>📊 Controle de Parcelas</h2>
-    <div id="data"></div>
+<h2>📊 Controle de Parcelas</h2>
+<div id="data"></div>
 </div>
 
 <div class="card summary">
-    <div class="box total">💰 Arrecadado<br>R$ <span id="arrecadado">0.00</span></div>
-    <div class="box pendente">📌 Pendente<br>R$ <span id="pendente">0.00</span></div>
+<div class="box total">💰 Arrecadado<br>R$ <span id="arrecadado">0.00</span></div>
+<div class="box pendente">📌 Pendente<br>R$ <span id="pendente">0.00</span></div>
 </div>
 
 <div class="card">
+
+<h3>🚐 Hospedagem + Transporte</h3>
 <table>
+<thead>
 <tr>
-<th>Nome</th>
-<th>Parcela</th>
+<th>Nome</th><th>Parcela</th>
 <th>Mar</th><th>Abr</th><th>Mai</th><th>Jun</th><th>Jul</th><th>Ago</th><th>Set</th>
 </tr>
-
-<tbody id="tabela"></tbody>
-
+</thead>
+<tbody id="grupo1"></tbody>
 </table>
+
+<h3>🧒 Criança (metade)</h3>
+<table>
+<tbody id="grupo2"></tbody>
+</table>
+
+<h3>🏠 Só hospedagem</h3>
+<table>
+<tbody id="grupo3"></tbody>
+</table>
+
 </div>
 
 <div class="footer">
@@ -143,36 +155,60 @@ Relatório gerado em: <span id="dataRodape"></span>
 <button onclick="gerarImagem()">📸 Gerar Imagem para WhatsApp</button>
 
 <script>
-const pessoas = [
+
+const meses = 7;
+
+const grupo1 = [
 "Wanderson","Rayssa","Mauricelio","Raniely","Welyda","Wilker","Inês","Leo","Paty","Cleane","Laércio","Neta","Erick"
 ];
 
-const tabela = document.getElementById("tabela");
+const grupo2 = ["Cecilia","Guilherme"];
 
-pessoas.forEach(nome=>{
-    let tr = "<tr>";
-    tr += `<td class="nome">${nome}</td>`;
-    tr += `<td>R$ 43.29</td>`;
+const grupo3 = ["Raimundo","Bia","Rudson","Letícia","Dázim"];
 
-    for(let i=0;i<7;i++){
-        tr += `<td class="click" onclick="toggle(this)"> </td>`;
-    }
+function criarTabela(lista, valor, id){
+    let html = `
+    <tr>
+    <th>Nome</th><th>Parcela</th>
+    <th>Mar</th><th>Abr</th><th>Mai</th><th>Jun</th><th>Jul</th><th>Ago</th><th>Set</th>
+    </tr>`;
 
-    tr += "</tr>";
-    tabela.innerHTML += tr;
-});
+    lista.forEach(nome=>{
+        html += `<tr>`;
+        html += `<td class="nome">${nome}</td>`;
+        html += `<td>R$ ${valor}</td>`;
 
-function toggle(el){
+        for(let i=0;i<meses;i++){
+            html += `<td class="click" onclick="toggle(this, ${valor})"></td>`;
+        }
+
+        html += `</tr>`;
+    });
+
+    document.getElementById(id).innerHTML = html;
+}
+
+criarTabela(grupo1, 43.29, "grupo1");
+criarTabela(grupo2, 21.64, "grupo2");
+criarTabela(grupo3, 12.07, "grupo3");
+
+function toggle(el, valor){
     el.classList.toggle("pago");
     calcular();
 }
 
 function calcular(){
-    let pagos = document.querySelectorAll(".pago").length;
-    let valor = 43.29;
+    let total = 0;
 
-    let total = pagos * valor;
-    let totalGeral = pessoas.length * 7 * valor;
+    document.querySelectorAll(".pago").forEach(td=>{
+        let valor = parseFloat(td.parentElement.children[1].innerText.replace("R$",""));
+        total += valor;
+    });
+
+    let totalGeral =
+        grupo1.length * 7 * 43.29 +
+        grupo2.length * 7 * 21.64 +
+        grupo3.length * 7 * 12.07;
 
     document.getElementById("arrecadado").innerText = total.toFixed(2);
     document.getElementById("pendente").innerText = (totalGeral - total).toFixed(2);
@@ -190,6 +226,7 @@ function gerarImagem(){
 let hoje = new Date().toLocaleDateString();
 document.getElementById("data").innerText = hoje;
 document.getElementById("dataRodape").innerText = hoje;
+
 </script>
 
 </body>
