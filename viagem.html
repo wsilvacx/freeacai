@@ -10,7 +10,6 @@
 body {
     font-family: 'Segoe UI', sans-serif;
     background: #eef2f7;
-    margin: 0;
 }
 
 .container {
@@ -50,7 +49,7 @@ body {
 }
 
 .total { background: #d4edda; }
-.pendente { background: #fff3cd; }
+.pendente { background: #ffeeba; }
 
 h3 {
     margin-top: 15px;
@@ -59,6 +58,7 @@ h3 {
 table {
     width: 100%;
     border-collapse: collapse;
+    font-size: 14px;
 }
 
 th {
@@ -73,18 +73,39 @@ td {
     border-bottom: 1px solid #eee;
 }
 
-td.nome {
+.nome {
     text-align: left;
     font-weight: 500;
 }
 
-.click {
-    cursor: pointer;
+/* NOVO CHECKBOX */
+.checkbox {
+    width: 22px;
+    height: 22px;
     border-radius: 6px;
+    border: 2px solid #ccc;
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    transition: 0.2s;
 }
 
-.pago {
+.checkbox.pago {
     background: #28a745;
+    border-color: #28a745;
+}
+
+.checkbox.pago::after {
+    content: "✔";
+    color: white;
+    font-size: 14px;
+    position: absolute;
+    top: 1px;
+    left: 4px;
+}
+
+.checkbox:hover {
+    transform: scale(1.1);
 }
 
 button {
@@ -124,25 +145,13 @@ button {
 <div class="card">
 
 <h3>🚐 Hospedagem + Transporte</h3>
-<table>
-<thead>
-<tr>
-<th>Nome</th><th>Parcela</th>
-<th>Mar</th><th>Abr</th><th>Mai</th><th>Jun</th><th>Jul</th><th>Ago</th><th>Set</th>
-</tr>
-</thead>
-<tbody id="grupo1"></tbody>
-</table>
+<table><tbody id="g1"></tbody></table>
 
 <h3>🧒 Criança (metade)</h3>
-<table>
-<tbody id="grupo2"></tbody>
-</table>
+<table><tbody id="g2"></tbody></table>
 
 <h3>🏠 Só hospedagem</h3>
-<table>
-<tbody id="grupo3"></tbody>
-</table>
+<table><tbody id="g3"></tbody></table>
 
 </div>
 
@@ -152,45 +161,40 @@ Relatório gerado em: <span id="dataRodape"></span>
 
 </div>
 
-<button onclick="gerarImagem()">📸 Gerar Imagem para WhatsApp</button>
+<button onclick="gerarImagem()">📸 Gerar Imagem</button>
 
 <script>
 
-const meses = 7;
+const meses = ["Mar","Abr","Mai","Jun","Jul","Ago","Set"];
 
-const grupo1 = [
-"Wanderson","Rayssa","Mauricelio","Raniely","Welyda","Wilker","Inês","Leo","Paty","Cleane","Laércio","Neta","Erick"
-];
-
+const grupo1 = ["Wanderson","Rayssa","Mauricelio","Raniely","Welyda","Wilker","Inês","Leo","Paty","Cleane","Laércio","Neta","Erick"];
 const grupo2 = ["Cecilia","Guilherme"];
-
 const grupo3 = ["Raimundo","Bia","Rudson","Letícia","Dázim"];
 
-function criarTabela(lista, valor, id){
-    let html = `
-    <tr>
-    <th>Nome</th><th>Parcela</th>
-    <th>Mar</th><th>Abr</th><th>Mai</th><th>Jun</th><th>Jul</th><th>Ago</th><th>Set</th>
-    </tr>`;
+function criar(lista, valor, id){
+    let html = "<tr><th>Nome</th><th>Parcela</th>";
+
+    meses.forEach(m => html += `<th>${m}</th>`);
+    html += "</tr>";
 
     lista.forEach(nome=>{
         html += `<tr>`;
         html += `<td class="nome">${nome}</td>`;
-        html += `<td>R$ ${valor}</td>`;
+        html += `<td>R$ ${valor.toFixed(2)}</td>`;
 
-        for(let i=0;i<meses;i++){
-            html += `<td class="click" onclick="toggle(this, ${valor})"></td>`;
-        }
+        meses.forEach(()=>{
+            html += `<td><div class="checkbox" onclick="toggle(this, ${valor})"></div></td>`;
+        });
 
-        html += `</tr>`;
+        html += "</tr>";
     });
 
     document.getElementById(id).innerHTML = html;
 }
 
-criarTabela(grupo1, 43.29, "grupo1");
-criarTabela(grupo2, 21.64, "grupo2");
-criarTabela(grupo3, 12.07, "grupo3");
+criar(grupo1, 43.50, "g1");
+criar(grupo2, 21.64, "g2");
+criar(grupo3, 12.50, "g3");
 
 function toggle(el, valor){
     el.classList.toggle("pago");
@@ -200,15 +204,15 @@ function toggle(el, valor){
 function calcular(){
     let total = 0;
 
-    document.querySelectorAll(".pago").forEach(td=>{
-        let valor = parseFloat(td.parentElement.children[1].innerText.replace("R$",""));
+    document.querySelectorAll(".checkbox.pago").forEach(cb=>{
+        let valor = parseFloat(cb.parentElement.parentElement.children[1].innerText.replace("R$",""));
         total += valor;
     });
 
     let totalGeral =
-        grupo1.length * 7 * 43.29 +
+        grupo1.length * 7 * 43.50 +
         grupo2.length * 7 * 21.64 +
-        grupo3.length * 7 * 12.07;
+        grupo3.length * 7 * 12.50;
 
     document.getElementById("arrecadado").innerText = total.toFixed(2);
     document.getElementById("pendente").innerText = (totalGeral - total).toFixed(2);
