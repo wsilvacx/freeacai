@@ -2,128 +2,106 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Controle de Parcelas</title>
 
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
 <style>
-body {
-    font-family: 'Segoe UI', sans-serif;
-    background: #eef2f7;
+body{
+    font-family: 'Segoe UI';
+    background:#eef2f7;
+    margin:0;
 }
 
-.container {
-    max-width: 1100px;
-    margin: auto;
-    padding: 20px;
+.container{
+    padding:15px;
+    max-width:1000px;
+    margin:auto;
 }
 
-.header {
-    background: linear-gradient(135deg, #1e73be, #155a96);
-    color: white;
-    padding: 20px;
-    border-radius: 12px;
-    text-align: center;
+.header{
+    background:linear-gradient(135deg,#1e73be,#155a96);
+    color:white;
+    padding:15px;
+    border-radius:10px;
+    text-align:center;
 }
 
-.card {
-    background: white;
-    margin-top: 15px;
-    padding: 15px;
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+.card{
+    background:white;
+    margin-top:10px;
+    padding:10px;
+    border-radius:10px;
 }
 
-.summary {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
+.summary{
+    display:flex;
+    gap:10px;
 }
 
-.box {
-    flex: 1;
-    padding: 10px;
-    border-radius: 10px;
-    text-align: center;
-    font-weight: bold;
+.box{
+    flex:1;
+    text-align:center;
+    padding:10px;
+    border-radius:10px;
+    font-weight:bold;
 }
 
-.total { background: #d4edda; }
-.pendente { background: #ffeeba; }
+.total{background:#d4edda;}
+.pendente{background:#ffeeba;}
 
-h3 {
-    margin-top: 15px;
+table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13px;
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 14px;
+th{
+    background:#1e73be;
+    color:white;
 }
 
-th {
-    background: #1e73be;
-    color: white;
-    padding: 6px;
+td,th{
+    padding:5px;
+    text-align:center;
 }
 
-td {
-    padding: 6px;
-    text-align: center;
-    border-bottom: 1px solid #eee;
+.nome{text-align:left;}
+
+.checkbox{
+    width:20px;
+    height:20px;
+    border:2px solid #ccc;
+    border-radius:5px;
+    margin:auto;
 }
 
-.nome {
-    text-align: left;
-    font-weight: 500;
+.pago{
+    background:#28a745;
 }
 
-/* NOVO CHECKBOX */
-.checkbox {
-    width: 22px;
-    height: 22px;
-    border-radius: 6px;
-    border: 2px solid #ccc;
-    cursor: pointer;
-    display: inline-block;
-    position: relative;
-    transition: 0.2s;
+.progress{
+    height:6px;
+    background:#ddd;
+    border-radius:5px;
 }
 
-.checkbox.pago {
-    background: #28a745;
-    border-color: #28a745;
+.progress div{
+    height:6px;
+    background:#28a745;
 }
 
-.checkbox.pago::after {
-    content: "✔";
-    color: white;
-    font-size: 14px;
-    position: absolute;
-    top: 1px;
-    left: 4px;
-}
-
-.checkbox:hover {
-    transform: scale(1.1);
-}
-
-button {
-    width: 100%;
-    margin-top: 15px;
-    padding: 12px;
-    background: #1e73be;
-    color: white;
-    border: none;
-    border-radius: 10px;
-    font-size: 16px;
-    cursor: pointer;
-}
-
-.footer {
-    text-align: right;
-    font-size: 12px;
-    margin-top: 10px;
+button{
+    width:100%;
+    margin-top:10px;
+    padding:12px;
+    border:none;
+    border-radius:10px;
+    background:#1e73be;
+    color:white;
+    font-size:15px;
 }
 </style>
 </head>
@@ -138,98 +116,157 @@ button {
 </div>
 
 <div class="card summary">
-<div class="box total">💰 Arrecadado<br>R$ <span id="arrecadado">0.00</span></div>
-<div class="box pendente">📌 Pendente<br>R$ <span id="pendente">0.00</span></div>
+<div class="box total">💰 R$ <span id="arrecadado">0.00</span></div>
+<div class="box pendente">📌 R$ <span id="pendente">0.00</span></div>
 </div>
 
 <div class="card">
-
-<h3>🚐 Hospedagem + Transporte</h3>
-<table><tbody id="g1"></tbody></table>
-
-<h3>🧒 Criança (metade)</h3>
-<table><tbody id="g2"></tbody></table>
-
-<h3>🏠 Só hospedagem</h3>
-<table><tbody id="g3"></tbody></table>
-
+<h3>🏆 Ranking</h3>
+<div id="ranking"></div>
 </div>
 
-<div class="footer">
-Relatório gerado em: <span id="dataRodape"></span>
+<div class="card">
+<table id="tabela"></table>
 </div>
 
 </div>
 
 <button onclick="gerarImagem()">📸 Gerar Imagem</button>
+<button onclick="gerarWhatsApp()">📲 WhatsApp</button>
 
 <script>
 
-const meses = ["Mar","Abr","Mai","Jun","Jul","Ago","Set"];
+// CONFIGURAÇÃO
+const pessoas = [
+{nome:"Wanderson",valor:43.50},
+{nome:"Rayssa",valor:43.50},
+{nome:"Mauricelio",valor:43.50},
+{nome:"Raniely",valor:43.50},
+{nome:"Welyda",valor:43.50},
+{nome:"Wilker",valor:43.50},
+{nome:"Inês",valor:43.50},
+{nome:"Leo",valor:43.50},
+{nome:"Paty",valor:43.50},
+{nome:"Cleane",valor:43.50},
+{nome:"Laércio",valor:43.50},
+{nome:"Neta",valor:43.50},
+{nome:"Erick",valor:43.50},
 
-const grupo1 = ["Wanderson","Rayssa","Mauricelio","Raniely","Welyda","Wilker","Inês","Leo","Paty","Cleane","Laércio","Neta","Erick"];
-const grupo2 = ["Cecilia","Guilherme"];
-const grupo3 = ["Raimundo","Bia","Rudson","Letícia","Dázim"];
+{nome:"Cecilia",valor:21.64},
+{nome:"Guilherme",valor:21.64},
 
-function criar(lista, valor, id){
-    let html = "<tr><th>Nome</th><th>Parcela</th>";
+{nome:"Raimundo",valor:12.50},
+{nome:"Bia",valor:12.50},
+{nome:"Rudson",valor:12.50},
+{nome:"Letícia",valor:12.50},
+{nome:"Dázim",valor:12.50}
+];
 
-    meses.forEach(m => html += `<th>${m}</th>`);
-    html += "</tr>";
+const meses=7;
 
-    lista.forEach(nome=>{
-        html += `<tr>`;
-        html += `<td class="nome">${nome}</td>`;
-        html += `<td>R$ ${valor.toFixed(2)}</td>`;
+// CRIAR TABELA
+function criar(){
+let html="<tr><th>Nome</th><th>R$</th>";
+for(let i=1;i<=7;i++) html+=`<th>${i}</th>`;
+html+="<th>%</th></tr>";
 
-        meses.forEach(()=>{
-            html += `<td><div class="checkbox" onclick="toggle(this, ${valor})"></div></td>`;
-        });
+pessoas.forEach(p=>{
+html+=`<tr>
+<td class="nome">${p.nome}</td>
+<td>${p.valor}</td>`;
 
-        html += "</tr>";
-    });
-
-    document.getElementById(id).innerHTML = html;
+for(let i=0;i<7;i++){
+html+=`<td><div class="checkbox" onclick="toggle(this)"></div></td>`;
 }
 
-criar(grupo1, 43.50, "g1");
-criar(grupo2, 21.64, "g2");
-criar(grupo3, 12.50, "g3");
+html+=`<td><div class="progress"><div></div></div></td></tr>`;
+});
 
-function toggle(el, valor){
-    el.classList.toggle("pago");
-    calcular();
+document.getElementById("tabela").innerHTML=html;
 }
 
+// TOGGLE
+function toggle(el){
+el.classList.toggle("pago");
+salvar();
+calcular();
+}
+
+// SALVAR
+function salvar(){
+localStorage.setItem("dados",document.getElementById("tabela").innerHTML);
+}
+
+// CARREGAR
+function carregar(){
+let d=localStorage.getItem("dados");
+if(d){
+document.getElementById("tabela").innerHTML=d;
+}else criar();
+}
+
+// CALCULAR
 function calcular(){
-    let total = 0;
+let total=0;
+let ranking=[];
 
-    document.querySelectorAll(".checkbox.pago").forEach(cb=>{
-        let valor = parseFloat(cb.parentElement.parentElement.children[1].innerText.replace("R$",""));
-        total += valor;
-    });
+document.querySelectorAll("#tabela tr").forEach((tr,i)=>{
+if(i==0)return;
 
-    let totalGeral =
-        grupo1.length * 7 * 43.50 +
-        grupo2.length * 7 * 21.64 +
-        grupo3.length * 7 * 12.50;
+let nome=tr.children[0].innerText;
+let valor=parseFloat(tr.children[1].innerText);
+let pagos=tr.querySelectorAll(".pago").length;
 
-    document.getElementById("arrecadado").innerText = total.toFixed(2);
-    document.getElementById("pendente").innerText = (totalGeral - total).toFixed(2);
+total+=pagos*valor;
+
+let perc=(pagos/7)*100;
+tr.querySelector(".progress div").style.width=perc+"%";
+
+ranking.push({nome,pagos});
+});
+
+ranking.sort((a,b)=>b.pagos-a.pagos);
+
+document.getElementById("ranking").innerHTML=
+ranking.map(r=>`🏅 ${r.nome} (${r.pagos}/7)`).join("<br>");
+
+let totalGeral=
+(13*7*43.50)+(2*7*21.64)+(5*7*12.50);
+
+document.getElementById("arrecadado").innerText=total.toFixed(2);
+document.getElementById("pendente").innerText=(totalGeral-total).toFixed(2);
 }
 
+// IMAGEM
 function gerarImagem(){
-    html2canvas(document.querySelector("#relatorio")).then(canvas=>{
-        let link = document.createElement("a");
-        link.download = "relatorio.png";
-        link.href = canvas.toDataURL();
-        link.click();
-    });
+html2canvas(document.querySelector("#relatorio")).then(c=>{
+let a=document.createElement("a");
+a.download="relatorio.png";
+a.href=c.toDataURL();
+a.click();
+});
 }
 
-let hoje = new Date().toLocaleDateString();
-document.getElementById("data").innerText = hoje;
-document.getElementById("dataRodape").innerText = hoje;
+// WHATSAPP
+function gerarWhatsApp(){
+let msg="📊 RELATÓRIO\n\n";
+
+document.querySelectorAll("#tabela tr").forEach((tr,i)=>{
+if(i==0)return;
+let nome=tr.children[0].innerText;
+let pagos=tr.querySelectorAll(".pago").length;
+msg+=`• ${nome} (${pagos}/7)\n`;
+});
+
+window.open("https://wa.me/?text="+encodeURIComponent(msg));
+}
+
+// DATA
+document.getElementById("data").innerText=new Date().toLocaleDateString();
+
+// INIT
+carregar();
+calcular();
 
 </script>
 
