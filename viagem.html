@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<title>Controle de Parcelas PRO</title>
+<title>Controle de Parcelas PRO+</title>
 
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
@@ -34,22 +34,44 @@ body {
     box-shadow: 0 4px 10px rgba(0,0,0,0.08);
 }
 
-.summary {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
+h3 {
+    margin-top: 15px;
 }
 
-.box {
-    flex: 1;
-    padding: 10px;
-    border-radius: 10px;
-    text-align: center;
-    font-weight: bold;
+/* CHECKBOX NOVO */
+.checkbox {
+    width: 22px;
+    height: 22px;
+    border-radius: 8px;
+    border: 2px solid #bbb;
+    cursor: pointer;
+    transition: 0.25s;
+    position: relative;
 }
 
-.total { background: #d4edda; }
-.pendente { background: #ffeeba; }
+.checkbox:hover {
+    transform: scale(1.15);
+    border-color: #1e73be;
+}
+
+.checkbox.pago {
+    background: linear-gradient(135deg, #28a745, #218838);
+    border: none;
+    box-shadow: 0 0 6px rgba(40,167,69,0.6);
+}
+
+.checkbox.pago::after {
+    content: "✔";
+    color: white;
+    font-size: 14px;
+    position: absolute;
+    top: 2px;
+    left: 5px;
+}
+
+tr.pago-linha {
+    background: #e9f9ee;
+}
 
 table {
     width: 100%;
@@ -74,21 +96,26 @@ td {
     font-weight: 500;
 }
 
-.checkbox {
-    width: 20px;
-    height: 20px;
-    border-radius: 6px;
-    border: 2px solid #ccc;
-    cursor: pointer;
+.resumoPessoa {
+    font-size: 11px;
+    color: #666;
 }
 
-.checkbox.pago {
-    background: #28a745;
+.summary {
+    display: flex;
+    gap: 10px;
 }
 
-tr.pago-linha {
-    background: #e6f7ec;
+.box {
+    flex: 1;
+    padding: 10px;
+    border-radius: 10px;
+    text-align: center;
+    font-weight: bold;
 }
+
+.total { background: #d4edda; }
+.pendente { background: #ffeeba; }
 
 button {
     width: 100%;
@@ -100,11 +127,6 @@ button {
     border-radius: 10px;
     cursor: pointer;
 }
-
-.resumoPessoa {
-    font-size: 12px;
-    color: #555;
-}
 </style>
 </head>
 
@@ -113,7 +135,7 @@ button {
 <div class="container" id="relatorio">
 
 <div class="header">
-<h2>📊 Controle de Parcelas PRO</h2>
+<h2>📊 Controle de Parcelas PRO+</h2>
 </div>
 
 <div class="card summary">
@@ -122,43 +144,52 @@ button {
 </div>
 
 <div class="card">
-<table><tbody id="tabela"></tbody></table>
+<h3>🚐 Hospedagem + Transporte</h3>
+<table><tbody id="g1"></tbody></table>
+
+<h3>🧒 Crianças</h3>
+<table><tbody id="g2"></tbody></table>
+
+<h3>🏠 Só hospedagem</h3>
+<table><tbody id="g3"></tbody></table>
 </div>
 
 </div>
 
-<button onclick="gerarImagem()">📸 Gerar Imagem</button>
-<button onclick="gerarWhats()">📲 WhatsApp</button>
 <button onclick="resetar()">🧹 Resetar Tudo</button>
 
 <script>
 
 const meses = ["Mar","Abr","Mai","Jun","Jul","Ago","Set"];
 
-const pessoas = [
-    {nome:"Wanderson", valor:43.50},
-    {nome:"Rayssa", valor:43.50},
-    {nome:"Mauricelio", valor:43.50},
-    {nome:"Raniely", valor:43.50},
-    {nome:"Welyda", valor:43.50},
-    {nome:"Wilker", valor:43.50},
-    {nome:"Inês", valor:43.50},
-    {nome:"Leo", valor:43.50},
-    {nome:"Paty", valor:43.50},
-    {nome:"Cleane", valor:43.50},
-    {nome:"Laércio", valor:43.50},
-    {nome:"Neta", valor:43.50},
-    {nome:"Erick", valor:43.50},
-
-    {nome:"Cecilia", valor:21.64},
-    {nome:"Guilherme", valor:21.64},
-
-    {nome:"Raimundo", valor:12.50},
-    {nome:"Bia", valor:12.50},
-    {nome:"Rudson", valor:12.50},
-    {nome:"Letícia", valor:12.50},
-    {nome:"Dázim", valor:12.50}
-];
+const grupos = {
+    g1: [
+        {nome:"Wanderson", valor:43.50},
+        {nome:"Rayssa", valor:43.50},
+        {nome:"Mauricelio", valor:43.50},
+        {nome:"Raniely", valor:43.50},
+        {nome:"Welyda", valor:43.50},
+        {nome:"Wilker", valor:43.50},
+        {nome:"Inês", valor:43.50},
+        {nome:"Leo", valor:43.50},
+        {nome:"Paty", valor:43.50},
+        {nome:"Cleane", valor:43.50},
+        {nome:"Laércio", valor:43.50},
+        {nome:"Neta", valor:43.50},
+        {nome:"Erick", valor:43.50}
+    ],
+    g2: [
+        {nome:"Cecilia", valor:21.64},
+        {nome:"Guilherme", valor:21.64}
+    ],
+    g3: [
+        {nome:"Raimundo", valor:12.50},
+        {nome:"Bia", valor:12.50},
+        {nome:"Rudson", valor:12.50},
+        {nome:"Letícia", valor:12.50},
+        {nome:"Dázim", valor:12.50}
+    ]
+};
 
 let estado = JSON.parse(localStorage.getItem("pagamentos")) || {};
 
@@ -166,12 +197,12 @@ function salvar(){
     localStorage.setItem("pagamentos", JSON.stringify(estado));
 }
 
-function criar(){
+function criarGrupo(lista, id){
     let html = "<tr><th>Nome</th><th>Parcela</th>";
     meses.forEach(m => html += `<th>${m}</th>`);
-    html += "<th>Total Pago</th></tr>";
+    html += "<th>Total</th></tr>";
 
-    pessoas.forEach(p=>{
+    lista.forEach(p=>{
         html += `<tr>`;
         html += `<td class="nome">${p.nome}<div class="resumoPessoa" id="r_${p.nome}"></div></td>`;
         html += `<td>R$ ${p.valor}</td>`;
@@ -190,13 +221,16 @@ function criar(){
         html += `</tr>`;
     });
 
-    document.getElementById("tabela").innerHTML = html;
-    calcular();
+    document.getElementById(id).innerHTML = html;
 }
 
 function toggle(el,key,valor){
     el.classList.toggle("pago");
     estado[key] = el.classList.contains("pago");
+
+    let linha = el.closest("tr");
+    linha.classList.toggle("pago-linha");
+
     salvar();
     calcular();
 }
@@ -204,8 +238,9 @@ function toggle(el,key,valor){
 function calcular(){
     let total = 0;
 
-    pessoas.forEach(p=>{
+    Object.values(grupos).flat().forEach(p=>{
         let pago = 0;
+
         meses.forEach((m,i)=>{
             if(estado[p.nome+"_"+i]){
                 total += p.valor;
@@ -217,35 +252,29 @@ function calcular(){
         document.getElementById("r_"+p.nome).innerText = `${pago}/7 parcelas`;
     });
 
-    let totalGeral = pessoas.reduce((s,p)=>s+(p.valor*7),0);
+    let totalGeral = Object.values(grupos).flat()
+        .reduce((s,p)=>s+(p.valor*7),0);
 
     document.getElementById("arrecadado").innerText = total.toFixed(2);
     document.getElementById("pendente").innerText = (totalGeral-total).toFixed(2);
-}
-
-function gerarImagem(){
-    html2canvas(document.querySelector("#relatorio")).then(canvas=>{
-        let link = document.createElement("a");
-        link.download = "relatorio.png";
-        link.href = canvas.toDataURL();
-        link.click();
-    });
-}
-
-function gerarWhats(){
-    let msg = `📊 RELATÓRIO\n💰 Arrecadado: R$ ${arrecadado.innerText}\n📌 Pendente: R$ ${pendente.innerText}`;
-    window.open("https://wa.me/?text="+encodeURIComponent(msg));
 }
 
 function resetar(){
     if(confirm("Apagar tudo?")){
         localStorage.removeItem("pagamentos");
         estado = {};
-        criar();
+        iniciar();
     }
 }
 
-criar();
+function iniciar(){
+    criarGrupo(grupos.g1, "g1");
+    criarGrupo(grupos.g2, "g2");
+    criarGrupo(grupos.g3, "g3");
+    calcular();
+}
+
+iniciar();
 
 </script>
 
