@@ -8,128 +8,188 @@
 
 <style>
 body {
-    font-family: Arial;
-    background: #f4f4f4;
+    font-family: 'Segoe UI', sans-serif;
+    background: #eef2f7;
+    margin: 0;
+}
+
+.container {
+    max-width: 1000px;
+    margin: auto;
+    padding: 20px;
+}
+
+.header {
+    background: linear-gradient(135deg, #1e73be, #155a96);
+    color: white;
+    padding: 20px;
+    border-radius: 12px;
     text-align: center;
 }
 
-h1 {
-    background: #1e73be;
-    color: white;
-    padding: 10px;
+.card {
+    background: white;
+    margin-top: 15px;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
 }
+
+.summary {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.box {
+    flex: 1;
+    min-width: 200px;
+    padding: 10px;
+    border-radius: 10px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.total { background: #d4edda; }
+.pendente { background: #fff3cd; }
 
 table {
-    margin: auto;
+    width: 100%;
     border-collapse: collapse;
-    background: white;
-}
-
-th, td {
-    border: 1px solid #ccc;
-    padding: 8px;
-    text-align: center;
+    font-size: 14px;
 }
 
 th {
     background: #1e73be;
     color: white;
+    padding: 8px;
+}
+
+td {
+    padding: 6px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+}
+
+td.nome {
+    text-align: left;
+    font-weight: 500;
+}
+
+td.click {
+    cursor: pointer;
+    border-radius: 6px;
 }
 
 .pago {
-    background: #4CAF50;
+    background: #28a745;
 }
 
 button {
-    margin: 15px;
-    padding: 10px 20px;
-    background: #28a745;
+    width: 100%;
+    margin-top: 15px;
+    padding: 12px;
+    background: #1e73be;
     color: white;
     border: none;
+    border-radius: 10px;
+    font-size: 16px;
     cursor: pointer;
+}
+
+.footer {
+    text-align: right;
+    font-size: 12px;
+    margin-top: 10px;
+    color: #666;
 }
 </style>
 </head>
 
 <body>
 
-<h1>Controle de Parcelas</h1>
+<div class="container" id="relatorio">
 
-<div id="tabela">
+<div class="header">
+    <h2>📊 Controle de Parcelas</h2>
+    <div id="data"></div>
+</div>
 
+<div class="card summary">
+    <div class="box total">💰 Arrecadado<br>R$ <span id="arrecadado">0.00</span></div>
+    <div class="box pendente">📌 Pendente<br>R$ <span id="pendente">0.00</span></div>
+</div>
+
+<div class="card">
 <table>
 <tr>
 <th>Nome</th>
 <th>Parcela</th>
-<th>Mar</th>
-<th>Abr</th>
-<th>Mai</th>
-<th>Jun</th>
-<th>Jul</th>
-<th>Ago</th>
-<th>Set</th>
+<th>Mar</th><th>Abr</th><th>Mai</th><th>Jun</th><th>Jul</th><th>Ago</th><th>Set</th>
 </tr>
+
+<tbody id="tabela"></tbody>
+
+</table>
+</div>
+
+<div class="footer">
+Relatório gerado em: <span id="dataRodape"></span>
+</div>
+
+</div>
+
+<button onclick="gerarImagem()">📸 Gerar Imagem para WhatsApp</button>
 
 <script>
 const pessoas = [
-    {nome: "Wanderson", valor: 43.29},
-    {nome: "Rayssa", valor: 43.29},
-    {nome: "Mauricelio", valor: 43.29},
-    {nome: "Raniely", valor: 43.29},
-    {nome: "Welyda", valor: 43.29},
-    {nome: "Wilker", valor: 43.29},
-    {nome: "Inês", valor: 43.29},
-    {nome: "Leo", valor: 43.29},
-    {nome: "Paty", valor: 43.29},
-    {nome: "Cleane", valor: 43.29},
-    {nome: "Laércio", valor: 43.29},
-    {nome: "Neta", valor: 43.29},
-    {nome: "Erick", valor: 43.29},
-
-    {nome: "Cecilia", valor: 21.64},
-    {nome: "Guilherme", valor: 21.64},
-
-    {nome: "Raimundo", valor: 12.07},
-    {nome: "Bia", valor: 12.07},
-    {nome: "Rudson", valor: 12.07},
-    {nome: "Letícia", valor: 12.07},
-    {nome: "Dázim", valor: 12.07}
+"Wanderson","Rayssa","Mauricelio","Raniely","Welyda","Wilker","Inês","Leo","Paty","Cleane","Laércio","Neta","Erick"
 ];
 
-const meses = 7;
+const tabela = document.getElementById("tabela");
 
-pessoas.forEach(p => {
-    document.write("<tr>");
-    document.write(`<td>${p.nome}</td>`);
-    document.write(`<td>R$ ${p.valor.toFixed(2)}</td>`);
+pessoas.forEach(nome=>{
+    let tr = "<tr>";
+    tr += `<td class="nome">${nome}</td>`;
+    tr += `<td>R$ 43.29</td>`;
 
-    for(let i=0;i<meses;i++){
-        document.write(`<td onclick="toggle(this)"></td>`);
+    for(let i=0;i<7;i++){
+        tr += `<td class="click" onclick="toggle(this)"> </td>`;
     }
 
-    document.write("</tr>");
+    tr += "</tr>";
+    tabela.innerHTML += tr;
 });
 
 function toggle(el){
     el.classList.toggle("pago");
+    calcular();
 }
-</script>
 
-</table>
+function calcular(){
+    let pagos = document.querySelectorAll(".pago").length;
+    let valor = 43.29;
 
-</div>
+    let total = pagos * valor;
+    let totalGeral = pessoas.length * 7 * valor;
 
-<button onclick="gerarImagem()">📸 Gerar Imagem</button>
+    document.getElementById("arrecadado").innerText = total.toFixed(2);
+    document.getElementById("pendente").innerText = (totalGeral - total).toFixed(2);
+}
 
-<script>
 function gerarImagem(){
-    html2canvas(document.querySelector("#tabela")).then(canvas => {
+    html2canvas(document.querySelector("#relatorio")).then(canvas=>{
         let link = document.createElement("a");
-        link.download = "controle.png";
+        link.download = "relatorio.png";
         link.href = canvas.toDataURL();
         link.click();
     });
 }
+
+let hoje = new Date().toLocaleDateString();
+document.getElementById("data").innerText = hoje;
+document.getElementById("dataRodape").innerText = hoje;
 </script>
 
 </body>
