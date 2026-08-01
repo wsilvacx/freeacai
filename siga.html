@@ -200,7 +200,7 @@ color:white;
 
 <li onclick="mostrar('testes')">📝 Testes</li>
 
-<li>📊 Relatórios</li>
+<li onclick="mostrar('relatorios')">📊 Relatórios</li>
 
 <li>⚙ Configurações</li>
 
@@ -243,6 +243,45 @@ color:white;
 </div>
 
 </div>
+
+</section>
+
+<section id="relatorios">
+
+<h2>Relatórios Pedagógicos</h2>
+
+
+<h3>Relatório Individual</h3>
+
+<select id="alunoRelatorio"></select>
+
+<button onclick="gerarRelatorioAluno()">
+Gerar Relatório
+</button>
+
+
+<div id="relatorioAluno">
+
+</div>
+
+
+<hr>
+
+
+<h3>Relatório da Turma</h3>
+
+<select id="turmaRelatorio"></select>
+
+
+<button onclick="gerarRelatorioTurma()">
+Gerar Relatório da Turma
+</button>
+
+
+<div id="relatorioTurma">
+
+</div>
+
 
 </section>
 
