@@ -196,7 +196,7 @@ color:white;
 
 <li onclick="mostrar('questoes')">📚 Questões</li>
 
-<li onclick="mostrar('testes')">📝 Testes</li>>
+<li onclick="mostrar('testes')">📝 Testes</li>
 
 <li>📊 Relatórios</li>
 
@@ -500,6 +500,178 @@ let questoes = JSON.parse(localStorage.getItem("questoes")) || [];
 let turmas = JSON.parse(localStorage.getItem("turmas")) || [];
 let alunos = JSON.parse(localStorage.getItem("alunos")) || [];
 let habilidades = JSON.parse(localStorage.getItem("habilidades")) || [];
+let testes = JSON.parse(localStorage.getItem("testes")) || [];
+
+function carregarTurmasTeste(){
+
+let select=document.getElementById("turmaTeste");
+
+select.innerHTML="";
+
+
+turmas.forEach(t=>{
+
+select.innerHTML+=`
+
+<option>
+${t.nome}
+</option>
+
+`;
+
+});
+
+}
+
+function carregarQuestoesTeste(){
+
+let div=document.getElementById("selecaoQuestoes");
+
+div.innerHTML="";
+
+
+questoes.forEach((q,index)=>{
+
+
+div.innerHTML+=`
+
+<label>
+
+<input type="checkbox" 
+value="${index}"
+class="questaoSelecionada">
+
+${index+1} -
+${q.enunciado.substring(0,60)}
+(${q.habilidade})
+
+</label>
+
+<br>
+
+`;
+
+});
+
+
+}
+
+function salvarTeste(){
+
+
+let selecionadas=[];
+
+
+document.querySelectorAll(".questaoSelecionada:checked")
+.forEach(q=>{
+
+
+selecionadas.push(Number(q.value));
+
+
+});
+
+
+
+let teste={
+
+
+nome:
+document.getElementById("nomeTeste").value,
+
+
+data:
+document.getElementById("dataTeste").value,
+
+
+turma:
+document.getElementById("turmaTeste").value,
+
+
+questoes:
+selecionadas
+
+
+};
+
+
+
+testes.push(teste);
+
+
+
+localStorage.setItem(
+"testes",
+JSON.stringify(testes)
+);
+
+
+
+listarTestes();
+
+
+}
+
+function listarTestes(){
+
+let tabela=document.getElementById("listaTestes");
+
+
+tabela.innerHTML="";
+
+
+testes.forEach((t,index)=>{
+
+
+tabela.innerHTML+=`
+
+<tr>
+
+<td>${t.nome}</td>
+
+<td>${t.turma}</td>
+
+<td>${t.data}</td>
+
+<td>${t.questoes.length}</td>
+
+<td>
+
+<button onclick="excluirTeste(${index})">
+
+Excluir
+
+</button>
+
+</td>
+
+
+</tr>
+
+`;
+
+});
+
+
+}
+
+
+
+function excluirTeste(index){
+
+testes.splice(index,1);
+
+
+localStorage.setItem(
+"testes",
+JSON.stringify(testes)
+);
+
+
+listarTestes();
+
+
+}
 
 function carregarHabilidadesQuestao(){
 
@@ -986,6 +1158,11 @@ atualizarDashboard();
 
 listarQuestoes();
 
+listarTestes();
+
+carregarTurmasTeste();
+
+carregarQuestoesTeste();
 carregarHabilidadesQuestao();
 
 </script>
