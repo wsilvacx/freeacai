@@ -480,6 +480,61 @@ ${h.codigo} - ${h.descricao}
 }
 
 
+function salvarQuestao(){
+
+
+let questao={
+
+
+enunciado:
+document.getElementById("enunciadoQuestao").value,
+
+
+A:
+document.getElementById("alternativaA").value,
+
+
+B:
+document.getElementById("alternativaB").value,
+
+
+C:
+document.getElementById("alternativaC").value,
+
+
+D:
+document.getElementById("alternativaD").value,
+
+
+gabarito:
+document.getElementById("gabaritoQuestao").value,
+
+
+habilidade:
+document.getElementById("habilidadeQuestao").value
+
+
+};
+
+
+
+questoes.push(questao);
+
+
+
+localStorage.setItem(
+"questoes",
+JSON.stringify(questoes)
+);
+
+
+
+listarQuestoes();
+
+
+
+}
+
 function carregarHabilidadesQuestao(){
 
 let select=document.getElementById("habilidadeQuestao");
