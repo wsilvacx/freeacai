@@ -196,6 +196,8 @@ color:white;
 
 <li onclick="mostrar('questoes')">📚 Questões</li>
 
+<li onclick="mostrar('correcao')">✅ Correção</li>
+
 <li onclick="mostrar('testes')">📝 Testes</li>
 
 <li>📊 Relatórios</li>
@@ -492,15 +494,240 @@ Salvar Avaliação
 
 </section>
 
+<section id="correcao">
+
+<h2>Correção de Avaliações</h2>
+
+<select id="alunoCorrecao"></select>
+
+<select id="testeCorrecao"></select>
+
+
+<h3>Digite as respostas do aluno</h3>
+
+<p>
+Exemplo: A,B,C,D,A
+</p>
+
+<textarea 
+id="respostasAluno"
+placeholder="Digite as respostas separadas por vírgula"
+style="width:100%;height:80px;padding:10px;">
+</textarea>
+
+
+<button onclick="corrigirTeste()">
+Corrigir Avaliação
+</button>
+
+
+<div id="resultadoCorrecao">
+
+</div>
+
+
+</section>
+
 </div>
 
 <script>
 
+let resultados = JSON.parse(localStorage.getItem("resultados")) || [];
 let questoes = JSON.parse(localStorage.getItem("questoes")) || [];
 let turmas = JSON.parse(localStorage.getItem("turmas")) || [];
 let alunos = JSON.parse(localStorage.getItem("alunos")) || [];
 let habilidades = JSON.parse(localStorage.getItem("habilidades")) || [];
 let testes = JSON.parse(localStorage.getItem("testes")) || [];
+
+
+function carregarDadosCorrecao(){
+
+let aluno=document.getElementById("alunoCorrecao");
+
+aluno.innerHTML="";
+
+
+alunos.forEach((a,index)=>{
+
+aluno.innerHTML+=`
+
+<option value="${index}">
+${a.nome}
+</option>
+
+`;
+
+});
+
+
+let teste=document.getElementById("testeCorrecao");
+
+teste.innerHTML="";
+
+
+testes.forEach((t,index)=>{
+
+teste.innerHTML+=`
+
+<option value="${index}">
+${t.nome}
+</option>
+
+`;
+
+});
+
+
+}
+
+function corrigirTeste(){
+
+
+let alunoIndex=
+document.getElementById("alunoCorrecao").value;
+
+
+let testeIndex=
+document.getElementById("testeCorrecao").value;
+
+
+
+let teste=testes[testeIndex];
+
+
+let respostas=
+document.getElementById("respostasAluno")
+.value
+.toUpperCase()
+.split(",");
+
+
+
+let acertos=0;
+
+
+
+teste.questoes.forEach((q,index)=>{
+
+
+let questao=questoes[q];
+
+
+if(respostas[index]==questao.gabarito){
+
+acertos++;
+
+}
+
+
+});
+
+
+
+let total=teste.questoes.length;
+
+
+let percentual=
+Math.round((acertos/total)*100);
+
+
+
+let nivel="";
+
+
+if(percentual<=20){
+
+nivel="🔴 Muito Crítico";
+
+}
+else if(percentual<=40){
+
+nivel="🟠 Crítico";
+
+}
+else if(percentual<=60){
+
+nivel="🟡 Em Desenvolvimento";
+
+}
+else if(percentual<=80){
+
+nivel="🟢 Adequado";
+
+}
+else{
+
+nivel="🔵 Avançado";
+
+}
+
+
+
+let resultado={
+
+
+aluno:
+alunos[alunoIndex].nome,
+
+
+teste:
+teste.nome,
+
+
+acertos,
+
+
+total,
+
+
+percentual,
+
+
+nivel
+
+
+};
+
+
+
+resultados.push(resultado);
+
+
+
+localStorage.setItem(
+"resultados",
+JSON.stringify(resultados)
+);
+
+
+
+document.getElementById("resultadoCorrecao")
+.innerHTML=`
+
+<h3>Resultado</h3>
+
+<p>
+Aluno: ${resultado.aluno}
+</p>
+
+<p>
+Acertos:
+${acertos}/${total}
+</p>
+
+<p>
+Percentual:
+${percentual}%
+</p>
+
+<p>
+Nível:
+${nivel}
+</p>
+
+`;
+
+}
 
 function carregarTurmasTeste(){
 
@@ -1161,6 +1388,8 @@ listarQuestoes();
 listarTestes();
 
 carregarTurmasTeste();
+
+carregarDadosCorrecao();
 
 carregarQuestoesTeste();
 carregarHabilidadesQuestao();
