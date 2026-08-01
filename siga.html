@@ -422,6 +422,112 @@ function salvarTurma(){
     document.getElementById("anoTurma").value="";
 
 }
+function salvarHabilidade(){
+
+let habilidade={
+
+codigo:document.getElementById("codigoHabilidade").value,
+
+descricao:document.getElementById("descricaoHabilidade").value,
+
+serie:document.getElementById("serieHabilidade").value,
+
+disciplina:document.getElementById("disciplinaHabilidade").value
+
+};
+
+
+habilidades.push(habilidade);
+
+
+localStorage.setItem(
+"habilidades",
+JSON.stringify(habilidades)
+);
+
+
+listarHabilidades();
+
+
+document.getElementById("codigoHabilidade").value="";
+document.getElementById("descricaoHabilidade").value="";
+document.getElementById("serieHabilidade").value="";
+document.getElementById("disciplinaHabilidade").value="";
+
+
+}
+
+
+
+function listarHabilidades(){
+
+let tabela=document.getElementById("listaHabilidades");
+
+
+tabela.innerHTML="";
+
+
+habilidades.forEach((h,index)=>{
+
+
+tabela.innerHTML+=`
+
+<tr>
+
+<td>${h.codigo}</td>
+
+<td>${h.descricao}</td>
+
+<td>${h.serie}</td>
+
+<td>${h.disciplina}</td>
+
+<td>
+
+<button onclick="excluirHabilidade(${index})">
+
+Excluir
+
+</button>
+
+</td>
+
+
+</tr>
+
+
+`;
+
+
+});
+
+
+}
+
+
+
+function excluirHabilidade(index){
+
+
+if(confirm("Excluir habilidade?")){
+
+
+habilidades.splice(index,1);
+
+
+localStorage.setItem(
+"habilidades",
+JSON.stringify(habilidades)
+);
+
+
+listarHabilidades();
+
+
+}
+
+
+}
 
 function listarTurmas(){
 
