@@ -371,14 +371,204 @@ Salvar Habilidade
     </table>
 
 </section>
+<section id="questoes">
+
+<h2>Cadastro de Questões</h2>
+
+<textarea id="enunciadoQuestao" 
+placeholder="Digite o enunciado da questão"
+style="width:100%;height:100px;padding:10px;">
+</textarea>
+
+
+<input id="alternativaA" placeholder="Alternativa A">
+
+<input id="alternativaB" placeholder="Alternativa B">
+
+<input id="alternativaC" placeholder="Alternativa C">
+
+<input id="alternativaD" placeholder="Alternativa D">
+
+
+<select id="gabaritoQuestao">
+
+<option value="A">Resposta correta A</option>
+
+<option value="B">Resposta correta B</option>
+
+<option value="C">Resposta correta C</option>
+
+<option value="D">Resposta correta D</option>
+
+</select>
+
+
+<select id="habilidadeQuestao">
+
+</select>
+
+
+<button onclick="salvarQuestao()">
+
+Salvar Questão
+
+</button>
+
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Questão</th>
+
+<th>Habilidade</th>
+
+<th>Resposta</th>
+
+<th>Ação</th>
+
+</tr>
+
+</thead>
+
+
+<tbody id="listaQuestoes">
+
+</tbody>
+
+
+</table>
+
+
+</section>
 
 </div>
 
 <script>
 
+let questoes = JSON.parse(localStorage.getItem("questoes")) || [];
 let turmas = JSON.parse(localStorage.getItem("turmas")) || [];
 let alunos = JSON.parse(localStorage.getItem("alunos")) || [];
 let habilidades = JSON.parse(localStorage.getItem("habilidades")) || [];
+
+function carregarHabilidadesQuestao(){
+
+let select=document.getElementById("habilidadeQuestao");
+
+select.innerHTML="";
+
+
+habilidades.forEach((h)=>{
+
+
+select.innerHTML+=`
+
+<option value="${h.codigo}">
+
+${h.codigo} - ${h.descricao}
+
+</option>
+
+`;
+
+
+});
+
+
+}
+
+
+function carregarHabilidadesQuestao(){
+
+let select=document.getElementById("habilidadeQuestao");
+
+select.innerHTML="";
+
+
+habilidades.forEach((h)=>{
+
+
+select.innerHTML+=`
+
+<option value="${h.codigo}">
+
+${h.codigo} - ${h.descricao}
+
+</option>
+
+`;
+
+
+});
+
+
+}
+
+function listarQuestoes(){
+
+
+let tabela=document.getElementById("listaQuestoes");
+
+
+tabela.innerHTML="";
+
+
+questoes.forEach((q,index)=>{
+
+
+tabela.innerHTML+=`
+
+<tr>
+
+<td>${q.enunciado.substring(0,50)}...</td>
+
+<td>${q.habilidade}</td>
+
+<td>${q.gabarito}</td>
+
+
+<td>
+
+<button onclick="excluirQuestao(${index})">
+
+Excluir
+
+</button>
+
+</td>
+
+
+</tr>
+
+`;
+
+
+});
+
+
+}
+
+
+
+function excluirQuestao(index){
+
+
+questoes.splice(index,1);
+
+
+localStorage.setItem(
+"questoes",
+JSON.stringify(questoes)
+);
+
+
+
+listarQuestoes();
+
+
+}
 
 function mostrar(id){
 
@@ -690,6 +880,10 @@ listarAlunos();
 atualizarSelectTurmas();
 
 atualizarDashboard();
+
+listarQuestoes();
+
+carregarHabilidadesQuestao();
 
 </script>
 
