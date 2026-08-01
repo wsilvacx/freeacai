@@ -578,6 +578,250 @@ let alunos = JSON.parse(localStorage.getItem("alunos")) || [];
 let habilidades = JSON.parse(localStorage.getItem("habilidades")) || [];
 let testes = JSON.parse(localStorage.getItem("testes")) || [];
 
+function carregarRelatorios(){
+
+
+let aluno=document.getElementById("alunoRelatorio");
+
+aluno.innerHTML="";
+
+
+alunos.forEach((a,index)=>{
+
+aluno.innerHTML+=`
+
+<option value="${index}">
+${a.nome}
+</option>
+
+`;
+
+});
+
+
+
+let turma=document.getElementById("turmaRelatorio");
+
+turma.innerHTML="";
+
+
+turmas.forEach(t=>{
+
+turma.innerHTML+=`
+
+<option>
+${t.nome}
+</option>
+
+`;
+
+});
+
+
+}
+
+function gerarRelatorioAluno(){
+
+
+let index=
+document.getElementById("alunoRelatorio").value;
+
+
+
+let nome=alunos[index].nome;
+
+
+
+let dados=resultados.filter(r=>r.aluno==nome);
+
+
+
+let html=`
+
+
+<h3>${nome}</h3>
+
+
+`;
+
+
+if(dados.length==0){
+
+html+=`
+
+<p>
+Nenhuma avaliação realizada.
+</p>
+
+`;
+
+}
+
+else{
+
+
+let soma=0;
+
+
+dados.forEach(r=>{
+
+
+soma+=r.percentual;
+
+
+
+html+=`
+
+<div class="card">
+
+<p>
+Avaliação:
+${r.teste}
+</p>
+
+<p>
+Acertos:
+${r.acertos}/${r.total}
+</p>
+
+<p>
+Percentual:
+${r.percentual}%
+</p>
+
+<p>
+Nível:
+${r.nivel}
+</p>
+
+
+</div>
+
+`;
+
+
+});
+
+
+let media=Math.round(
+soma/dados.length
+);
+
+
+
+html+=`
+
+<h3>
+Média Geral:
+${media}%
+</h3>
+
+`;
+
+}
+
+
+
+document.getElementById(
+"relatorioAluno"
+).innerHTML=html;
+
+
+}
+
+function gerarRelatorioTurma(){
+
+
+let turma=
+document.getElementById("turmaRelatorio").value;
+
+
+
+let alunosTurma=
+alunos.filter(
+a=>a.turma==turma
+);
+
+
+
+let html=`
+
+
+<h3>
+Turma: ${turma}
+</h3>
+
+
+<p>
+Quantidade de alunos:
+${alunosTurma.length}
+</p>
+
+`;
+
+
+
+let soma=0;
+
+let quantidade=0;
+
+
+
+alunosTurma.forEach(a=>{
+
+
+let dados=
+resultados.filter(
+r=>r.aluno==a.nome
+);
+
+
+
+dados.forEach(r=>{
+
+soma+=r.percentual;
+
+quantidade++;
+
+});
+
+
+
+});
+
+
+
+let media=0;
+
+
+if(quantidade>0){
+
+media=Math.round(
+soma/quantidade
+);
+
+}
+
+
+
+html+=`
+
+<h3>
+Média da Turma:
+${media}%
+</h3>
+
+`;
+
+
+
+document.getElementById(
+"relatorioTurma"
+).innerHTML=html;
+
+
+
+}
 
 function carregarDadosCorrecao(){
 
@@ -1432,6 +1676,7 @@ carregarDadosCorrecao();
 
 carregarQuestoesTeste();
 carregarHabilidadesQuestao();
+carregarRelatorios();
 
 </script>
 
