@@ -1,0 +1,3417 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>SAHA - Acompanhamento de Habilidades</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    font-family:Arial, sans-serif;
+    background:#f4f6fb;
+    color:#172033;
+}
+
+header{
+    background:linear-gradient(135deg,#2347c7,#4f46e5);
+    color:white;
+    padding:22px;
+}
+
+header h1{
+    margin:0;
+}
+
+header p{
+    margin:5px 0 0;
+}
+
+.container{
+    max-width:1200px;
+    margin:auto;
+    padding:20px;
+}
+
+nav{
+    display:flex;
+    gap:8px;
+    overflow:auto;
+    margin-bottom:20px;
+}
+
+nav button{
+    border:0;
+    padding:11px 15px;
+    border-radius:9px;
+    background:white;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+nav button.active{
+    background:#315efb;
+    color:white;
+}
+
+section{
+    display:none;
+}
+
+section.active{
+    display:block;
+}
+
+.card{
+    background:white;
+    border-radius:14px;
+    padding:18px;
+    margin-bottom:15px;
+    box-shadow:0 2px 8px #00000010;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:15px;
+}
+
+.form-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:12px;
+}
+
+label{
+    font-weight:bold;
+    font-size:14px;
+}
+
+input,select{
+    width:100%;
+    padding:10px;
+    margin-top:5px;
+    border:1px solid #d0d5dd;
+    border-radius:8px;
+}
+
+button{
+    cursor:pointer;
+}
+
+.btn{
+    border:0;
+    padding:10px 15px;
+    border-radius:8px;
+    background:#315efb;
+    color:white;
+    font-weight:bold;
+}
+
+.btn-danger{
+    background:#dc3545;
+}
+
+.btn-success{
+    background:#16a34a;
+}
+
+.btn-secondary{
+    background:#667085;
+}
+
+.stat{
+    font-size:30px;
+    font-weight:bold;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th,td{
+    padding:10px;
+    border-bottom:1px solid #e5e7eb;
+    text-align:left;
+}
+
+th{
+    background:#f8fafc;
+}
+
+.table-container{
+    overflow:auto;
+}
+
+.badge{
+    padding:5px 8px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:bold;
+}
+
+.red{
+    background:#fee2e2;
+    color:#b42318;
+}
+
+.orange{
+    background:#ffedd5;
+    color:#c2410c;
+}
+
+.yellow{
+    background:#fef3c7;
+    color:#a16207;
+}
+
+.green{
+    background:#dcfce7;
+    color:#15803d;
+}
+
+.blue{
+    background:#dbeafe;
+    color:#1d4ed8;
+}
+
+.progress{
+    height:10px;
+    background:#e5e7eb;
+    border-radius:20px;
+    overflow:hidden;
+    margin-top:6px;
+}
+
+.progress div{
+    height:100%;
+    background:#315efb;
+}
+
+.habilidade-box{
+    border:1px solid #e5e7eb;
+    padding:12px;
+    border-radius:10px;
+    margin-top:10px;
+}
+
+.aluno-box{
+    border:1px solid #e5e7eb;
+    padding:15px;
+    border-radius:10px;
+    margin-bottom:10px;
+}
+
+.small{
+    font-size:13px;
+    color:#667085;
+}
+
+.alert{
+    padding:12px;
+    background:#fff7ed;
+    border:1px solid #fed7aa;
+    border-radius:8px;
+}
+
+@media(max-width:600px){
+
+    .container{
+        padding:10px;
+    }
+
+    th,td{
+        font-size:13px;
+    }
+
+}
+
+@media print{
+
+    header,
+    nav,
+    .no-print{
+        display:none !important;
+    }
+
+    body{
+        background:white;
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+
+<h1>📊 SAHA</h1>
+
+<p>
+Sistema de Acompanhamento de Habilidades
+</p>
+
+</header>
+
+
+<div class="container">
+
+
+<nav>
+
+<button class="active" onclick="abrirAba('dashboard',this)">
+📊 Dashboard
+</button>
+
+<button onclick="abrirAba('turmas',this)">
+🏫 Turmas
+</button>
+
+<button onclick="abrirAba('alunos',this)">
+👨‍🎓 Alunos
+</button>
+
+<button onclick="abrirAba('habilidades',this)">
+🎯 Habilidades
+</button>
+
+<button onclick="abrirAba('avaliacoes',this)">
+📝 Avaliações
+</button>
+
+<button onclick="abrirAba('correcao',this)">
+✅ Correção
+</button>
+
+<button onclick="abrirAba('relatorios',this)">
+📈 Relatórios
+</button>
+
+<button onclick="abrirAba('backup',this)">
+💾 Backup
+</button>
+
+</nav>
+
+
+<!-- DASHBOARD -->
+
+<section id="dashboard" class="active">
+
+<h2>📊 Dashboard</h2>
+
+<div class="grid">
+
+<div class="card">
+
+<div class="small">
+Turmas
+</div>
+
+<div class="stat" id="totalTurmas">
+0
+</div>
+
+</div>
+
+
+<div class="card">
+
+<div class="small">
+Alunos
+</div>
+
+<div class="stat" id="totalAlunos">
+0
+</div>
+
+</div>
+
+
+<div class="card">
+
+<div class="small">
+Habilidades
+</div>
+
+<div class="stat" id="totalHabilidades">
+0
+</div>
+
+</div>
+
+
+<div class="card">
+
+<div class="small">
+Avaliações
+</div>
+
+<div class="stat" id="totalAvaliacoes">
+0
+</div>
+
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h3>
+🎯 Habilidades que precisam de atenção
+</h3>
+
+<div id="dashboardHabilidades"></div>
+
+</div>
+
+
+<div class="card">
+
+<h3>
+🏫 Desempenho das turmas
+</h3>
+
+<div id="dashboardTurmas"></div>
+
+</div>
+
+</section>
+
+
+
+<!-- TURMAS -->
+
+<section id="turmas">
+
+<h2>🏫 Cadastro de Turmas</h2>
+
+
+<div class="card">
+
+<div class="form-grid">
+
+<div>
+
+<label>Ano</label>
+
+<select id="anoTurma">
+
+<option>6º Ano</option>
+<option>7º Ano</option>
+
+</select>
+
+</div>
+
+
+<div>
+
+<label>Nome da turma</label>
+
+<input
+id="nomeTurma"
+placeholder="Ex.: 6º Ano A"
+>
+
+</div>
+
+</div>
+
+<br>
+
+<button
+class="btn"
+onclick="cadastrarTurma()"
+>
+Cadastrar turma
+</button>
+
+</div>
+
+
+<div class="card">
+
+<div id="listaTurmas"></div>
+
+</div>
+
+</section>
+
+
+
+<!-- ALUNOS -->
+
+<section id="alunos">
+
+<h2>👨‍🎓 Cadastro de Alunos</h2>
+
+
+<div class="card">
+
+<div class="form-grid">
+
+<div>
+
+<label>Nome do aluno</label>
+
+<input
+id="nomeAluno"
+placeholder="Nome completo"
+>
+
+</div>
+
+
+<div>
+
+<label>Turma</label>
+
+<select id="turmaAluno"></select>
+
+</div>
+
+</div>
+
+<br>
+
+<button
+class="btn"
+onclick="cadastrarAluno()"
+>
+Cadastrar aluno
+</button>
+
+</div>
+
+
+<div class="card">
+
+<input
+id="buscarAluno"
+placeholder="🔎 Buscar aluno..."
+oninput="mostrarAlunos()"
+>
+
+<br><br>
+
+<div id="listaAlunos"></div>
+
+</div>
+
+</section>
+
+
+
+<!-- HABILIDADES -->
+
+<section id="habilidades">
+
+<h2>🎯 Habilidades</h2>
+
+
+<div class="card">
+
+<div class="form-grid">
+
+<div>
+
+<label>Ano</label>
+
+<select id="anoHabilidade">
+
+<option>6º Ano</option>
+<option>7º Ano</option>
+
+</select>
+
+</div>
+
+
+<div>
+
+<label>Código</label>
+
+<input
+id="codigoHabilidade"
+placeholder="H01"
+>
+
+</div>
+
+</div>
+
+
+<br>
+
+<label>
+Descrição da habilidade
+</label>
+
+<input
+id="descricaoHabilidade"
+placeholder="Ex.: Resolver problemas envolvendo..."
+>
+
+<br><br>
+
+<button
+class="btn"
+onclick="cadastrarHabilidade()"
+>
+Cadastrar habilidade
+</button>
+
+</div>
+
+
+<div class="card">
+
+<div id="listaHabilidades"></div>
+
+</div>
+
+</section>
+
+
+
+<!-- AVALIAÇÕES -->
+
+<section id="avaliacoes">
+
+<h2>📝 Cadastro de Avaliação</h2>
+
+
+<div class="card">
+
+<div class="form-grid">
+
+<div>
+
+<label>Nome da avaliação</label>
+
+<input
+id="nomeAvaliacao"
+placeholder="Ex.: Avaliação Diagnóstica"
+>
+
+</div>
+
+
+<div>
+
+<label>Turma</label>
+
+<select
+id="turmaAvaliacao"
+onchange="carregarHabilidadesAvaliacao()"
+></select>
+
+</div>
+
+
+<div>
+
+<label>Data</label>
+
+<input
+type="date"
+id="dataAvaliacao"
+>
+
+</div>
+
+</div>
+
+
+<br>
+
+<h3>
+Habilidades avaliadas
+</h3>
+
+<div id="habilidadesAvaliacao"></div>
+
+
+<br>
+
+<button
+class="btn"
+onclick="cadastrarAvaliacao()"
+>
+Criar avaliação
+</button>
+
+</div>
+
+
+<div class="card">
+
+<div id="listaAvaliacoes"></div>
+
+</div>
+
+</section>
+
+
+
+<!-- CORREÇÃO -->
+
+<section id="correcao">
+
+<h2>✅ Correção por habilidade</h2>
+
+
+<div class="card">
+
+<div class="form-grid">
+
+<div>
+
+<label>Avaliação</label>
+
+<select
+id="avaliacaoCorrecao"
+onchange="carregarAlunosCorrecao()"
+></select>
+
+</div>
+
+
+<div>
+
+<label>Aluno</label>
+
+<select
+id="alunoCorrecao"
+onchange="mostrarCorrecao()"
+></select>
+
+</div>
+
+</div>
+
+</div>
+
+
+<div id="areaCorrecao"></div>
+
+</section>
+
+
+
+<!-- RELATÓRIOS -->
+
+<section id="relatorios">
+
+<h2>📈 Relatórios</h2>
+
+
+<div class="card no-print">
+
+<div class="form-grid">
+
+<div>
+
+<label>Tipo de relatório</label>
+
+<select
+id="tipoRelatorio"
+onchange="mostrarRelatorio()"
+>
+
+<option value="turma">
+Resumo da turma
+</option>
+
+<option value="aluno">
+Relatório individual
+</option>
+
+<option value="habilidade">
+Mapa de habilidades
+</option>
+
+<option value="historico">
+Histórico de evolução
+</option>
+
+</select>
+
+</div>
+
+
+<div>
+
+<label>Turma</label>
+
+<select
+id="turmaRelatorio"
+onchange="carregarAlunosRelatorio()"
+></select>
+
+</div>
+
+
+<div>
+
+<label>Aluno</label>
+
+<select
+id="alunoRelatorio"
+onchange="mostrarRelatorio()"
+></select>
+
+</div>
+
+</div>
+
+</div>
+
+
+<div
+id="areaRelatorio"
+class="card"
+></div>
+
+</section>
+
+
+
+<!-- BACKUP -->
+
+<section id="backup">
+
+<h2>💾 Backup dos dados</h2>
+
+
+<div class="card">
+
+<p>
+Faça um backup regularmente para não perder os registros.
+</p>
+
+
+<button
+class="btn"
+onclick="exportarDados()"
+>
+⬇️ Exportar dados
+</button>
+
+
+<br><br>
+
+
+<input
+type="file"
+accept=".json"
+onchange="importarDados(event)"
+>
+
+
+<br><br>
+
+
+<button
+class="btn btn-danger"
+onclick="apagarTudo()"
+>
+🗑️ Apagar todos os dados
+</button>
+
+</div>
+
+</section>
+
+
+</div>
+
+
+
+<script>
+
+
+// =====================================================
+// BANCO DE DADOS
+// =====================================================
+
+const CHAVE = "SAHA_SISTEMA_V2";
+
+
+let banco =
+JSON.parse(localStorage.getItem(CHAVE))
+||
+{
+
+    turmas:[],
+    alunos:[],
+    habilidades:[],
+    avaliacoes:[],
+    resultados:[]
+
+};
+
+
+
+function salvar(){
+
+    localStorage.setItem(
+        CHAVE,
+        JSON.stringify(banco)
+    );
+
+    atualizarSistema();
+
+}
+
+
+
+function id(){
+
+    return Date.now().toString(36)
+    +
+    Math.random()
+    .toString(36)
+    .substring(2,8);
+
+}
+
+
+
+function turmaPorId(id){
+
+    return banco.turmas.find(
+        t=>t.id===id
+    );
+
+}
+
+
+
+function alunoPorId(id){
+
+    return banco.alunos.find(
+        a=>a.id===id
+    );
+
+}
+
+
+
+function habilidadePorId(id){
+
+    return banco.habilidades.find(
+        h=>h.id===id
+    );
+
+}
+
+
+
+function avaliacaoPorId(id){
+
+    return banco.avaliacoes.find(
+        a=>a.id===id
+    );
+
+}
+
+
+
+// =====================================================
+// NÍVEIS
+// =====================================================
+
+function nivel(percentual){
+
+    if(percentual < 30)
+
+        return {
+            texto:"🔴 Crítico",
+            classe:"red"
+        };
+
+
+    if(percentual < 50)
+
+        return {
+            texto:"🟠 Precisa avançar",
+            classe:"orange"
+        };
+
+
+    if(percentual < 80)
+
+        return {
+            texto:"🟡 Em desenvolvimento",
+            classe:"yellow"
+        };
+
+
+    if(percentual < 90)
+
+        return {
+            texto:"🟢 Adequado",
+            classe:"green"
+        };
+
+
+    return {
+        texto:"🔵 Avançado",
+        classe:"blue"
+    };
+
+}
+
+
+
+// =====================================================
+// ABAS
+// =====================================================
+
+function abrirAba(idAba,botao){
+
+    document
+    .querySelectorAll("section")
+    .forEach(
+        s=>s.classList.remove("active")
+    );
+
+
+    document
+    .getElementById(idAba)
+    .classList.add("active");
+
+
+    document
+    .querySelectorAll("nav button")
+    .forEach(
+        b=>b.classList.remove("active")
+    );
+
+
+    botao.classList.add("active");
+
+}
+
+
+
+// =====================================================
+// TURMAS
+// =====================================================
+
+function cadastrarTurma(){
+
+    const nome =
+    document
+    .getElementById("nomeTurma")
+    .value
+    .trim();
+
+
+    const ano =
+    document
+    .getElementById("anoTurma")
+    .value;
+
+
+    if(!nome){
+
+        alert("Informe o nome da turma.");
+
+        return;
+
+    }
+
+
+    banco.turmas.push({
+
+        id:id(),
+        nome:nome,
+        ano:ano
+
+    });
+
+
+    document
+    .getElementById("nomeTurma")
+    .value="";
+
+
+    salvar();
+
+}
+
+
+
+function mostrarTurmas(){
+
+    const div =
+    document
+    .getElementById("listaTurmas");
+
+
+    if(!banco.turmas.length){
+
+        div.innerHTML =
+        "<p>Nenhuma turma cadastrada.</p>";
+
+        return;
+
+    }
+
+
+    div.innerHTML = `
+
+    <div class="table-container">
+
+    <table>
+
+    <tr>
+
+    <th>Turma</th>
+    <th>Ano</th>
+    <th>Alunos</th>
+    <th>Ações</th>
+
+    </tr>
+
+    ${
+        banco.turmas.map(t=>`
+
+        <tr>
+
+        <td>${t.nome}</td>
+
+        <td>${t.ano}</td>
+
+        <td>
+        ${
+            banco.alunos
+            .filter(a=>a.turmaId===t.id)
+            .length
+        }
+        </td>
+
+        <td>
+
+        <button
+        class="btn btn-danger"
+        onclick="excluirTurma('${t.id}')"
+        >
+        Excluir
+        </button>
+
+        </td>
+
+        </tr>
+
+        `).join("")
+    }
+
+    </table>
+
+    </div>
+
+    `;
+
+}
+
+
+
+function excluirTurma(idTurma){
+
+    if(!confirm("Excluir esta turma?")) return;
+
+
+    banco.turmas =
+    banco.turmas
+    .filter(t=>t.id!==idTurma);
+
+
+    banco.alunos =
+    banco.alunos
+    .filter(a=>a.turmaId!==idTurma);
+
+
+    salvar();
+
+}
+
+
+
+// =====================================================
+// ALUNOS
+// =====================================================
+
+function carregarSelectTurmas(){
+
+    const selects=[
+
+        "turmaAluno",
+        "turmaAvaliacao",
+        "turmaRelatorio"
+
+    ];
+
+
+    selects.forEach(idSelect=>{
+
+        const select =
+        document.getElementById(idSelect);
+
+
+        if(!select) return;
+
+
+        const valorAtual =
+        select.value;
+
+
+        select.innerHTML =
+        `<option value="">Selecione</option>`;
+
+
+        banco.turmas.forEach(t=>{
+
+            select.innerHTML += `
+
+            <option value="${t.id}">
+            ${t.nome}
+            </option>
+
+            `;
+
+        });
+
+
+        select.value=valorAtual;
+
+    });
+
+}
+
+
+
+function cadastrarAluno(){
+
+    const nome =
+    document
+    .getElementById("nomeAluno")
+    .value
+    .trim();
+
+
+    const turmaId =
+    document
+    .getElementById("turmaAluno")
+    .value;
+
+
+    if(!nome || !turmaId){
+
+        alert("Informe o nome e a turma.");
+
+        return;
+
+    }
+
+
+    banco.alunos.push({
+
+        id:id(),
+        nome:nome,
+        turmaId:turmaId
+
+    });
+
+
+    document
+    .getElementById("nomeAluno")
+    .value="";
+
+
+    salvar();
+
+}
+
+
+
+function mostrarAlunos(){
+
+    const busca =
+    document
+    .getElementById("buscarAluno")
+    .value
+    .toLowerCase();
+
+
+    const lista =
+    banco.alunos
+    .filter(
+        a=>a.nome
+        .toLowerCase()
+        .includes(busca)
+    );
+
+
+    const div =
+    document
+    .getElementById("listaAlunos");
+
+
+    if(!lista.length){
+
+        div.innerHTML=
+        "<p>Nenhum aluno encontrado.</p>";
+
+        return;
+
+    }
+
+
+    div.innerHTML=`
+
+    <div class="table-container">
+
+    <table>
+
+    <tr>
+
+    <th>Aluno</th>
+    <th>Turma</th>
+    <th>Ações</th>
+
+    </tr>
+
+    ${
+        lista.map(a=>`
+
+        <tr>
+
+        <td>${a.nome}</td>
+
+        <td>
+        ${turmaPorId(a.turmaId)?.nome || ""}
+        </td>
+
+        <td>
+
+        <button
+        class="btn btn-danger"
+        onclick="excluirAluno('${a.id}')"
+        >
+        Excluir
+        </button>
+
+        </td>
+
+        </tr>
+
+        `).join("")
+    }
+
+    </table>
+
+    </div>
+
+    `;
+
+}
+
+
+
+function excluirAluno(idAluno){
+
+    if(!confirm("Excluir este aluno?")) return;
+
+
+    banco.alunos =
+    banco.alunos
+    .filter(a=>a.id!==idAluno);
+
+
+    banco.resultados =
+    banco.resultados
+    .filter(r=>r.alunoId!==idAluno);
+
+
+    salvar();
+
+}
+
+
+
+// =====================================================
+// HABILIDADES
+// =====================================================
+
+function cadastrarHabilidade(){
+
+    const ano =
+    document
+    .getElementById("anoHabilidade")
+    .value;
+
+
+    const codigo =
+    document
+    .getElementById("codigoHabilidade")
+    .value
+    .trim();
+
+
+    const descricao =
+    document
+    .getElementById("descricaoHabilidade")
+    .value
+    .trim();
+
+
+    if(!descricao){
+
+        alert("Informe a descrição.");
+
+        return;
+
+    }
+
+
+    banco.habilidades.push({
+
+        id:id(),
+        ano:ano,
+        codigo:codigo || "H"+(banco.habilidades.length+1),
+        descricao:descricao
+
+    });
+
+
+    document
+    .getElementById("codigoHabilidade")
+    .value="";
+
+
+    document
+    .getElementById("descricaoHabilidade")
+    .value="";
+
+
+    salvar();
+
+}
+
+
+
+function mostrarHabilidades(){
+
+    const div =
+    document
+    .getElementById("listaHabilidades");
+
+
+    if(!banco.habilidades.length){
+
+        div.innerHTML=
+        "<p>Nenhuma habilidade cadastrada.</p>";
+
+        return;
+
+    }
+
+
+    div.innerHTML=`
+
+    <div class="table-container">
+
+    <table>
+
+    <tr>
+
+    <th>Código</th>
+    <th>Ano</th>
+    <th>Habilidade</th>
+    <th>Ação</th>
+
+    </tr>
+
+    ${
+        banco.habilidades.map(h=>`
+
+        <tr>
+
+        <td><b>${h.codigo}</b></td>
+
+        <td>${h.ano}</td>
+
+        <td>${h.descricao}</td>
+
+        <td>
+
+        <button
+        class="btn btn-danger"
+        onclick="excluirHabilidade('${h.id}')"
+        >
+        Excluir
+        </button>
+
+        </td>
+
+        </tr>
+
+        `).join("")
+    }
+
+    </table>
+
+    </div>
+
+    `;
+
+}
+
+
+
+function excluirHabilidade(idHab){
+
+    if(!confirm("Excluir esta habilidade?")) return;
+
+
+    banco.habilidades =
+    banco.habilidades
+    .filter(h=>h.id!==idHab);
+
+
+    banco.resultados =
+    banco.resultados
+    .filter(r=>r.habilidadeId!==idHab);
+
+
+    salvar();
+
+}
+
+
+
+// =====================================================
+// CRIAÇÃO DA AVALIAÇÃO
+// =====================================================
+
+function carregarHabilidadesAvaliacao(){
+
+    const turmaId =
+    document
+    .getElementById("turmaAvaliacao")
+    .value;
+
+
+    const turmaSelecionada =
+    turmaPorId(turmaId);
+
+
+    const div =
+    document
+    .getElementById("habilidadesAvaliacao");
+
+
+    if(!turmaSelecionada){
+
+        div.innerHTML=
+        "<p>Selecione uma turma.</p>";
+
+        return;
+
+    }
+
+
+    const habilidades =
+    banco.habilidades
+    .filter(
+        h=>h.ano===turmaSelecionada.ano
+    );
+
+
+    if(!habilidades.length){
+
+        div.innerHTML=
+        `<div class="alert">
+        Cadastre primeiro as habilidades do ${turmaSelecionada.ano}.
+        </div>`;
+
+        return;
+
+    }
+
+
+    div.innerHTML =
+    habilidades.map(h=>`
+
+    <label
+    class="habilidade-box"
+    style="display:block"
+    >
+
+    <input
+    type="checkbox"
+    value="${h.id}"
+    style="width:auto"
+    >
+
+    <b>${h.codigo}</b>
+    -
+    ${h.descricao}
+
+    </label>
+
+    `).join("");
+
+}
+
+
+
+function cadastrarAvaliacao(){
+
+    const nome =
+    document
+    .getElementById("nomeAvaliacao")
+    .value
+    .trim();
+
+
+    const turmaId =
+    document
+    .getElementById("turmaAvaliacao")
+    .value;
+
+
+    const data =
+    document
+    .getElementById("dataAvaliacao")
+    .value;
+
+
+    const habilidades =
+    [
+        ...document
+        .querySelectorAll(
+            "#habilidadesAvaliacao input:checked"
+        )
+    ]
+    .map(i=>i.value);
+
+
+    if(!nome || !turmaId || !habilidades.length){
+
+        alert(
+        "Informe o nome, turma e pelo menos uma habilidade."
+        );
+
+        return;
+
+    }
+
+
+    banco.avaliacoes.push({
+
+        id:id(),
+        nome:nome,
+        turmaId:turmaId,
+        data:data,
+        habilidades:habilidades
+
+    });
+
+
+    document
+    .getElementById("nomeAvaliacao")
+    .value="";
+
+
+    salvar();
+
+}
+
+
+
+function mostrarAvaliacoes(){
+
+    const div =
+    document
+    .getElementById("listaAvaliacoes");
+
+
+    if(!banco.avaliacoes.length){
+
+        div.innerHTML=
+        "<p>Nenhuma avaliação cadastrada.</p>";
+
+        return;
+
+    }
+
+
+    div.innerHTML=`
+
+    <div class="table-container">
+
+    <table>
+
+    <tr>
+
+    <th>Avaliação</th>
+    <th>Turma</th>
+    <th>Data</th>
+    <th>Habilidades</th>
+    <th>Ação</th>
+
+    </tr>
+
+    ${
+        banco.avaliacoes.map(a=>`
+
+        <tr>
+
+        <td>
+        <b>${a.nome}</b>
+        </td>
+
+        <td>
+        ${turmaPorId(a.turmaId)?.nome || ""}
+        </td>
+
+        <td>
+        ${a.data
+        ?
+        new Date(a.data+"T12:00")
+        .toLocaleDateString("pt-BR")
+        :
+        "-"
+        }
+        </td>
+
+        <td>
+        ${a.habilidades.length}
+        </td>
+
+        <td>
+
+        <button
+        class="btn btn-danger"
+        onclick="excluirAvaliacao('${a.id}')"
+        >
+        Excluir
+        </button>
+
+        </td>
+
+        </tr>
+
+        `).join("")
+    }
+
+    </table>
+
+    </div>
+
+    `;
+
+}
+
+
+
+function excluirAvaliacao(idAvaliacao){
+
+    if(!confirm("Excluir esta avaliação?")) return;
+
+
+    banco.avaliacoes =
+    banco.avaliacoes
+    .filter(a=>a.id!==idAvaliacao);
+
+
+    banco.resultados =
+    banco.resultados
+    .filter(
+        r=>r.avaliacaoId!==idAvaliacao
+    );
+
+
+    salvar();
+
+}
+
+
+
+// =====================================================
+// CORREÇÃO
+// =====================================================
+
+function carregarSelectAvaliacoes(){
+
+    const select =
+    document
+    .getElementById("avaliacaoCorrecao");
+
+
+    const valor=select.value;
+
+
+    select.innerHTML=
+    `<option value="">Selecione</option>`;
+
+
+    banco.avaliacoes.forEach(a=>{
+
+        select.innerHTML+=`
+
+        <option value="${a.id}">
+        ${a.nome}
+        -
+        ${turmaPorId(a.turmaId)?.nome || ""}
+        </option>
+
+        `;
+
+    });
+
+
+    select.value=valor;
+
+}
+
+
+
+function carregarAlunosCorrecao(){
+
+    const avaliacaoId =
+    document
+    .getElementById("avaliacaoCorrecao")
+    .value;
+
+
+    const avaliacao =
+    avaliacaoPorId(avaliacaoId);
+
+
+    const select =
+    document
+    .getElementById("alunoCorrecao");
+
+
+    select.innerHTML=
+    `<option value="">Selecione</option>`;
+
+
+    if(!avaliacao) return;
+
+
+    banco.alunos
+    .filter(
+        a=>a.turmaId===avaliacao.turmaId
+    )
+    .forEach(a=>{
+
+        select.innerHTML+=`
+
+        <option value="${a.id}">
+        ${a.nome}
+        </option>
+
+        `;
+
+    });
+
+
+    mostrarCorrecao();
+
+}
+
+
+
+function resultadoExistente(
+    avaliacaoId,
+    alunoId,
+    habilidadeId
+){
+
+    return banco.resultados.find(
+
+        r=>
+        r.avaliacaoId===avaliacaoId
+        &&
+        r.alunoId===alunoId
+        &&
+        r.habilidadeId===habilidadeId
+
+    );
+
+}
+
+
+
+function mostrarCorrecao(){
+
+    const avaliacaoId =
+    document
+    .getElementById("avaliacaoCorrecao")
+    .value;
+
+
+    const alunoId =
+    document
+    .getElementById("alunoCorrecao")
+    .value;
+
+
+    const div =
+    document
+    .getElementById("areaCorrecao");
+
+
+    const avaliacao =
+    avaliacaoPorId(avaliacaoId);
+
+
+    const aluno =
+    alunoPorId(alunoId);
+
+
+    if(!avaliacao || !aluno){
+
+        div.innerHTML="";
+
+        return;
+
+    }
+
+
+    div.innerHTML=`
+
+    <div class="card">
+
+    <h3>
+    ${avaliacao.nome}
+    </h3>
+
+    <p>
+    <b>Aluno:</b> ${aluno.nome}
+    </p>
+
+
+    ${
+        avaliacao.habilidades
+        .map(habilidadeId=>{
+
+            const h =
+            habilidadePorId(
+                habilidadeId
+            );
+
+
+            const resultado =
+            resultadoExistente(
+                avaliacaoId,
+                alunoId,
+                habilidadeId
+            );
+
+
+            return `
+
+            <div class="habilidade-box">
+
+            <b>
+            ${h.codigo}
+            -
+            ${h.descricao}
+            </b>
+
+
+            <div class="form-grid">
+
+            <div>
+
+            <label>
+            Total de questões
+            </label>
+
+            <input
+            type="number"
+            min="1"
+            id="total_${habilidadeId}"
+            value="${
+                resultado
+                ?
+                resultado.total
+                :
+                ""
+            }"
+            >
+
+            </div>
+
+
+            <div>
+
+            <label>
+            Questões corretas
+            </label>
+
+            <input
+            type="number"
+            min="0"
+            id="acertos_${habilidadeId}"
+            value="${
+                resultado
+                ?
+                resultado.acertos
+                :
+                ""
+            }"
+            >
+
+            </div>
+
+            </div>
+
+            </div>
+
+            `;
+
+        }).join("")
+    }
+
+
+    <br>
+
+    <button
+    class="btn btn-success"
+    onclick="
+    salvarResultados(
+        '${avaliacaoId}',
+        '${alunoId}'
+    )
+    "
+    >
+
+    💾 Salvar resultados
+
+    </button>
+
+    </div>
+
+    `;
+
+}
+
+
+
+function salvarResultados(
+    avaliacaoId,
+    alunoId
+){
+
+    const avaliacao =
+    avaliacaoPorId(avaliacaoId);
+
+
+    avaliacao.habilidades
+    .forEach(habilidadeId=>{
+
+        const total =
+        Number(
+            document
+            .getElementById(
+                "total_"+habilidadeId
+            )
+            .value
+        );
+
+
+        const acertos =
+        Number(
+            document
+            .getElementById(
+                "acertos_"+habilidadeId
+            )
+            .value
+        );
+
+
+        if(!total) return;
+
+
+        const acertosCorrigidos =
+        Math.min(
+            Math.max(acertos,0),
+            total
+        );
+
+
+        let resultado =
+        resultadoExistente(
+            avaliacaoId,
+            alunoId,
+            habilidadeId
+        );
+
+
+        if(resultado){
+
+            resultado.total=total;
+
+            resultado.acertos=
+            acertosCorrigidos;
+
+        }else{
+
+            banco.resultados.push({
+
+                id:id(),
+
+                avaliacaoId:
+                avaliacaoId,
+
+                alunoId:
+                alunoId,
+
+                habilidadeId:
+                habilidadeId,
+
+                total:
+                total,
+
+                acertos:
+                acertosCorrigidos
+
+            });
+
+        }
+
+    });
+
+
+    salvar();
+
+
+    alert(
+    "Resultados registrados com sucesso!"
+    );
+
+}
+
+
+
+// =====================================================
+// CÁLCULO DO DOMÍNIO
+// =====================================================
+
+function dominioAlunoHabilidade(
+    alunoId,
+    habilidadeId
+){
+
+    const resultados =
+    banco.resultados
+    .filter(
+        r=>
+        r.alunoId===alunoId
+        &&
+        r.habilidadeId===habilidadeId
+    );
+
+
+    if(!resultados.length)
+        return null;
+
+
+    const total =
+    resultados
+    .reduce(
+        (s,r)=>s+r.total,
+        0
+    );
+
+
+    const acertos =
+    resultados
+    .reduce(
+        (s,r)=>s+r.acertos,
+        0
+    );
+
+
+    return total
+    ?
+    Math.round(
+        acertos/total*100
+    )
+    :
+    null;
+
+}
+
+
+
+function dominioTurmaHabilidade(
+    turmaId,
+    habilidadeId
+){
+
+    const alunos =
+    banco.alunos
+    .filter(
+        a=>a.turmaId===turmaId
+    );
+
+
+    const valores =
+    alunos
+    .map(
+        a=>
+        dominioAlunoHabilidade(
+            a.id,
+            habilidadeId
+        )
+    )
+    .filter(
+        x=>x!==null
+    );
+
+
+    if(!valores.length)
+        return null;
+
+
+    return Math.round(
+        valores.reduce(
+            (a,b)=>a+b,
+            0
+        )
+        /
+        valores.length
+    );
+
+}
+
+
+
+// =====================================================
+// RELATÓRIOS
+// =====================================================
+
+function carregarAlunosRelatorio(){
+
+    const turmaId =
+    document
+    .getElementById("turmaRelatorio")
+    .value;
+
+
+    const select =
+    document
+    .getElementById("alunoRelatorio");
+
+
+    select.innerHTML=
+    `<option value="">Selecione</option>`;
+
+
+    banco.alunos
+    .filter(
+        a=>a.turmaId===turmaId
+    )
+    .forEach(a=>{
+
+        select.innerHTML+=`
+
+        <option value="${a.id}">
+        ${a.nome}
+        </option>
+
+        `;
+
+    });
+
+
+    mostrarRelatorio();
+
+}
+
+
+
+function mostrarRelatorio(){
+
+    const tipo =
+    document
+    .getElementById("tipoRelatorio")
+    .value;
+
+
+    const turmaId =
+    document
+    .getElementById("turmaRelatorio")
+    .value;
+
+
+    const alunoId =
+    document
+    .getElementById("alunoRelatorio")
+    .value;
+
+
+    const div =
+    document
+    .getElementById("areaRelatorio");
+
+
+    if(tipo==="aluno"){
+
+        relatorioAluno(
+            alunoId,
+            div
+        );
+
+        return;
+
+    }
+
+
+    if(tipo==="habilidade"){
+
+        relatorioHabilidade(
+            turmaId,
+            div
+        );
+
+        return;
+
+    }
+
+
+    if(tipo==="historico"){
+
+        relatorioHistorico(
+            alunoId,
+            div
+        );
+
+        return;
+
+    }
+
+
+    relatorioTurma(
+        turmaId,
+        div
+    );
+
+}
+
+
+
+// =====================================================
+// RELATÓRIO INDIVIDUAL
+// =====================================================
+
+function relatorioAluno(
+    alunoId,
+    div
+){
+
+    const aluno =
+    alunoPorId(alunoId);
+
+
+    if(!aluno){
+
+        div.innerHTML=
+        "<p>Selecione um aluno.</p>";
+
+        return;
+
+    }
+
+
+    const turma =
+    turmaPorId(aluno.turmaId);
+
+
+    const habilidades =
+    banco.habilidades
+    .filter(
+        h=>h.ano===turma.ano
+    );
+
+
+    let html=`
+
+    <h2>
+    👤 ${aluno.nome}
+    </h2>
+
+    <p>
+    <b>Turma:</b>
+    ${turma.nome}
+    </p>
+
+    <hr>
+
+    `;
+
+
+    habilidades.forEach(h=>{
+
+        const percentual =
+        dominioAlunoHabilidade(
+            aluno.id,
+            h.id
+        );
+
+
+        const n =
+        percentual===null
+        ?
+        null
+        :
+        nivel(percentual);
+
+
+        html+=`
+
+        <div class="habilidade-box">
+
+        <b>
+        ${h.codigo}
+        -
+        ${h.descricao}
+        </b>
+
+        <br><br>
+
+        ${
+            percentual===null
+            ?
+            "Sem dados"
+            :
+            `
+            <strong>
+            ${percentual}%
+            </strong>
+
+            <span
+            class="badge ${n.classe}"
+            >
+            ${n.texto}
+            </span>
+
+            <div class="progress">
+
+            <div
+            style="width:${percentual}%"
+            ></div>
+
+            </div>
+            `
+        }
+
+        </div>
+
+        `;
+
+    });
+
+
+    html+=`
+
+    <br>
+
+    <button
+    class="btn no-print"
+    onclick="window.print()"
+    >
+    🖨️ Imprimir relatório
+    </button>
+
+    `;
+
+
+    div.innerHTML=html;
+
+}
+
+
+
+// =====================================================
+// RELATÓRIO DA TURMA
+// =====================================================
+
+function relatorioTurma(
+    turmaId,
+    div
+){
+
+    const turma =
+    turmaPorId(turmaId);
+
+
+    if(!turma){
+
+        div.innerHTML=
+        "<p>Selecione uma turma.</p>";
+
+        return;
+
+    }
+
+
+    const alunos =
+    banco.alunos
+    .filter(
+        a=>a.turmaId===turma.id
+    );
+
+
+    const habilidades =
+    banco.habilidades
+    .filter(
+        h=>h.ano===turma.ano
+    );
+
+
+    let html=`
+
+    <h2>
+    🏫 ${turma.nome}
+    </h2>
+
+    <p>
+    Total de alunos:
+    <b>${alunos.length}</b>
+    </p>
+
+
+    <div class="table-container">
+
+    <table>
+
+    <tr>
+
+    <th>Aluno</th>
+    `;
+
+
+    habilidades.forEach(h=>{
+
+        html+=`
+        <th>
+        ${h.codigo}
+        </th>
+        `;
+
+    });
+
+
+    html+=`
+
+    </tr>
+
+    `;
+
+
+    alunos.forEach(a=>{
+
+        html+=`
+        <tr>
+
+        <td>
+        <b>${a.nome}</b>
+        </td>
+        `;
+
+
+        habilidades.forEach(h=>{
+
+            const p =
+            dominioAlunoHabilidade(
+                a.id,
+                h.id
+            );
+
+
+            if(p===null){
+
+                html+=`
+                <td>—</td>
+                `;
+
+            }else{
+
+                const n=nivel(p);
+
+
+                html+=`
+
+                <td>
+
+                ${p}%
+
+                <br>
+
+                <span
+                class="badge ${n.classe}"
+                >
+                ${n.texto}
+                </span>
+
+                </td>
+
+                `;
+
+            }
+
+        });
+
+
+        html+=`
+        </tr>
+        `;
+
+    });
+
+
+    html+=`
+    </table>
+
+    </div>
+
+    <br>
+
+    <button
+    class="btn no-print"
+    onclick="window.print()"
+    >
+    🖨️ Imprimir relatório
+    </button>
+
+    `;
+
+
+    div.innerHTML=html;
+
+}
+
+
+
+// =====================================================
+// MAPA DE HABILIDADES
+// =====================================================
+
+function relatorioHabilidade(
+    turmaId,
+    div
+){
+
+    const turma =
+    turmaPorId(turmaId);
+
+
+    if(!turma){
+
+        div.innerHTML=
+        "<p>Selecione uma turma.</p>";
+
+        return;
+
+    }
+
+
+    const habilidades =
+    banco.habilidades
+    .filter(
+        h=>h.ano===turma.ano
+    );
+
+
+    let html=`
+
+    <h2>
+    🎯 Mapa de habilidades
+    </h2>
+
+    <h3>
+    ${turma.nome}
+    </h3>
+
+
+    <div class="table-container">
+
+    <table>
+
+    <tr>
+
+    <th>Habilidade</th>
+
+    <th>
+    Domínio da turma
+    </th>
+
+    <th>
+    Crítico
+    </th>
+
+    <th>
+    Em desenvolvimento
+    </th>
+
+    <th>
+    Adequado/Avançado
+    </th>
+
+    </tr>
+
+    `;
+
+
+    habilidades.forEach(h=>{
+
+        const alunos =
+        banco.alunos
+        .filter(
+            a=>a.turmaId===turma.id
+        );
+
+
+        const valores =
+        alunos
+        .map(
+            a=>
+            dominioAlunoHabilidade(
+                a.id,
+                h.id
+            )
+        )
+        .filter(
+            x=>x!==null
+        );
+
+
+        const media =
+        valores.length
+        ?
+        Math.round(
+            valores.reduce(
+                (a,b)=>a+b,
+                0
+            )
+            /
+            valores.length
+        )
+        :
+        null;
+
+
+        const critico =
+        valores.filter(
+            p=>p<50
+        ).length;
+
+
+        const desenvolvimento =
+        valores.filter(
+            p=>p>=50 && p<80
+        ).length;
+
+
+        const adequado =
+        valores.filter(
+            p=>p>=80
+        ).length;
+
+
+        html+=`
+
+        <tr>
+
+        <td>
+
+        <b>${h.codigo}</b>
+
+        <br>
+
+        ${h.descricao}
+
+        </td>
+
+
+        <td>
+
+        ${
+            media===null
+            ?
+            "—"
+            :
+            media+"%"
+        }
+
+        </td>
+
+
+        <td>
+        ${critico}
+        </td>
+
+
+        <td>
+        ${desenvolvimento}
+        </td>
+
+
+        <td>
+        ${adequado}
+        </td>
+
+        </tr>
+
+        `;
+
+    });
+
+
+    html+=`
+
+    </table>
+
+    </div>
+
+    <br>
+
+    <button
+    class="btn no-print"
+    onclick="window.print()"
+    >
+    🖨️ Imprimir mapa
+    </button>
+
+    `;
+
+
+    div.innerHTML=html;
+
+}
+
+
+
+// =====================================================
+// HISTÓRICO DE EVOLUÇÃO
+// =====================================================
+
+function relatorioHistorico(
+    alunoId,
+    div
+){
+
+    const aluno =
+    alunoPorId(alunoId);
+
+
+    if(!aluno){
+
+        div.innerHTML=
+        "<p>Selecione um aluno.</p>";
+
+        return;
+
+    }
+
+
+    const turma =
+    turmaPorId(aluno.turmaId);
+
+
+    const habilidades =
+    banco.habilidades
+    .filter(
+        h=>h.ano===turma.ano
+    );
+
+
+    let html=`
+
+    <h2>
+    📈 Evolução de ${aluno.nome}
+    </h2>
+
+    `;
+
+
+    habilidades.forEach(h=>{
+
+        const resultados =
+        banco.resultados
+        .filter(
+            r=>
+            r.alunoId===aluno.id
+            &&
+            r.habilidadeId===h.id
+        );
+
+
+        if(!resultados.length)
+            return;
+
+
+        html+=`
+
+        <div class="habilidade-box">
+
+        <h3>
+        ${h.codigo}
+        -
+        ${h.descricao}
+        </h3>
+
+        <div class="table-container">
+
+        <table>
+
+        <tr>
+
+        <th>Avaliação</th>
+        <th>Data</th>
+        <th>Resultado</th>
+
+        </tr>
+
+        `;
+
+
+        resultados.forEach(r=>{
+
+            const avaliacao =
+            avaliacaoPorId(
+                r.avaliacaoId
+            );
+
+
+            const percentual =
+            Math.round(
+                r.acertos/
+                r.total*
+                100
+            );
+
+
+            const n=nivel(
+                percentual
+            );
+
+
+            html+=`
+
+            <tr>
+
+            <td>
+            ${avaliacao?.nome || ""}
+            </td>
+
+            <td>
+
+            ${
+                avaliacao?.data
+                ?
+                new Date(
+                    avaliacao.data+"T12:00"
+                )
+                .toLocaleDateString(
+                    "pt-BR"
+                )
+                :
+                "-"
+            }
+
+            </td>
+
+            <td>
+
+            <b>
+            ${percentual}%
+            </b>
+
+            <span
+            class="badge ${n.classe}"
+            >
+            ${n.texto}
+            </span>
+
+            </td>
+
+            </tr>
+
+            `;
+
+        });
+
+
+        html+=`
+
+        </table>
+
+        </div>
+
+        </div>
+
+        `;
+
+    });
+
+
+    html+=`
+
+    <br>
+
+    <button
+    class="btn no-print"
+    onclick="window.print()"
+    >
+    🖨️ Imprimir histórico
+    </button>
+
+    `;
+
+
+    div.innerHTML=html;
+
+}
+
+
+
+// =====================================================
+// DASHBOARD
+// =====================================================
+
+function atualizarDashboard(){
+
+    document
+    .getElementById("totalTurmas")
+    .textContent=
+    banco.turmas.length;
+
+
+    document
+    .getElementById("totalAlunos")
+    .textContent=
+    banco.alunos.length;
+
+
+    document
+    .getElementById("totalHabilidades")
+    .textContent=
+    banco.habilidades.length;
+
+
+    document
+    .getElementById("totalAvaliacoes")
+    .textContent=
+    banco.avaliacoes.length;
+
+
+
+    const div =
+    document
+    .getElementById(
+        "dashboardHabilidades"
+    );
+
+
+    let lista=[];
+
+
+    banco.habilidades.forEach(h=>{
+
+        let valores=[];
+
+
+        banco.alunos.forEach(a=>{
+
+            const p =
+            dominioAlunoHabilidade(
+                a.id,
+                h.id
+            );
+
+
+            if(p!==null)
+                valores.push(p);
+
+        });
+
+
+        if(valores.length){
+
+            const media =
+            Math.round(
+                valores.reduce(
+                    (a,b)=>a+b,
+                    0
+                )
+                /
+                valores.length
+            );
+
+
+            lista.push({
+                habilidade:h,
+                media:media
+            });
+
+        }
+
+    });
+
+
+    lista.sort(
+        (a,b)=>a.media-b.media
+    );
+
+
+    if(!lista.length){
+
+        div.innerHTML=
+        "<p>Ainda não existem resultados.</p>";
+
+    }else{
+
+        div.innerHTML=
+        lista
+        .slice(0,5)
+        .map(item=>{
+
+            const n =
+            nivel(
+                item.media
+            );
+
+
+            return `
+
+            <div
+            class="habilidade-box"
+            >
+
+            <b>
+            ${item.habilidade.codigo}
+            -
+            ${item.habilidade.descricao}
+            </b>
+
+            <br>
+
+            <strong>
+            ${item.media}%
+            </strong>
+
+            <span
+            class="badge ${n.classe}"
+            >
+            ${n.texto}
+            </span>
+
+            <div class="progress">
+
+            <div
+            style="width:${item.media}%"
+            ></div>
+
+            </div>
+
+            </div>
+
+            `;
+
+        }).join("");
+
+    }
+
+
+
+    const divTurmas =
+    document
+    .getElementById(
+        "dashboardTurmas"
+    );
+
+
+    divTurmas.innerHTML =
+    banco.turmas
+    .map(t=>{
+
+        let valores=[];
+
+
+        banco.alunos
+        .filter(
+            a=>a.turmaId===t.id
+        )
+        .forEach(a=>{
+
+            banco.habilidades
+            .filter(
+                h=>h.ano===t.ano
+            )
+            .forEach(h=>{
+
+                const p =
+                dominioAlunoHabilidade(
+                    a.id,
+                    h.id
+                );
+
+
+                if(p!==null)
+                    valores.push(p);
+
+            });
+
+        });
+
+
+        const media =
+        valores.length
+        ?
+        Math.round(
+            valores.reduce(
+                (a,b)=>a+b,
+                0
+            )
+            /
+            valores.length
+        )
+        :
+        0;
+
+
+        return `
+
+        <div
+        class="habilidade-box"
+        >
+
+        <b>
+        ${t.nome}
+        </b>
+
+        <span style="float:right">
+
+        ${
+            valores.length
+            ?
+            media+"%"
+            :
+            "Sem dados"
+        }
+
+        </span>
+
+        <div class="progress">
+
+        <div
+        style="width:${media}%"
+        ></div>
+
+        </div>
+
+        </div>
+
+        `;
+
+    })
+    .join("");
+
+}
+
+
+
+// =====================================================
+// BACKUP
+// =====================================================
+
+function exportarDados(){
+
+    const arquivo =
+    new Blob(
+        [
+            JSON.stringify(
+                banco,
+                null,
+                2
+            )
+        ],
+        {
+            type:"application/json"
+        }
+    );
+
+
+    const url =
+    URL.createObjectURL(
+        arquivo
+    );
+
+
+    const link =
+    document.createElement("a");
+
+
+    link.href=url;
+
+    link.download=
+    "backup-SAHA.json";
+
+
+    link.click();
+
+
+    URL.revokeObjectURL(url);
+
+}
+
+
+
+function importarDados(event){
+
+    const arquivo =
+    event.target.files[0];
+
+
+    if(!arquivo) return;
+
+
+    const leitor =
+    new FileReader();
+
+
+    leitor.onload=function(){
+
+        try{
+
+            const dados =
+            JSON.parse(
+                leitor.result
+            );
+
+
+            if(
+                !dados.turmas ||
+                !dados.alunos ||
+                !dados.habilidades ||
+                !dados.avaliacoes ||
+                !dados.resultados
+            ){
+
+                throw new Error();
+
+            }
+
+
+            banco=dados;
+
+
+            salvar();
+
+
+            alert(
+            "Backup importado com sucesso!"
+            );
+
+        }catch{
+
+            alert(
+            "Arquivo inválido."
+            );
+
+        }
+
+    };
+
+
+    leitor.readAsText(
+        arquivo
+    );
+
+}
+
+
+
+function apagarTudo(){
+
+    if(
+        !confirm(
+            "ATENÇÃO: todos os dados serão apagados. Continuar?"
+        )
+    )
+
+        return;
+
+
+    banco={
+        turmas:[],
+        alunos:[],
+        habilidades:[],
+        avaliacoes:[],
+        resultados:[]
+    };
+
+
+    salvar();
+
+}
+
+
+
+// =====================================================
+// ATUALIZAÇÃO
+// =====================================================
+
+function atualizarSistema(){
+
+    carregarSelectTurmas();
+
+    carregarSelectAvaliacoes();
+
+    mostrarTurmas();
+
+    mostrarAlunos();
+
+    mostrarHabilidades();
+
+    mostrarAvaliacoes();
+
+    atualizarDashboard();
+
+}
+
+
+
+// =====================================================
+// INICIALIZAÇÃO
+// =====================================================
+
+atualizarSistema();
+
+
+</script>
+
+</body>
+</html>
