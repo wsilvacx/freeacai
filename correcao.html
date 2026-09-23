@@ -2,157 +2,109 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>v8 - DEBUG</title>
+<title>v9 - Anti Parede + Guia</title>
 <style>
-body{margin:0;background:#f2f4f7;font-family:Arial}header{background:#174a73;color:#fff;padding:12px;text-align:center}
-main{max-width:800px;margin:auto;padding:8px}.card{background:#fff;padding:12px;border-radius:10px;margin:8px 0;box-shadow:0 2px 6px #0002}
-button{padding:12px 16px;border:0;border-radius:8px;font-weight:bold;color:#fff;cursor:pointer;margin:4px 0;width:100%;font-size:16px}.g{background:#16834b}.gr{background:#666}.b{background:#174a73}.r{background:#b33}
-input,select{width:100%;padding:10px;border:1px solid #aaa;border-radius:6px;margin:4px 0}
-#log{background:#000;color:#0f0;padding:8px;border-radius:6px;font-size:12px;white-space:pre-wrap;max-height:200px;overflow:auto}
-#camBox{position:relative;background:#000;border-radius:10px;overflow:hidden;max-width:500px;margin:10px auto}
-#video{width:100%}#overlay{position:absolute;inset:0;pointer-events:none}
-.guide{position:absolute;left:5%;top:5%;width:90%;height:90%;border:3px dashed #00ff00;border-radius:12px;box-shadow:0 0 0 1000px rgba(0,0,0,.6)}
-.corner{position:absolute;width:32px;height:32px;border:5px solid #00ff00}
-.tl{top:-3px;left:-3px;border-right:0;border-bottom:0}.tr{top:-3px;right:-3px;border-left:0;border-bottom:0}.bl{bottom:-3px;left:-3px;border-right:0;border-top:0}.br{bottom:-3px;right:-3px;border-left:0;border-top:0}
-#can{max-width:100%;border:2px solid #000;margin-top:8px}
-.item{display:flex;justify-content:space-between;padding:8px;border:1px solid #ddd;border-radius:8px;margin:4px 0}.item.ok{background:#d6f5de}
+body{margin:0;background:#f2f4f7;font-family:Arial}header{background:#174a73;color:#fff;padding:10px;text-align:center}
+main{max-width:900px;margin:auto;padding:8px}.card{background:#fff;padding:12px;border-radius:10px;margin:8px 0}
+.btn{padding:12px;border:0;border-radius:8px;font-weight:bold;color:#fff;cursor:pointer;width:100%;margin-top:6px;font-size:16px}.g{background:#16834b}.b{background:#174a73}.gr{background:#666}.r{background:#b33}
+input,select{width:100%;padding:10px;border:1px solid #aaa;border-radius:6px;margin-top:4px}
+#camBox{position:relative;background:#000;border-radius:12px;overflow:hidden;max-width:500px;margin:10px auto}
+#video{width:100%;display:block}#overlay{position:absolute;inset:0}
+.guide{position:absolute;left:4%;top:4%;width:92%;height:92%;border:3px dashed #00ff00;border-radius:10px;box-shadow:0 0 0 9999px rgba(0,0,0,.65)}
+.corner{position:absolute;width:36px;height:36px;border:6px solid #00ff00}.tl{top:-3px;left:-3px;border-right:0;border-bottom:0}.tr{top:-3px;right:-3px;border-left:0;border-bottom:0}.bl{bottom:-3px;left:-3px;border-right:0;border-top:0}.br{bottom:-3px;right:-3px;border-left:0;border-top:0}
+#can{max-width:100%;border:2px solid #000;margin-top:8px;display:block}
+.item{display:flex;justify-content:space-between;align-items:center;padding:8px;border:1px solid #ddd;border-radius:8px;margin:4px 0}.item.ok{background:#d6f5de}
 .hidden{display:none!important}
+.q{border:1px solid #ddd;border-radius:6px;padding:4px;text-align:center;background:#fafafa}
 </style>
 </head>
 <body>
-<header><h1>v8 - COM GUIA + DEBUG</h1><p id="statusTop">Carregando...</p></header>
+<header><h1>v9 - Só lê com os 4 cantos pretos</h1><p>Se fotografar parede, vai avisar FOLHA NÃO ENCONTRADA</p></header>
 <main>
 <div class="card">
-<h3>LOG DE ERRO (me manda foto disso se der erro)</h3>
-<div id="log">Iniciando...\n</div>
-<button class="b" onclick="testarBotoes()">🔧 TESTAR BOTÕES - CLIQUE AQUI PRIMEIRO</button>
+<input id="inT" placeholder="Turma ex: 6A"><button class="btn g" id="btnT">+ Turma</button><select id="selT" style="margin-top:8px"></select><select id="selTC" style="margin-top:8px"></select>
 </div>
-
 <div class="card">
-<h3>1. Turma (obrigatório)</h3>
-<input id="inT" placeholder="Ex: 6A"><button class="g" id="btnT">Adicionar Turma</button><div id="listT"></div>
+<div style="display:flex;gap:6px"><input id="qtd" type="number" value="10" style="width:80px"><select id="alt" style="width:80px"><option value="5" selected>A-E</option><option value="4">A-D</option></select><input id="nomeP" value="Prova 1"></div>
+<div id="boxG" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(75px,1fr));gap:4px;margin-top:8px"></div>
+<button class="btn g" id="btnG">💾 SALVAR GABARITO</button><button class="btn gr" id="btnPrint">🖨️ IMPRIMIR FOLHA OFICIAL (tem que ser essa)</button><div id="msgG" style="color:green;font-weight:bold"></div>
 </div>
-
 <div class="card">
-<h3>2. Gabarito</h3>
-<div style="display:flex;gap:6px"><input id="qtd" type="number" value="10" style="width:80px"><select id="alt" style="width:80px"><option value="4">A-D</option><option value="5" selected>A-E</option></select></div>
-<div id="boxG" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:4px;margin-top:8px"></div>
-<button class="g" id="btnG">💾 SALVAR GABARITO</button><div id="msgG"></div>
-</div>
-
-<div class="card">
-<h3>3. Aluno (para testar)</h3>
-<select id="selT"></select><input id="inA" placeholder="Nome aluno teste"><button class="g" id="btnA">Adicionar Aluno</button><div id="listA"></div>
-</div>
-
-<div class="card">
-<h3>4. Corrigir com GUIA</h3>
-<select id="selTC"></select><div id="listC"></div>
+<input id="inA" placeholder="Nome aluno"><button class="btn g" id="btnA">+ Aluno</button><div id="listC"></div>
 <div id="boxCor" class="hidden">
-<h4 id="titC"></h4>
-<div id="camBox" class="hidden">
-<video id="video" autoplay playsinline></video>
-<div id="overlay"><div class="guide"><div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div><div style="position:absolute;top:50%;left:0;width:100%;text-align:center;color:#0f0;background:rgba(0,0,0,.5);font-weight:bold">ALINHE OS 4 QUADRADOS PRETOS AQUI</div></div></div>
-</div>
-<button class="b" id="btnCam">📷 ABRIR CÂMERA COM GUIA</button>
-<button class="g hidden" id="btnCap" style="background:#0a5;font-size:20px">📸 CAPTURAR FOLHA</button>
-<p style="text-align:center">ou</p>
-<input id="foto" type="file" accept="image/*">
+<h3 id="titC"></h3>
+<div id="camBox" class="hidden"><video id="video" autoplay playsinline></video><div id="overlay"><div class="guide"><div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div><div style="position:absolute;top:48%;left:0;width:100%;text-align:center;color:#0f0;background:rgba(0,0,0,.6);font-weight:bold;padding:4px">ENCAIXE OS 4 ■ PRETOS NOS CANTOS VERDES</div></div></div></div>
+<button class="btn b" id="btnCam">📷 ABRIR CÂMERA COM GUIA</button><button class="btn g hidden" id="btnCap" style="font-size:20px;background:#0a5">📸 CAPTURAR QUANDO ALINHAR</button>
+<input id="foto" type="file" accept="image/*" style="margin-top:8px">
 <canvas id="can"></canvas>
-<div id="msgAuto"></div>
-<div id="boxR" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:4px"></div>
-<button class="g hidden" id="btnConf">✅ SALVAR E FICAR VERDE</button>
+<div id="msgAuto" style="padding:8px;border-radius:6px;margin-top:6px;background:#e8f5ff"></div>
+<div id="boxR" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(75px,1fr));gap:4px;margin-top:8px"></div>
+<button class="btn g hidden" id="btnConf">✅ SALVAR E FICAR VERDE</button>
 </div>
 </div>
-
-<div id="print" style="display:none"><div style="border:6px solid #000;padding:10px"><div style="display:flex;justify-content:space-between"><div style="width:40px;height:40px;background:#000"></div><div style="width:40px;height:40px;background:#000"></div></div><h2 id="pNome" style="text-align:center"></h2><div id="pGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:4px"></div><div style="display:flex;justify-content:space-between;margin-top:8px"><div style="width:40px;height:40px;background:#000"></div><div style="width:40px;height:40px;background:#000"></div></div></div></div>
+<div id="print" style="display:none"><div style="border:8px solid #000;padding:12px"><div style="display:flex;justify-content:space-between"><div style="width:48px;height:48px;background:#000"></div><div style="width:48px;height:48px;background:#000"></div></div><h1 style="text-align:center" id="pNome"></h1><div id="pGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:6px"></div><div style="display:flex;justify-content:space-between;margin-top:12px"><div style="width:48px;height:48px;background:#000"></div><div style="width:48px;height:48px;background:#000"></div></div></div></div>
 </main>
-
 <script>
-let logEl=document.getElementById('log');
-function log(m){logEl.textContent+=m+'\n'; console.log(m);}
-window.onerror=(msg,src,line)=>{log('ERRO JS: '+msg+' linha '+line); alert('ERRO: '+msg);};
-log('JS carregou OK');
-let turmas=JSON.parse(localStorage.getItem('t8')||'[]'), alunos=JSON.parse(localStorage.getItem('a8')||'[]'), gab=JSON.parse(localStorage.getItem('g8')||'[]'), notas=JSON.parse(localStorage.getItem('n8')||'[]'), cfg={qtd:10,alt:5};
-let atual=null; const L=['A','B','C','D','E'];
-const $=id=>document.getElementById(id);
-function save(){localStorage.setItem('t8',JSON.stringify(turmas));localStorage.setItem('a8',JSON.stringify(alunos));localStorage.setItem('g8',JSON.stringify(gab));localStorage.setItem('n8',JSON.stringify(notas));}
-function testarBotoes(){log('Teste de botões OK'); alert('Botões funcionando! Se apareceu isso, o arquivo está OK. Agora cadastre turma.');}
+let turmas=JSON.parse(localStorage.getItem('t9')||'[]'), alunos=JSON.parse(localStorage.getItem('a9')||'[]'), gab=JSON.parse(localStorage.getItem('g9')||'[]'), notas=JSON.parse(localStorage.getItem('n9')||'[]'), cfg={qtd:10,alt:5,nome:'Prova 1'};
+let atual=null; const L=['A','B','C','D','E']; const $=id=>document.getElementById(id);
+function save(){localStorage.setItem('t9',JSON.stringify(turmas));localStorage.setItem('a9',JSON.stringify(alunos));localStorage.setItem('g9',JSON.stringify(gab));localStorage.setItem('n9',JSON.stringify(notas));}
 function render(){
- try{
-  $('listT').innerHTML=turmas.map(t=>`<div class="item">${t.nome} <button class="r" onclick="delT(${t.id})" style="width:auto">X</button></div>`).join('')||'Nenhuma';
-  let sel=turmas.map(t=>`<option value="${t.id}">${t.nome}</option>`).join(''); $('selT').innerHTML=sel; $('selTC').innerHTML=sel;
-  $('listA').innerHTML=alunos.map(a=>`<div class="item">${a.nome}</div>`).join('');
-  buildG(); renderC(); log('Render OK turmas:'+turmas.length+' gab:'+gab.length);
- }catch(e){log('Erro render: '+e.message);}
+ $('selT').innerHTML=turmas.map(t=>`<option value="${t.id}">${t.nome}</option>`).join(''); $('selTC').innerHTML=$('selT').innerHTML;
+ let tid=+$('selTC').value; let lista=tid?alunos.filter(a=>a.tid==tid):[];
+ $('listC').innerHTML=lista.map(a=>{let n=notas.find(x=>x.aid==a.id); return `<div class="item ${n?'ok':''}"><span><b>${a.nome}</b> ${n?`VERDE ${n.ac}/${cfg.qtd}`:''}</span><button class="btn g" style="width:auto" onclick="abrir(${a.id})">Corrigir</button></div>`}).join('')||'Sem alunos';
+ buildG();
 }
-window.delT=(id)=>{turmas=turmas.filter(t=>t.id!=id); save(); render();};
-function buildG(){let q=+$('qtd').value||10, al=+$('alt').value; $('boxG').innerHTML=''; for(let i=0;i<q;i++){let v=gab[i]||''; $('boxG').innerHTML+=`<div style="border:1px solid #ddd;padding:4px;text-align:center"><b>${i+1}</b><select id="g${i}"><option value="">-</option>${L.slice(0,al).map(l=>`<option ${l==v?'selected':''}>${l}</option>`).join('')}</select></div>`}}
-$('btnT').addEventListener('click',()=>{let n=$('inT').value.trim(); if(!n){log('Turma vazia'); return alert('Digite turma');} turmas.push({id:Date.now(),nome:n}); $('inT').value=''; save(); render(); log('Turma add: '+n);});
-$('btnG').addEventListener('click',()=>{let q=+$('qtd').value, al=+$('alt').value, g=[]; for(let i=0;i<q;i++){let v=$('g'+i).value; if(!v){log('Gabarito falta Q'+(i+1)); return alert('Falta Q'+(i+1));} g.push(v);} gab=g; cfg={qtd:q,alt:al}; save(); $('msgG').textContent='✅ SALVO: '+gab.join(' '); log('Gabarito salvo '+gab.join(' '));});
-$('btnA').addEventListener('click',()=>{let n=$('inA').value.trim(), tid=+$('selT').value; if(!n||!tid){log('Aluno sem turma'); return alert('Escolha turma');} alunos.push({id:Date.now(),nome:n,tid}); $('inA').value=''; save(); render(); log('Aluno add '+n);});
-function renderC(){
- let tid=+$('selTC').value; if(!tid){$('listC').innerHTML='Escolha turma';return}
- let lista=alunos.filter(a=>a.tid==tid);
- $('listC').innerHTML=lista.map(a=>{let nt=notas.find(x=>x.aid==a.id); return `<div class="item ${nt?'ok':''}"><span><b>${a.nome}</b> ${nt?`VERDE ${nt.ac}/${cfg.qtd}`:''}</span><button class="g" style="width:auto" onclick="abrir(${a.id})">Corrigir</button></div>`}).join('')||'Sem alunos';
-}
-$('selTC').addEventListener('change',renderC);
-window.abrir=(id)=>{if(!gab.length){log('Sem gabarito'); return alert('Salve gabarito');} atual=alunos.find(a=>a.id==id); $('boxCor').classList.remove('hidden'); $('titC').textContent='Aluno: '+atual.nome; log('Abrindo aluno '+atual.nome);};
+function buildG(){let q=+$('qtd').value||10, al=+$('alt').value; $('boxG').innerHTML=''; for(let i=0;i<q;i++){let v=gab[i]||''; $('boxG').innerHTML+=`<div class="q"><b>${i+1}</b><select id="g${i}"><option value="">-</option>${L.slice(0,al).map(l=>`<option ${l==v?'selected':''}>${l}</option>`).join('')}</select></div>`}}
+$('btnT').onclick=()=>{let n=$('inT').value.trim(); if(!n)return; turmas.push({id:Date.now(),nome:n}); $('inT').value=''; save(); render();};
+$('btnA').onclick=()=>{let n=$('inA').value.trim(), tid=+$('selT').value; if(!n||!tid)return alert('Escolha turma'); alunos.push({id:Date.now(),nome:n,tid}); $('inA').value=''; save(); render();};
+$('btnG').onclick=()=>{let q=+$('qtd').value, al=+$('alt').value, g=[]; for(let i=0;i<q;i++){let v=$('g'+i).value; if(!v)return alert('Falta Q'+(i+1)); g.push(v);} gab=g; cfg={qtd:q,alt:al,nome:$('nomeP').value}; save(); $('msgG').textContent='✅ SALVO '+gab.join(' ');};
+$('btnPrint').onclick=()=>{if(!gab.length)return alert('Salve gabarito'); $('pNome').textContent=cfg.nome; $('pGrid').innerHTML=''; for(let i=0;i<cfg.qtd;i++){let b=L.slice(0,cfg.alt).map(l=>`<span style="width:20px;height:20px;border:2.5px solid #000;border-radius:50%;display:inline-flex;justify-content:center;align-items:center;font-size:10px;font-weight:bold">${l}</span>`).join(' '); $('pGrid').innerHTML+=`<div style="border:2px solid #000;padding:8px;display:flex;justify-content:space-between"><b>${i+1}</b><span>${b}</span></div>`} window.print();};
+window.abrir=(id)=>{if(!gab.length)return alert('Salve gabarito'); atual=alunos.find(a=>a.id==id); $('boxCor').classList.remove('hidden'); $('titC').textContent='Aluno: '+atual.nome; $('boxR').innerHTML=''; $('msgAuto').textContent='Abra a câmera e encaixe os 4 quadrados pretos nos cantos verdes'; window.scrollTo(0,$('boxCor').offsetTop);};
+$('selTC').onchange=render;
 
 let stream=null;
-$('btnCam').addEventListener('click',async()=>{
- try{
-  log('Tentando abrir câmera...');
-  stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{exact:'environment'}}}).catch(async()=>{log('Tentando câmera traseira genérica'); return await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});});
-  $('video').srcObject=stream;
-  $('camBox').classList.remove('hidden');
-  $('btnCam').classList.add('hidden');
-  $('btnCap').classList.remove('hidden');
-  log('Câmera aberta OK');
-  $('statusTop').textContent='Câmera aberta - alinhe os quadrados';
- }catch(e){log('Erro câmera: '+e.message); alert('Erro câmera: '+e.message+'\nUse o botão de arquivo abaixo. Precisa abrir no Chrome, não no WhatsApp.');}
-});
-$('btnCap').addEventListener('click',()=>{
- let v=$('video'), c=$('can'), ctx=c.getContext('2d'); c.width=v.videoWidth; c.height=v.videoHeight; ctx.drawImage(v,0,0);
- if(stream)stream.getTracks().forEach(t=>t.stop());
- $('camBox').classList.add('hidden'); $('btnCap').classList.add('hidden'); $('btnCam').classList.remove('hidden');
- process(c); log('Foto capturada '+c.width+'x'+c.height);
-});
-$('foto').addEventListener('change',e=>{
- let f=e.target.files[0]; if(!f){log('Nenhum arquivo');return;} log('Arquivo: '+f.name+' '+f.size);
- let img=new Image(); img.onload=()=>{let c=$('can'), ctx=c.getContext('2d'); c.width=img.width; c.height=img.height; ctx.drawImage(img,0,0); process(c); log('Imagem carregada '+img.width+'x'+img.height);}; img.src=URL.createObjectURL(f);
-});
+$('btnCam').onclick=async()=>{
+ try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}}); $('video').srcObject=stream; $('camBox').classList.remove('hidden'); $('btnCam').classList.add('hidden'); $('btnCap').classList.remove('hidden');}catch(e){alert('Erro câmera, use arquivo: '+e.message);}
+};
+$('btnCap').onclick=()=>{let v=$('video'), c=$('can'), ctx=c.getContext('2d'); c.width=v.videoWidth; c.height=v.videoHeight; ctx.drawImage(v,0,0); if(stream)stream.getTracks().forEach(t=>t.stop()); $('camBox').classList.add('hidden'); $('btnCam').classList.remove('hidden'); $('btnCap').classList.add('hidden'); process(c);};
+$('foto').addEventListener('change',e=>{let f=e.target.files[0]; if(!f)return; let img=new Image(); img.onload=()=>{let c=$('can'), ctx=c.getContext('2d'); c.width=img.width; c.height=img.height; ctx.drawImage(img,0,0); process(c);}; img.src=URL.createObjectURL(f);});
+
 function process(can){
- try{
-  let ctx=can.getContext('2d',{willReadFrequently:true}), w=can.width,h=can.height, d=ctx.getImageData(0,0,w,h).data;
-  function gray(x,y){let i=(y*w+x)*4; return (d[i]+d[i+1]+d[i+2])/3}
-  function find(x0,y0,x1,y1){let best=null, bd=1000; for(let y=y0;y<y1;y+=6)for(let x=x0;x<x1;x+=6){let g=gray(x,y); if(g<80&&g<bd){bd=g; best={x,y}}} return best;}
-  let tl=find(0,0,w*0.3,h*0.3), tr=find(w*0.7,0,w,h*0.3), bl=find(0,h*0.7,w*0.3,h), br=find(w*0.7,h*0.7,w,h);
-  log(`Cantos: tl=${!!tl} tr=${!!tr} bl=${!!bl} br=${!!br}`);
-  if(!tl||!tr||!bl||!br){$('msgAuto').innerHTML='<b style="color:red">Não achei os 4 quadrados pretos. Foto tem que pegar folha toda. Se imprimiu folha antiga, imprima a nova.</b>'; return;}
-  let left=Math.min(tl.x,bl.x), right=Math.max(tr.x,br.x), top=Math.min(tl.y,tr.y), bottom=Math.max(bl.y,br.y), bw=right-left, bh=bottom-top;
-  $('boxR').innerHTML=''; let leitura=[];
-  for(let i=0;i<cfg.qtd;i++){
-    let col=i%2, row=Math.floor(i/2), rows=Math.ceil(cfg.qtd/2);
-    let cellW=bw/2, cellH=bh*0.8/rows, baseY=top+bh*0.12+row*(bh*0.8/rows)+cellH*0.5, baseX=left+col*cellW;
-    let scores=[];
-    for(let a=0;a<cfg.alt;a++){let cx=baseX+cellW*0.3+a*cellW*0.13, cy=baseY, r=Math.max(7,Math.floor(w*0.016)), s=0,cnt=0; for(let yy=-r;yy<=r;yy++)for(let xx=-r;xx<=r;xx++)if(xx*xx+yy*yy<=r*r){let X=Math.min(w-1,Math.max(0,Math.round(cx+xx))), Y=Math.min(h-1,Math.max(0,Math.round(cy+yy))); s+=255-gray(X,Y); cnt++;} scores.push(s/cnt);}
-    let best=Math.max(...scores), idx=scores.indexOf(best), letra=best>35?L[idx]:''; leitura.push(letra);
-    $('boxR').innerHTML+=`<div style="border:1px solid #ddd;padding:4px;text-align:center"><b>${i+1}</b><select id="r${i}"><option value="">?</option>${L.slice(0,cfg.alt).map(l=>`<option ${l==letra?'selected':''}>${l}</option>`).join('')}</select><div style="font-size:10px">auto:${letra||'?'} gab:${gab[i]}</div></div>`;
-  }
-  $('msgAuto').innerHTML=`<b style="color:green">Leitura: ${leitura.filter(x=>x).length}/${cfg.qtd}</b>`;
-  $('btnConf').classList.remove('hidden');
-  log('Leitura feita: '+leitura.join(' '));
- }catch(e){log('Erro process: '+e.message+' '+e.stack); alert('Erro ao processar: '+e.message);}
+ let ctx=can.getContext('2d',{willReadFrequently:true}), w=can.width,h=can.height, d=ctx.getImageData(0,0,w,h).data;
+ function gray(x,y){let i=(y*w+x)*4; return (d[i]+d[i+1]+d[i+2])/3}
+ function hasBlackSquare(x0,y0,x1,y1){
+   let black=0,total=0; for(let y=y0;y<y1;y+=3)for(let x=x0;x<x1;x+=3){total++; if(gray(x,y)<50)black++;}
+   return (black/total)>0.35;
+ }
+ let tl=hasBlackSquare(0,0,w*0.25,h*0.25), tr=hasBlackSquare(w*0.75,0,w,h*0.25), bl=hasBlackSquare(0,h*0.75,w*0.25,h), br=hasBlackSquare(w*0.75,h*0.75,w,h);
+ if(!(tl&&tr&&bl&&br)){
+   $('msgAuto').innerHTML=`<b style="color:red;font-size:18px">❌ FOLHA NÃO ENCONTRADA<br>Você fotografou a parede ou a folha está cortada.<br>Precisa aparecer os 4 quadrados pretos grandes.</b><br>Detectado: TL=${tl} TR=${tr} BL=${bl} BR=${br}`;
+   $('can').style.border='4px solid red';
+   return;
+ }
+ $('can').style.border='4px solid #0a5';
+ $('msgAuto').innerHTML='<b style="color:green">✅ Folha encontrada! Lendo bolinhas...</b>';
+ // leitura só se achou cantos
+ let left=w*0.08, right=w*0.92, top=h*0.15, bottom=h*0.92, bw=right-left, bh=bottom-top;
+ $('boxR').innerHTML=''; let leitura=[];
+ for(let i=0;i<cfg.qtd;i++){
+   let col=i%2, row=Math.floor(i/2), rows=Math.ceil(cfg.qtd/2);
+   let cellW=bw/2, cellH=bh/rows, baseY=top+row*cellH+cellH*0.55, baseX=left+col*cellW;
+   let scores=[];
+   for(let a=0;a<cfg.alt;a++){let cx=baseX+cellW*0.32+a*cellW*0.12, cy=baseY, r=Math.max(8,Math.floor(w*0.018)), s=0,cnt=0; for(let yy=-r;yy<=r;yy++)for(let xx=-r;xx<=r;xx++)if(xx*xx+yy*yy<=r*r){let X=Math.min(w-1,Math.max(0,Math.round(cx+xx))), Y=Math.min(h-1,Math.max(0,Math.round(cy+yy))); s+=255-gray(X,Y); cnt++;} scores.push(s/cnt);}
+   let best=Math.max(...scores), idx=scores.indexOf(best), letra=best>45?L[idx]:''; leitura.push(letra);
+   $('boxR').innerHTML+=`<div class="q"><b>${i+1}</b><select id="r${i}"><option value="">?</option>${L.slice(0,cfg.alt).map(l=>`<option ${l==letra?'selected':''}>${l}</option>`).join('')}</select><div style="font-size:10px">auto:${letra||'?'} gab:${gab[i]}</div></div>`;
+ }
+ $('msgAuto').innerHTML+=`<br>Leitura: ${leitura.filter(x=>x).length}/${cfg.qtd} - Confira e clique em SALVAR VERDE`;
+ $('btnConf').classList.remove('hidden');
 }
-$('btnConf').addEventListener('click',()=>{
+$('btnConf').onclick=()=>{
  let resp=[]; for(let i=0;i<cfg.qtd;i++)resp.push($('r'+i).value||'');
  let ac=0; resp.forEach((x,i)=>{if(x==gab[i])ac++;}); let nota=ac/cfg.qtd*10;
  let idx=notas.findIndex(x=>x.aid==atual.id), obj={aid:atual.id,tid:atual.tid,ac,nota,resp};
- if(idx>=0)notas[idx]=obj; else notas.push(obj); save(); render(); $('boxCor').classList.add('hidden'); log('Salvo verde '+atual.nome); alert('Salvo VERDE');
-});
-$('qtd').addEventListener('change',buildG); $('alt').addEventListener('change',buildG);
-window.addEventListener('load',()=>{log('Página carregada'); $('statusTop').textContent='Pronto - clique em TESTAR BOTÕES'; render(); buildG();});
+ if(idx>=0)notas[idx]=obj; else notas.push(obj); save(); render(); alert('Salvo VERDE!'); $('boxCor').classList.add('hidden');
+};
+window.onload=()=>{buildG(); render();};
 </script>
 </body>
 </html>
