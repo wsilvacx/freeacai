@@ -2,165 +2,189 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>v5 - Leitura Automática Real</title>
+<title>v6 - BOTOES FUNCIONANDO + AUTO</title>
 <style>
-body{margin:0;background:#f2f4f7;font-family:Arial}header{background:#174a73;color:#fff;padding:12px;text-align:center}
-main{max-width:1100px;margin:auto;padding:10px}.card{background:#fff;padding:14px;border-radius:10px;margin:8px 0;box-shadow:0 2px 6px #0001}
-.tabs{display:flex;gap:4px;overflow:auto}.tabs button{padding:10px;border:0;border-radius:8px;background:#666;color:#fff;font-weight:bold}.tabs button.active{background:#16834b}
+body{margin:0;background:#eef2f5;font-family:Arial}header{background:#174a73;color:#fff;padding:12px;text-align:center}
+main{max-width:1100px;margin:auto;padding:10px}.card{background:#fff;padding:14px;border-radius:10px;margin:8px 0}
+.tabs{display:flex;gap:4px;overflow:auto}.tabs button{padding:10px 14px;border:0;border-radius:8px;background:#666;color:#fff;font-weight:bold;cursor:pointer}.tabs button.active{background:#0b7a53}
 .panel{display:none}.panel.active{display:block}
 input,select{padding:9px;border:1px solid #aaa;border-radius:6px;width:100%;margin-top:4px}
-.btn{padding:10px 14px;border:0;border-radius:8px;font-weight:bold;color:#fff;cursor:pointer}.g{background:#16834b}.gr{background:#666}.r{background:#b33}
-table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:6px;border-bottom:1px solid #ddd;text-align:center}
-.item{display:flex;justify-content:space-between;align-items:center;padding:9px;border:1px solid #ddd;border-radius:8px;margin:5px 0}.item.ok{background:#d6f5de;border-color:#2e9d4a}
-.badge{padding:3px 8px;border-radius:10px;font-size:11px;font-weight:bold}.ok{background:#bff0cc}.pend{background:#ffe0a3}
-.gab{display:grid;grid-template-columns:repeat(auto-fill,minmax(95px,1fr));gap:5px}.q{background:#fafafa;border:1px solid #ddd;border-radius:6px;padding:5px;text-align:center}
-#can{max-width:100%;border:2px solid #333;border-radius:8px;margin-top:8px;display:block}.hidden{display:none}
+.btn{padding:10px 14px;border:0;border-radius:8px;font-weight:bold;color:#fff;cursor:pointer;margin-top:4px}.g{background:#16834b}.gr{background:#666}.r{background:#b33}.o{background:#c77a00}
+.item{display:flex;justify-content:space-between;align-items:center;padding:8px;border:1px solid #ddd;border-radius:8px;margin:4px 0;background:#fff}.item.ok{background:#d6f5de;border-color:#2e9d4a}
+.gab{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:5px}.q{border:1px solid #ddd;border-radius:6px;padding:5px;text-align:center;background:#fafafa}
+#can{max-width:100%;border:2px solid #000;display:block;margin-top:8px}.hidden{display:none!important}
 #print{display:none}
 @media print{#print{display:block!important}header,.tabs,main>.card:not(#print){display:none!important}}
 </style>
 </head>
 <body>
-<header><h1>v5 - LEITURA AUTOMÁTICA</h1><p>Precisa imprimir pela v5 para funcionar</p></header>
+<header><h1>v6 - FINAL FUNCIONANDO</h1></header>
 <main>
 <div class="tabs">
-<button class="active" onclick="go('t',this)">1 Turmas</button>
-<button onclick="go('a',this)">2 Alunos</button>
-<button onclick="go('g',this)">3 Gabarito</button>
-<button onclick="go('c',this)">4 Corrigir AUTO</button>
+<button id="bt_t" class="active">1 Turmas</button>
+<button id="bt_a">2 Alunos</button>
+<button id="bt_g">3 Gabarito</button>
+<button id="bt_c">4 Corrigir AUTO</button>
 </div>
 
 <div id="t" class="panel active card">
-<input id="inT" placeholder="Nome turma ex: 6A"><button class="btn g" onclick="addT()">Add Turma</button><div id="listT"></div>
+<h3>1. Turmas</h3>
+<input id="inT" placeholder="Ex: 6A"><button class="btn g" id="btnAddT">+ Adicionar Turma</button>
+<div id="listT" style="margin-top:8px"></div>
 </div>
 
 <div id="a" class="panel card">
-<select id="selTA"></select><input id="inA" placeholder="Nome aluno"><button class="btn g" onclick="addA()">Add</button><button class="btn gr" onclick="addLote()">Colar lista</button><div id="listA"></div>
+<h3>2. Alunos</h3>
+<select id="selTA"></select>
+<input id="inA" placeholder="Nome do aluno">
+<button class="btn g" id="btnAddA">+ Adicionar 1 aluno</button>
+<button class="btn gr" id="btnLote">+ Colar lista (1 por linha)</button>
+<div id="listA" style="margin-top:8px"></div>
 </div>
 
 <div id="g" class="panel card">
-<div style="display:flex;gap:6px"><input id="qtd" type="number" value="20" style="width:80px"><select id="alt" style="width:80px"><option value="4">A-D</option><option value="5" selected>A-E</option></select><input id="nomeP" value="Prova 1"></div>
-<div id="boxG" class="gab" style="margin-top:8px"></div>
-<button class="btn g" onclick="saveG()" style="width:100%;margin-top:8px;font-size:18px">💾 SALVAR GABARITO</button><div id="msgG" style="font-weight:bold;color:green;margin-top:6px"></div>
-<button class="btn gr" onclick="imp()" style="width:100%;margin-top:8px">🖨️ IMPRIMIR FOLHA OFICIAL v5 (OBRIGATÓRIO)</button>
+<h3>3. Gabarito</h3>
+<div style="display:flex;gap:6px"><input id="qtd" type="number" value="20" style="width:90px"><select id="alt" style="width:90px"><option value="4">A-D</option><option value="5" selected>A-E</option></select><input id="nomeP" value="Prova 1"></div>
+<div id="boxG" class="gab" style="margin-top:10px"></div>
+<button class="btn g" id="btnSaveG" style="width:100%;font-size:18px;margin-top:10px">💾 SALVAR GABARITO</button>
+<div id="msgG" style="font-weight:bold;color:green;margin-top:6px"></div>
+<button class="btn gr" id="btnPrint" style="width:100%;margin-top:6px">🖨️ IMPRIMIR FOLHA OFICIAL v6</button>
 </div>
 
 <div id="c" class="panel card">
-<select id="selTC" onchange="renderC()"></select><div id="listC"></div>
-<div id="boxCor" class="hidden" style="border-top:3px solid #174a73;margin-top:10px;padding-top:8px">
+<h3>4. Corrigir - Escolha a turma primeiro</h3>
+<select id="selTC"></select>
+<div id="listC" style="margin-top:8px"></div>
+<div id="boxCor" class="hidden" style="border-top:3px solid #174a73;margin-top:10px;padding-top:10px">
 <h3 id="titC"></h3>
 <input id="foto" type="file" accept="image/*" capture="environment">
 <canvas id="can"></canvas>
 <div id="msgAuto" style="background:#e8f5ff;padding:8px;border-radius:6px;margin-top:6px"></div>
-<div id="boxR" class="gab"></div>
-<button class="btn g hidden" id="btnConf" onclick="conf()" style="width:100%;margin-top:8px;font-size:18px">✅ CONFIRMAR AUTO E DEIXAR VERDE</button>
+<div id="boxR" class="gab" style="margin-top:8px"></div>
+<button class="btn g hidden" id="btnConf" style="width:100%;font-size:18px;margin-top:8px">✅ SALVAR E DEIXAR VERDE</button>
+<button class="btn gr" id="btnFecha">Fechar</button>
 </div>
 </div>
 
-<div id="print">
-<div style="border:5px solid #000;padding:8px;color:#000;font-family:Arial">
-<div style="display:flex;justify-content:space-between"><div style="width:28px;height:28px;background:#000"></div><div style="width:28px;height:28px;background:#000"></div></div>
-<h2 style="text-align:center;margin:4px 0">FOLHA v5 - <span id="pNome"></span></h2>
+<div id="print"><div style="border:5px solid #000;padding:8px;color:#000;font-family:Arial">
+<div style="display:flex;justify-content:space-between"><div style="width:30px;height:30px;background:#000"></div><div style="width:30px;height:30px;background:#000"></div></div>
+<h2 style="text-align:center;margin:4px 0" id="pNome"></h2>
 <div id="pGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:4px"></div>
-<div style="display:flex;justify-content:space-between;margin-top:8px"><div style="width:28px;height:28px;background:#000"></div><div style="width:28px;height:28px;background:#000"></div></div>
-</div>
-</div>
+<div style="display:flex;justify-content:space-between;margin-top:8px"><div style="width:30px;height:30px;background:#000"></div><div style="width:30px;height:30px;background:#000"></div></div>
+</div></div>
 </main>
-<script>
-let turmas=JSON.parse(localStorage.getItem('t5')||'[]'), alunos=JSON.parse(localStorage.getItem('a5')||'[]'), gab=JSON.parse(localStorage.getItem('g5')||'[]'), notas=JSON.parse(localStorage.getItem('n5')||'[]'), cfg=JSON.parse(localStorage.getItem('c5')||'{"qtd":20,"alt":5,"nome":"Prova 1"}');
-let atual=null, leituraAuto=[];
-const $=id=>document.getElementById(id), L=['A','B','C','D','E'];
-function go(id,b){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));$(id).classList.add('active');document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));b.classList.add('active'); upd();}
-function save(){localStorage.setItem('t5',JSON.stringify(turmas));localStorage.setItem('a5',JSON.stringify(alunos));localStorage.setItem('g5',JSON.stringify(gab));localStorage.setItem('n5',JSON.stringify(notas));localStorage.setItem('c5',JSON.stringify(cfg));}
-function addT(){let n=$('inT').value.trim();if(!n)return;turmas.push({id:Date.now(),nome:n});$('inT').value='';save();upd();}
-function addA(){let n=$('inA').value.trim(),tid=+$('selTA').value;if(!n||!tid)return;alunos.push({id:Date.now(),nome:n,tid});$('inA').value='';save();upd();}
-function addLote(){let t=prompt('Cole nomes 1 por linha');if(!t)return;let tid=+$('selTA').value;if(!tid)return;t.split('\n').forEach(x=>{x=x.trim();if(x)alunos.push({id:Date.now()+Math.random(),nome:x,tid})});save();upd();}
-function upd(){
- $('listT').innerHTML=turmas.map(t=>`<div class="item"><span>${t.nome} (${alunos.filter(a=>a.tid==t.id).length})</span><button class="btn r" onclick="delT(${t.id})">X</button></div>`).join('');
- let sel=turmas.map(t=>`<option value="${t.id}">${t.nome}</option>`).join('');$('selTA').innerHTML=sel;$('selTC').innerHTML=sel;
- $('listA').innerHTML=alunos.map(a=>{let tt=turmas.find(x=>x.id==a.tid);return `<div class="item"><span>${a.nome} - ${tt?tt.nome:''}</span><button class="btn r" onclick="delA(${a.id})">X</button></div>`).join('');
- buildG(); renderC(); $('msgG').textContent=gab.length? 'Gabarito: '+gab.join(' '):'SEM GABARITO';
-}
-function delT(id){turmas=turmas.filter(t=>t.id!=id);alunos=alunos.filter(a=>a.tid!=id);save();upd();}
-function delA(id){alunos=alunos.filter(a=>a.id!=id);notas=notas.filter(n=>n.aid!=id);save();upd();}
-function buildG(){let q=+$('qtd').value||20, al=+$('alt').value; $('boxG').innerHTML=''; for(let i=0;i<q;i++){let v=gab[i]||'';$('boxG').innerHTML+=`<div class="q"><b>${i+1}</b><select id="g${i}"><option value="">-</option>${L.slice(0,al).map(l=>`<option ${l==v?'selected':''}>${l}</option>`).join('')}</select></div>`}}
-function saveG(){let q=+$('qtd').value, al=+$('alt').value; let g=[]; for(let i=0;i<q;i++){let v=$('g'+i).value; if(!v)return alert('Falta Q'+(i+1)); g.push(v);} gab=g; cfg={qtd:q,alt:al,nome:$('nomeP').value}; save(); $('msgG').textContent='✅ SALVO '+gab.join(' '); alert('Gabarito salvo! Agora imprima a folha oficial');}
-function imp(){if(!gab.length)return alert('Salve gabarito'); $('pNome').textContent=cfg.nome; $('pGrid').innerHTML=''; for(let i=0;i<cfg.qtd;i++){let bubs=L.slice(0,cfg.alt).map(l=>`<span style="display:inline-flex;align-items:center;gap:2px"><span style="width:18px;height:18px;border:2.5px solid #000;border-radius:50%;display:inline-flex;justify-content:center;align-items:center;font-size:9px;font-weight:bold">${l}</span></span>`).join(' '); $('pGrid').innerHTML+=`<div style="border:1.5px solid #000;padding:6px;display:flex;justify-content:space-between"><b>${i+1}</b><span>${bubs}</span></div>`} window.print();}
-function renderC(){let tid=+$('selTC').value; if(!tid){$('listC').innerHTML='Escolha turma';return} let lista=alunos.filter(a=>a.tid==tid); $('listC').innerHTML=lista.map(a=>{let n=notas.find(x=>x.aid==a.id); let ok=!!n; return `<div class="item ${ok?'ok':''}"><span><b>${a.nome}</b> ${ok?` <span class="badge ok">VERDE ${n.ac}/${cfg.qtd} Nota ${n.nota.toFixed(1)}</span>`:''}</span><button class="btn ${ok?'':'g'}" onclick="abrir(${a.id})">${ok?'Recorrigir':'Ler AUTO'}</button></div>`}).join('');}
-function abrir(id){if(!gab.length)return alert('Salve gabarito em 3'); atual=alunos.find(a=>a.id==id); $('boxCor').classList.remove('hidden'); $('titC').textContent='Lendo: '+atual.nome; $('boxR').innerHTML=''; $('msgAuto').textContent='Tire a foto agora pegando os 4 quadrados pretos';}
-$('foto').addEventListener('change',e=>{let f=e.target.files[0]; if(!f)return; let img=new Image(); img.onload=()=>runAuto(img); img.src=URL.createObjectURL(f);});
 
+<script>
+// DADOS
+let turmas=JSON.parse(localStorage.getItem('t6')||'[]'), alunos=JSON.parse(localStorage.getItem('a6')||'[]'), gab=JSON.parse(localStorage.getItem('g6')||'[]'), notas=JSON.parse(localStorage.getItem('n6')||'[]'), cfg=JSON.parse(localStorage.getItem('c6')||'{"qtd":20,"alt":5,"nome":"Prova 1"}');
+let atual=null; const L=['A','B','C','D','E'];
+const $=id=>document.getElementById(id);
+function save(){localStorage.setItem('t6',JSON.stringify(turmas));localStorage.setItem('a6',JSON.stringify(alunos));localStorage.setItem('g6',JSON.stringify(gab));localStorage.setItem('n6',JSON.stringify(notas));localStorage.setItem('c6',JSON.stringify(cfg));}
+
+// ABAS
+function go(id){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));$(id).classList.add('active');document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('active'));$('bt_'+id).classList.add('active');}
+$('bt_t').onclick=()=>go('t'); $('bt_a').onclick=()=>go('a'); $('bt_g').onclick=()=>go('g'); $('bt_c').onclick=()=>go('c');
+
+// TURMAS
+function renderAll(){
+ $('listT').innerHTML=turmas.map(t=>`<div class="item"><span>${t.nome} (${alunos.filter(a=>a.tid==t.id).length} alunos)</span><button class="btn r" data-del-t="${t.id}">X</button></div>`).join('') || 'Nenhuma turma';
+ let sel=turmas.map(t=>`<option value="${t.id}">${t.nome}</option>`).join(''); $('selTA').innerHTML=sel; $('selTC').innerHTML=sel;
+ $('listA').innerHTML=alunos.map(a=>{let tt=turmas.find(x=>x.id==a.tid);return `<div class="item"><span>${a.nome} - ${tt?tt.nome:''}</span><button class="btn r" data-del-a="${a.id}">X</button></div>`}).join('') || 'Nenhum aluno';
+ buildG(); renderC();
+ $('msgG').textContent=gab.length? 'Salvo: '+gab.join(' '):'SEM GABARITO SALVO';
+ // liga botoes de excluir
+ document.querySelectorAll('[data-del-t]').forEach(b=>b.onclick=()=>{let id=+b.getAttribute('data-del-t'); if(!confirm('Apagar turma?'))return; turmas=turmas.filter(t=>t.id!=id); alunos=alunos.filter(a=>a.tid!=id); save(); renderAll();});
+ document.querySelectorAll('[data-del-a]').forEach(b=>b.onclick=()=>{let id=+b.getAttribute('data-del-a'); alunos=alunos.filter(a=>a.id!=id); notas=notas.filter(n=>n.aid!=id); save(); renderAll();});
+}
+$('btnAddT').onclick=()=>{let n=$('inT').value.trim(); if(!n)return alert('Digite nome'); turmas.push({id:Date.now(),nome:n}); $('inT').value=''; save(); renderAll();};
+$('btnAddA').onclick=()=>{let n=$('inA').value.trim(), tid=+$('selTA').value; if(!n||!tid)return alert('Escolha turma e nome'); alunos.push({id:Date.now(),nome:n,tid}); $('inA').value=''; save(); renderAll();};
+$('btnLote').onclick=()=>{let t=prompt('Cole nomes, 1 por linha'); if(!t)return; let tid=+$('selTA').value; if(!tid)return alert('Escolha turma'); t.split('\n').forEach(x=>{x=x.trim();if(x)alunos.push({id:Date.now()+Math.random(),nome:x,tid})}); save(); renderAll();};
+
+// GABARITO
+function buildG(){let q=+$('qtd').value||20, al=+$('alt').value; $('boxG').innerHTML=''; for(let i=0;i<q;i++){let v=gab[i]||''; $('boxG').innerHTML+=`<div class="q"><b>${i+1}</b><select id="g${i}"><option value="">-</option>${L.slice(0,al).map(l=>`<option ${l==v?'selected':''}>${l}</option>`).join('')}</select></div>`}}
+$('qtd').onchange=buildG; $('alt').onchange=buildG;
+$('btnSaveG').onclick=()=>{
+ let q=+$('qtd').value, al=+$('alt').value; let g=[];
+ for(let i=0;i<q;i++){let v=$('g'+i).value; if(!v)return alert('Falta questão '+(i+1)); g.push(v);}
+ gab=g; cfg={qtd:q,alt:al,nome:$('nomeP').value}; save(); $('msgG').textContent='✅ SALVO: '+gab.join(' '); alert('Gabarito salvo! Agora imprima a folha oficial');
+};
+$('btnPrint').onclick=()=>{
+ if(!gab.length)return alert('Salve gabarito primeiro'); $('pNome').textContent=cfg.nome; $('pGrid').innerHTML=''; for(let i=0;i<cfg.qtd;i++){let b=L.slice(0,cfg.alt).map(l=>`<span style="display:inline-flex;align-items:center"><span style="width:18px;height:18px;border:2.5px solid #000;border-radius:50%;display:inline-flex;justify-content:center;align-items:center;font-size:9px;font-weight:bold">${l}</span></span>`).join(' '); $('pGrid').innerHTML+=`<div style="border:1.5px solid #000;padding:5px;display:flex;justify-content:space-between"><b>${i+1}</b><span>${b}</span></div>`} window.print();
+};
+
+// CORRIGIR
+$('selTC').onchange=()=>renderC();
+function renderC(){
+ let tid=+$('selTC').value; if(!tid){$('listC').innerHTML='Escolha turma acima';return}
+ let lista=alunos.filter(a=>a.tid==tid);
+ $('listC').innerHTML=lista.map(a=>{let n=notas.find(x=>x.aid==a.id); let ok=!!n; return `<div class="item ${ok?'ok':''}"><span><b>${a.nome}</b> ${ok?` - <b style="color:green">VERDE ${n.ac}/${cfg.qtd} Nota ${n.nota.toFixed(1)}</b>`:''}</span><button class="btn ${ok?'o':'g'}" data-cor="${a.id}">${ok?'Recorrigir AUTO':'Ler AUTO'}</button></div>`}).join('') || 'Sem alunos nesta turma';
+ document.querySelectorAll('[data-cor]').forEach(b=>b.onclick=()=>abrir(+b.getAttribute('data-cor')));
+}
+function abrir(id){
+ if(!gab.length)return alert('Salve gabarito em 3.Gabarito');
+ atual=alunos.find(a=>a.id==id);
+ $('boxCor').classList.remove('hidden');
+ $('titC').textContent='Aluno: '+atual.nome+' - Tire foto da folha oficial v6';
+ $('boxR').innerHTML='';
+ $('msgAuto').textContent='Aguardando foto... tem que pegar os 4 quadrados pretos';
+ window.scrollTo(0,$('boxCor').offsetTop);
+}
+$('btnFecha').onclick=()=>{$('boxCor').classList.add('hidden'); atual=null;}
+
+// LEITURA AUTOMATICA - 4 CANTOS
+$('foto').addEventListener('change',e=>{
+ let f=e.target.files[0]; if(!f)return;
+ let img=new Image(); img.onload=()=>runAuto(img); img.src=URL.createObjectURL(f);
+});
 function runAuto(img){
  let can=$('can'), ctx=can.getContext('2d',{willReadFrequently:true});
  let maxW=1200, sc=Math.min(1,maxW/img.width); can.width=img.width*sc; can.height=img.height*sc; ctx.drawImage(img,0,0,can.width,can.height);
- let w=can.width,h=can.height, data=ctx.getImageData(0,0,w,h).data;
- function gray(x,y){let i=(y*w+x)*4; return (data[i]+data[i+1]+data[i+2])/3}
- // 1. Acha folha pelos 4 quadrados pretos
- let pts=[]; // procura cantos
- function findDarkIn(x0,y0,x1,y1){
-   let best=null, bestD=999;
-   for(let y=y0;y<y1;y+=3)for(let x=x0;x<x1;x+=3){
-     let d=gray(x,y); if(d<60){ // bem preto
-       if(d<bestD){bestD=d; best={x,y}}
-     }
-   }
-   return best;
- }
- let topLeft=findDarkIn(0,0,w*0.25,h*0.25);
- let topRight=findDarkIn(w*0.75,0,w-1,h*0.25);
- let bottomLeft=findDarkIn(0,h*0.75,w*0.25,h-1);
- let bottomRight=findDarkIn(w*0.75,h*0.75,w-1,h-1);
- if(!topLeft||!topRight||!bottomLeft||!bottomRight){
-   $('msgAuto').innerHTML='<b style="color:red">Não achei os 4 quadrados pretos. Tira a foto mais de cima, com mais luz, pegando a folha toda.</b>';
-   return;
- }
- // desenha
- [topLeft,topRight,bottomLeft,bottomRight].forEach(p=>{ctx.fillStyle='#00ff00';ctx.fillRect(p.x-5,p.y-5,10,10);});
-
- let left=Math.min(topLeft.x,bottomLeft.x), right=Math.max(topRight.x,bottomRight.x), top=Math.min(topLeft.y,topRight.y), bottom=Math.max(bottomLeft.y,bottomRight.y);
+ let w=can.width,h=can.height, d=ctx.getImageData(0,0,w,h).data;
+ function gray(x,y){let i=(y*w+x)*4; return (d[i]+d[i+1]+d[i+2])/3}
+ function findDark(x0,y0,x1,y1){let best=null, bestD=1000; for(let y=y0;y<y1;y+=4)for(let x=x0;x<x1;x+=4){let g=gray(x,y); if(g<70 && g<bestD){bestD=g; best={x,y}}} return best;}
+ let tl=findDark(0,0,w*0.28,h*0.28), tr=findDark(w*0.72,0,w,h*0.28), bl=findDark(0,h*0.72,w*0.28,h), br=findDark(w*0.72,h*0.72,w,h);
+ if(!tl||!tr||!bl||!br){$('msgAuto').innerHTML='<b style="color:red">Não achei os 4 quadrados. Tira mais longe, com luz, folha toda visível.</b>'; return;}
+ let left=Math.min(tl.x,bl.x), right=Math.max(tr.x,br.x), top=Math.min(tl.y,tr.y), bottom=Math.max(bl.y,br.y);
  let bw=right-left, bh=bottom-top;
-
- leituraAuto=[];
+ let leitura=[];
  $('boxR').innerHTML='';
  for(let i=0;i<cfg.qtd;i++){
    let col=i%2, row=Math.floor(i/2), rows=Math.ceil(cfg.qtd/2);
-   // mesma matemática da impressão: 2 colunas
-   let cellW=bw/2, cellH=bh/rows*0.85;
-   let baseX=left+col*cellW+cellW*0.08;
-   let baseY=top+bh*0.12+row*(bh*0.78/rows)+cellH*0.5;
+   let cellW=bw/2, cellH=bh*0.78/rows;
+   let baseY=top+bh*0.12+row*(bh*0.78/rows)+cellH*0.55;
+   let baseX=left+col*cellW;
    let scores=[];
    for(let a=0;a<cfg.alt;a++){
-     let cx=baseX+18+a*32*(w/1000), cy=baseY;
-     // ajusta proporcional
-     cx=baseX+cellW*0.25+a*cellW*0.14;
-     let r=Math.max(8,Math.floor(w*0.018));
-     let sum=0,cnt=0;
+     let cx=baseX+cellW*0.30+a*cellW*0.13, cy=baseY;
+     let r=Math.max(7,Math.floor(w*0.016)), sum=0,cnt=0;
      for(let yy=-r;yy<=r;yy++)for(let xx=-r;xx<=r;xx++)if(xx*xx+yy*yy<=r*r){
        let X=Math.min(w-1,Math.max(0,Math.round(cx+xx))), Y=Math.min(h-1,Math.max(0,Math.round(cy+yy)));
        sum+=255-gray(X,Y); cnt++;
      }
      scores.push(sum/cnt);
-     // desenha busca
-     ctx.strokeStyle='yellow'; ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.stroke();
    }
    let best=Math.max(...scores), idx=scores.indexOf(best);
-   // se for bem marcado, best > 50
-   let letra=best>40?L[idx]:'';
-   leituraAuto.push(letra);
-   // destaca escolhido
-   let cxSel=baseX+cellW*0.25+idx*cellW*0.14, cySel=baseY;
-   ctx.strokeStyle=letra?'#00ff00':'#ff0000'; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(cxSel,cySel,12,0,Math.PI*2); ctx.stroke();
+   let letra=best>35?L[idx]:'';
+   leitura.push(letra);
    $('boxR').innerHTML+=`<div class="q"><b>${i+1}</b><select id="r${i}"><option value="">?</option>${L.slice(0,cfg.alt).map(l=>`<option ${l==letra?'selected':''}>${l}</option>`).join('')}</select><div style="font-size:10px">auto:${letra||'?'} gab:${gab[i]}</div></div>`;
  }
- $('msgAuto').innerHTML=`<b>Leitura automática feita: ${leituraAuto.filter(x=>x).length}/${cfg.qtd} detectadas</b><br>Verde = detectado, Vermelho = não achou. Confira e corrija antes de salvar.`;
+ $('msgAuto').innerHTML=`<b style="color:green">Leitura OK: ${leitura.filter(x=>x).length}/${cfg.qtd} lidas. Confira abaixo antes de salvar.</b>`;
  $('btnConf').classList.remove('hidden');
+ window.leituraTemp=leitura;
 }
-function conf(){
- let resp=[]; for(let i=0;i<cfg.qtd;i++){let v=$('r'+i).value; if(!v){if(!confirm('Q'+(i+1)+' vazia, salvar assim mesmo?'))return; } resp.push(v);}
- let ac=0; resp.forEach((x,i)=>{if(x==gab[i])ac++;}); let nota=ac/cfg.qtd*10;
- let idx=notas.findIndex(x=>x.aid==atual.id); let obj={aid:atual.id,tid:atual.tid,ac,nota,resp}; if(idx>=0)notas[idx]=obj; else notas.push(obj);
- save(); renderC(); $('boxCor').classList.add('hidden'); alert('Salvo! '+atual.nome+' ficou VERDE');
-}
-window.onload=()=>{upd(); if(cfg.qtd){$('qtd').value=cfg.qtd;$('alt').value=cfg.alt;$('nomeP').value=cfg.nome;}}
+
+$('btnConf').onclick=()=>{
+ let resp=[]; for(let i=0;i<cfg.qtd;i++){let v=$('r'+i).value; if(!v)v=''; resp.push(v);}
+ let ac=0; resp.forEach((x,i)=>{if(x==gab[i])ac++;});
+ let nota=ac/cfg.qtd*10;
+ let idx=notas.findIndex(x=>x.aid==atual.id);
+ let obj={aid:atual.id,tid:atual.tid,ac,nota,resp};
+ if(idx>=0)notas[idx]=obj; else notas.push(obj);
+ save(); renderAll(); $('boxCor').classList.add('hidden'); alert('Salvo! '+atual.nome+' ficou VERDE');
+};
+
+// INIT
+window.onload=()=>{if(cfg.qtd){$('qtd').value=cfg.qtd;$('alt').value=cfg.alt;$('nomeP').value=cfg.nome;} renderAll();}
 </script>
 </body>
 </html>
