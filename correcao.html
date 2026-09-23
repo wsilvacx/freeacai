@@ -2,137 +2,157 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Correção v3.1 - Fix Gabarito</title>
+<title>v8 - DEBUG</title>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#f3f5f7;font-family:Arial}header{background:#174a73;color:#fff;padding:16px;text-align:center}
-main{max-width:1100px;margin:auto;padding:12px}.card{background:#fff;border-radius:12px;padding:16px;margin:10px 0;box-shadow:0 2px 8px #0001}
-.tabs{display:flex;gap:5px;overflow:auto}.tabs button{background:#68737d;color:#fff;border:0;padding:10px 14px;border-radius:8px;font-weight:bold;cursor:pointer}.tabs button.active{background:#0b7a53}
-.panel{display:none}.panel.active{display:block}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px}input,select{width:100%;padding:9px;border:1px solid #bbb;border-radius:7px;margin-top:4px}
-button.green{background:#16834b;color:#fff;border:0;padding:10px 14px;border-radius:8px;font-weight:bold;cursor:pointer}button.red{background:#b93838;color:#fff;border:0;padding:8px 12px;border-radius:7px;cursor:pointer}button.gray{background:#68737d;color:#fff;border:0;padding:10px 14px;border-radius:8px;cursor:pointer}button.orange{background:#c77a0a;color:#fff;border:0;padding:10px 14px;border-radius:8px;cursor:pointer}
-table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:7px;border-bottom:1px solid #ddd;text-align:center}th{background:#eef2f5}
-.aluno-card{display:flex;justify-content:space-between;align-items:center;padding:10px;border:1px solid #ddd;border-radius:8px;margin:5px 0}.aluno-card.done{background:#d8f5e2;border-color:#27a65a}
-.badge{padding:2px 8px;border-radius:10px;font-size:11px;font-weight:bold}.ok{background:#d1f5df;color:#0a5}.pend{background:#ffe6c1;color:#8a4a00}
-.gab{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:6px}.q{background:#fafafa;border:1px solid #ddd;border-radius:8px;padding:6px;text-align:center}
-#scanCanvas{max-width:100%;border:2px dashed #888;border-radius:8px;margin-top:8px}.hidden{display:none!important}
-#printArea{display:none}
-@media print{#printArea{display:block!important}header,.tabs,main>.card:not(#printArea){display:none!important}}
+body{margin:0;background:#f2f4f7;font-family:Arial}header{background:#174a73;color:#fff;padding:12px;text-align:center}
+main{max-width:800px;margin:auto;padding:8px}.card{background:#fff;padding:12px;border-radius:10px;margin:8px 0;box-shadow:0 2px 6px #0002}
+button{padding:12px 16px;border:0;border-radius:8px;font-weight:bold;color:#fff;cursor:pointer;margin:4px 0;width:100%;font-size:16px}.g{background:#16834b}.gr{background:#666}.b{background:#174a73}.r{background:#b33}
+input,select{width:100%;padding:10px;border:1px solid #aaa;border-radius:6px;margin:4px 0}
+#log{background:#000;color:#0f0;padding:8px;border-radius:6px;font-size:12px;white-space:pre-wrap;max-height:200px;overflow:auto}
+#camBox{position:relative;background:#000;border-radius:10px;overflow:hidden;max-width:500px;margin:10px auto}
+#video{width:100%}#overlay{position:absolute;inset:0;pointer-events:none}
+.guide{position:absolute;left:5%;top:5%;width:90%;height:90%;border:3px dashed #00ff00;border-radius:12px;box-shadow:0 0 0 1000px rgba(0,0,0,.6)}
+.corner{position:absolute;width:32px;height:32px;border:5px solid #00ff00}
+.tl{top:-3px;left:-3px;border-right:0;border-bottom:0}.tr{top:-3px;right:-3px;border-left:0;border-bottom:0}.bl{bottom:-3px;left:-3px;border-right:0;border-top:0}.br{bottom:-3px;right:-3px;border-left:0;border-top:0}
+#can{max-width:100%;border:2px solid #000;margin-top:8px}
+.item{display:flex;justify-content:space-between;padding:8px;border:1px solid #ddd;border-radius:8px;margin:4px 0}.item.ok{background:#d6f5de}
+.hidden{display:none!important}
 </style>
 </head>
 <body>
-<header><h1>📝 Correção v3.1 - TURMAS + LEITURA FIX</h1></header>
+<header><h1>v8 - COM GUIA + DEBUG</h1><p id="statusTop">Carregando...</p></header>
 <main>
-<div class="tabs">
-<button class="active" onclick="tab('turmas',this)">1.Turmas</button>
-<button onclick="tab('alunos',this)">2.Alunos</button>
-<button onclick="tab('prova',this)">3.Gabarito</button>
-<button onclick="tab('corrigir',this)">4.Corrigir</button>
-<button onclick="tab('rel',this)">5.Relatório</button>
+<div class="card">
+<h3>LOG DE ERRO (me manda foto disso se der erro)</h3>
+<div id="log">Iniciando...\n</div>
+<button class="b" onclick="testarBotoes()">🔧 TESTAR BOTÕES - CLIQUE AQUI PRIMEIRO</button>
 </div>
 
-<section id="turmas" class="panel active card">
-<h2>1. Turmas</h2>
-<input id="turmaNome" placeholder="Ex: 6º A"><button class="green" onclick="addTurma()">Adicionar</button>
-<table id="tabTurmas"><thead><tr><th>Turma</th><th>Qtd</th><th></th></tr></thead><tbody></tbody></table>
-</section>
-
-<section id="alunos" class="panel card">
-<h2>2. Alunos</h2>
-<div class="grid"><label>Turma<select id="selTurmaAluno"></select></label><label>Aluno<input id="nomeAluno" placeholder="Nome completo"></label></div>
-<button class="green" onclick="addAluno()">Adicionar</button><button class="gray" onclick="addLote()">Colar lista (um por linha)</button>
-<table id="tabAlunos"><thead><tr><th>Aluno</th><th>Turma</th><th>Status</th><th></th></tr></thead><tbody></tbody></table>
-</section>
-
-<section id="prova" class="panel card">
-<h2>3. Gabarito - ISSO PRECISA SALVAR ANTES DE LER</h2>
-<div class="grid">
-<label>Prova<input id="nomeProva" value="Avaliação"></label><label>Qtd questões<input id="nQ" type="number" value="20" onchange="buildGab()"></label>
-<label>Alternativas<select id="alts" onchange="buildGab()"><option value="4">A-D</option><option value="5" selected>A-E</option></select></label><label>Valor<input id="valor" type="number" value="10"></label>
+<div class="card">
+<h3>1. Turma (obrigatório)</h3>
+<input id="inT" placeholder="Ex: 6A"><button class="g" id="btnT">Adicionar Turma</button><div id="listT"></div>
 </div>
-<div id="areaGab" class="gab" style="margin-top:10px"></div>
-<button class="green" onclick="saveGab()">💾 SALVAR GABARITO</button><span id="statusGab" style="margin-left:10px;font-weight:bold;color:#16834b"></span>
-<hr>
-<button class="gray" onclick="imprimirFolha()">🖨️ IMPRIMIR FOLHA PADRÃO (use esta para foto funcionar)</button>
-</section>
 
-<section id="corrigir" class="panel card">
-<h2>4. Corrigir por Turma</h2>
-<label>Escolha a turma<select id="selTurmaCorr" onchange="renderCorr()"></select></label>
-<div id="listaCorr" style="margin-top:10px"></div>
-<div id="boxScan" class="hidden" style="margin-top:15px;border-top:3px solid #174a73;padding-top:10px">
-<h3 id="tituloScan"></h3>
-<p style="font-size:13px">1. Tire foto da folha INTEIRA com os 4 cantos pretos aparecendo. 2. Confira abaixo.</p>
-<input id="foto" type="file" accept="image/*" capture="environment">
-<canvas id="scanCanvas"></canvas>
-<div id="infoScan" style="background:#edf7ff;padding:10px;border-radius:8px;margin-top:8px"></div>
-<div id="editScan" class="gab" style="margin-top:8px"></div>
-<button id="btnConf" class="green hidden" onclick="confirmar()">✅ CONFIRMAR - DEIXAR VERDE</button><button class="gray" onclick="cancelScan()">Cancelar</button>
+<div class="card">
+<h3>2. Gabarito</h3>
+<div style="display:flex;gap:6px"><input id="qtd" type="number" value="10" style="width:80px"><select id="alt" style="width:80px"><option value="4">A-D</option><option value="5" selected>A-E</option></select></div>
+<div id="boxG" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:4px;margin-top:8px"></div>
+<button class="g" id="btnG">💾 SALVAR GABARITO</button><div id="msgG"></div>
 </div>
-</section>
 
-<section id="rel" class="panel card">
-<h2>5. Relatório</h2><select id="selRel" onchange="renderRel()"><option value="">Todas turmas</option></select>
-<table id="tabRel"><thead><tr><th>Turma</th><th>Aluno</th><th>Acertos</th><th>Nota</th><th></th></tr></thead><tbody></tbody></table>
-</section>
+<div class="card">
+<h3>3. Aluno (para testar)</h3>
+<select id="selT"></select><input id="inA" placeholder="Nome aluno teste"><button class="g" id="btnA">Adicionar Aluno</button><div id="listA"></div>
+</div>
 
-<div id="printArea">
-<div style="border:4px solid #000;padding:10px;font-family:Arial;color:#000">
-<div style="display:flex;justify-content:space-between"><div style="width:20px;height:20px;background:#000"></div><div style="width:20px;height:20px;background:#000"></div></div>
-<h2 style="text-align:center;margin:5px 0">FOLHA DE RESPOSTAS - <span id="pProva"></span></h2>
-<div style="font-size:12px">Nome: ________________________________ Turma: <span id="pTurma"></span> Data: ___/___/___</div>
-<div id="pQuestoes" style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:8px"></div>
-<div style="display:flex;justify-content:space-between;margin-top:10px"><div style="width:20px;height:20px;background:#000"></div><div style="width:20px;height:20px;background:#000"></div></div>
-<div style="text-align:center;font-size:10px;margin-top:5px">PREENCHA TOTALMENTE A BOLINHA COM CANETA PRETA</div>
+<div class="card">
+<h3>4. Corrigir com GUIA</h3>
+<select id="selTC"></select><div id="listC"></div>
+<div id="boxCor" class="hidden">
+<h4 id="titC"></h4>
+<div id="camBox" class="hidden">
+<video id="video" autoplay playsinline></video>
+<div id="overlay"><div class="guide"><div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div><div style="position:absolute;top:50%;left:0;width:100%;text-align:center;color:#0f0;background:rgba(0,0,0,.5);font-weight:bold">ALINHE OS 4 QUADRADOS PRETOS AQUI</div></div></div>
+</div>
+<button class="b" id="btnCam">📷 ABRIR CÂMERA COM GUIA</button>
+<button class="g hidden" id="btnCap" style="background:#0a5;font-size:20px">📸 CAPTURAR FOLHA</button>
+<p style="text-align:center">ou</p>
+<input id="foto" type="file" accept="image/*">
+<canvas id="can"></canvas>
+<div id="msgAuto"></div>
+<div id="boxR" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:4px"></div>
+<button class="g hidden" id="btnConf">✅ SALVAR E FICAR VERDE</button>
 </div>
 </div>
+
+<div id="print" style="display:none"><div style="border:6px solid #000;padding:10px"><div style="display:flex;justify-content:space-between"><div style="width:40px;height:40px;background:#000"></div><div style="width:40px;height:40px;background:#000"></div></div><h2 id="pNome" style="text-align:center"></h2><div id="pGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:4px"></div><div style="display:flex;justify-content:space-between;margin-top:8px"><div style="width:40px;height:40px;background:#000"></div><div style="width:40px;height:40px;background:#000"></div></div></div></div>
 </main>
+
 <script>
-let turmas=JSON.parse(localStorage.getItem('v31_t')||'[]'), alunos=JSON.parse(localStorage.getItem('v31_a')||'[]'), gab=JSON.parse(localStorage.getItem('v31_g')||'[]'), res=JSON.parse(localStorage.getItem('v31_r')||'[]'), cfg=JSON.parse(localStorage.getItem('v31_c')||'{}');
-let alunoAtivo=null, leitura=[];
-const $=id=>document.getElementById(id), L=['A','B','C','D','E'];
-function tab(id,b){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));$(id).classList.add('active');document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));b.classList.add('active'); if(id=='turmas')rt(); if(id=='alunos')ra(); if(id=='corrigir')renderCorr(); if(id=='rel')renderRel();}
-function save(){localStorage.setItem('v31_t',JSON.stringify(turmas));localStorage.setItem('v31_a',JSON.stringify(alunos));localStorage.setItem('v31_g',JSON.stringify(gab));localStorage.setItem('v31_r',JSON.stringify(res));localStorage.setItem('v31_c',JSON.stringify(cfg));}
-function addTurma(){let n=$('turmaNome').value.trim();if(!n)return;turmas.push({id:Date.now(),nome:n});$('turmaNome').value='';save();rt();rsel();}
-function rt(){let tb=$('tabTurmas').querySelector('tbody');tb.innerHTML='';turmas.forEach(t=>{let q=alunos.filter(a=>a.tId==t.id).length;tb.innerHTML+=`<tr><td>${t.nome}</td><td>${q}</td><td><button class="red" onclick="delT(${t.id})">X</button></td></tr>`});}
-function delT(id){if(!confirm('Apagar?'))return;turmas=turmas.filter(t=>t.id!=id);alunos=alunos.filter(a=>a.tId!=id);save();rt();ra();rsel();}
-function addAluno(){let n=$('nomeAluno').value.trim(), tid=+$('selTurmaAluno').value;if(!n||!tid)return alert('Selecione turma');alunos.push({id:Date.now(),nome:n,tId:tid});$('nomeAluno').value='';save();ra();rt();}
-function addLote(){let txt=prompt('Cole nomes, um por linha');if(!txt)return;let tid=+$('selTurmaAluno').value;if(!tid)return alert('Selecione turma');txt.split('\n').forEach(s=>{s=s.trim();if(s)alunos.push({id:Date.now()+Math.random(),nome:s,tId:tid})});save();ra();rt();}
-function ra(){let tb=$('tabAlunos').querySelector('tbody');tb.innerHTML='';alunos.forEach(a=>{let t=turmas.find(x=>x.id==a.tId);let ok=res.some(r=>r.aId==a.id);tb.innerHTML+=`<tr><td style="text-align:left">${a.nome}</td><td>${t?t.nome:''}</td><td><span class="badge ${ok?'ok':'pend'}">${ok?'CORRIGIDO':''}</span></td><td><button class="red" onclick="delA(${a.id})">X</button></td></tr>`});}
-function delA(id){alunos=alunos.filter(a=>a.id!=id);res=res.filter(r=>r.aId!=id);save();ra();rt();renderCorr();}
-function rsel(){let h=turmas.map(t=>`<option value="${t.id}">${t.nome}</option>`).join('');$('selTurmaAluno').innerHTML=h;$('selTurmaCorr').innerHTML=h;$('selRel').innerHTML='<option value="">Todas</option>'+h;}
-function buildGab(){let n=+$('nQ').value||20, al=+$('alts').value; $('areaGab').innerHTML='';for(let i=0;i<n;i++){let v=gab[i]||'';$('areaGab').innerHTML+=`<div class="q"><b>${i+1}</b><select class="gSel" data-i="${i}"><option value="">-</option>${L.slice(0,al).map(l=>`<option ${l==v?'selected':''}>${l}</option>`).join('')}</select></div>`}}
-function saveGab(){cfg={nome:$('nomeProva').value,n: +$('nQ').value, alts:+$('alts').value, valor:+$('valor').value||10};gab=[...document.querySelectorAll('.gSel')].map(s=>s.value);if(gab.some(v=>!v))return alert('Preencha TODAS as questões do gabarito, não pode deixar em branco');save();$('statusGab').textContent='GABARITO SALVO! '+gab.join(' ');alert('Gabarito salvo com sucesso! Agora você pode ir em 4.Corrigir');}
-function imprimirFolha(){if(!gab.length)return alert('Salve o gabarito primeiro!');$('pProva').textContent=cfg.nome;$('pTurma').textContent='';$('pQuestoes').innerHTML='';for(let i=0;i<cfg.n;i++){let b=L.slice(0,cfg.alts).map(l=>`<span style="display:inline-flex;gap:2px;align-items:center"><span style="width:16px;height:16px;border:2px solid #000;border-radius:50%;display:inline-flex;justify-content:center;align-items:center;font-size:9px">${l}</span></span>`).join(' ');$('pQuestoes').innerHTML+=`<div style="border:1px solid #000;padding:5px;display:flex;justify-content:space-between;font-size:12px"><b>${i+1}</b><span>${b}</span></div>`}window.print();}
-function renderCorr(){let tid=+$('selTurmaCorr').value;if(!tid){$('listaCorr').innerHTML='Selecione a turma acima';return}let lista=alunos.filter(a=>a.tId==tid);if(!lista.length){$('listaCorr').innerHTML='Nenhum aluno nesta turma. Cadastre em 2.Alunos';return}let h=`<b>${lista.length} alunos - ${turmas.find(t=>t.id==tid).nome}</b>`;lista.forEach(a=>{let r=res.find(x=>x.aId==a.id);let ok=!!r;h+=`<div class="aluno-card ${ok?'done':''}"><div><b>${a.nome}</b> ${ok?`<span class="badge ok">VERDE ${r.ac}/${cfg.n} Nota ${r.nota.toFixed(1)}</span>`:'<span class="badge pend">PENDENTE</span>'}</div><div><button class="${ok?'orange':'green'}" onclick="abrirScan(${a.id})">${ok?'Recorrigir':'Corrigir 📷'}</button></div></div>`});$('listaCorr').innerHTML=h;}
-function abrirScan(id){if(!gab.length||gab.some(v=>!v))return alert('ERRO: Gabarito não salvo! Vá em 3.Gabarito e clique em SALVAR GABARITO');alunoAtivo=alunos.find(a=>a.id==id);$('boxScan').classList.remove('hidden');$('tituloScan').textContent='Aluno: '+alunoAtivo.nome;window.scrollTo(0,$('boxScan').offsetTop);}
-function cancelScan(){$('boxScan').classList.add('hidden');alunoAtivo=null;leitura=[]; $('foto').value='';}
-$('foto').addEventListener('change',e=>{let f=e.target.files[0];if(!f)return;let img=new Image();img.onload=()=>ler(img);img.src=URL.createObjectURL(f);});
-function ler(img){
- let can=$('scanCanvas'), ctx=can.getContext('2d',{willReadFrequently:true});let maxW=1000, sc=Math.min(1,maxW/img.width);can.width=img.width*sc;can.height=img.height*sc;ctx.drawImage(img,0,0,can.width,can.height);
- let w=can.width,h=can.height, d=ctx.getImageData(0,0,w,h).data; function g(x,y){let i=(y*w+x)*4;return (d[i]+d[i+1]+d[i+2])/3}
- leitura=[];
- for(let i=0;i<cfg.n;i++){
-  let col=i%2,row=Math.floor(i/2), rows=Math.ceil(cfg.n/2);
-  let baseX=col*0.5+0.10, baseY=0.18+row*(0.75/rows);
-  let scores=[];for(let a=0;a<cfg.alts;a++){let cxN=baseX+0.08+a*0.10, cyN=baseY;let cx=Math.floor(cxN*w),cy=Math.floor(cyN*h),r=Math.max(7,Math.floor(w*0.015));let s=0,c=0;for(let yy=-r;yy<=r;yy++)for(let xx=-r;xx<=r;xx++)if(xx*xx+yy*yy<=r*r){let X=Math.min(w-1,Math.max(0,cx+xx)),Y=Math.min(h-1,Math.max(0,cy+yy));s+=255-g(X,Y);c++;}scores.push(s/c);}
-  let bi=scores.indexOf(Math.max(...scores)); let best=scores[bi];
-  leitura.push(best>35?L[bi]:'');
-  ctx.lineWidth=3;ctx.strokeStyle=best>35?'#00c800':'#ff0000';ctx.beginPath();ctx.arc((baseX+0.08+bi*0.10)*w, baseY*h, 10,0,Math.PI*2);ctx.stroke();
- }
- $('infoScan').innerHTML='<b>Leitura:</b> '+leitura.map((x,i)=>`${i+1}:${x||'?'} `).join(' ')+'<br><small style="color:#666">Se aparecer? ou vermelho, é porque a bolinha está clara. Corrija manualmente abaixo.</small>';
- $('editScan').innerHTML='';leitura.forEach((v,i)=>{$('editScan').innerHTML+=`<div class="q"><b>${i+1}</b><select class="eSel"><option value="">?</option>${L.slice(0,cfg.alts).map(l=>`<option ${l==v?'selected':''}>${l}</option>`).join('')}</select></div>`});
- $('btnConf').classList.remove('hidden');
+let logEl=document.getElementById('log');
+function log(m){logEl.textContent+=m+'\n'; console.log(m);}
+window.onerror=(msg,src,line)=>{log('ERRO JS: '+msg+' linha '+line); alert('ERRO: '+msg);};
+log('JS carregou OK');
+let turmas=JSON.parse(localStorage.getItem('t8')||'[]'), alunos=JSON.parse(localStorage.getItem('a8')||'[]'), gab=JSON.parse(localStorage.getItem('g8')||'[]'), notas=JSON.parse(localStorage.getItem('n8')||'[]'), cfg={qtd:10,alt:5};
+let atual=null; const L=['A','B','C','D','E'];
+const $=id=>document.getElementById(id);
+function save(){localStorage.setItem('t8',JSON.stringify(turmas));localStorage.setItem('a8',JSON.stringify(alunos));localStorage.setItem('g8',JSON.stringify(gab));localStorage.setItem('n8',JSON.stringify(notas));}
+function testarBotoes(){log('Teste de botões OK'); alert('Botões funcionando! Se apareceu isso, o arquivo está OK. Agora cadastre turma.');}
+function render(){
+ try{
+  $('listT').innerHTML=turmas.map(t=>`<div class="item">${t.nome} <button class="r" onclick="delT(${t.id})" style="width:auto">X</button></div>`).join('')||'Nenhuma';
+  let sel=turmas.map(t=>`<option value="${t.id}">${t.nome}</option>`).join(''); $('selT').innerHTML=sel; $('selTC').innerHTML=sel;
+  $('listA').innerHTML=alunos.map(a=>`<div class="item">${a.nome}</div>`).join('');
+  buildG(); renderC(); log('Render OK turmas:'+turmas.length+' gab:'+gab.length);
+ }catch(e){log('Erro render: '+e.message);}
 }
-function confirmar(){
- let resp=[...document.querySelectorAll('.eSel')].map(s=>s.value); if(resp.some(v=>!v))if(!confirm('Tem questão em branco (?), confirmar mesmo assim?'))return;
- let ac=0;resp.forEach((x,i)=>{if(x==gab[i])ac++;});let nota=ac/gab.length*cfg.valor;
- let idx=res.findIndex(r=>r.aId==alunoAtivo.id);
- let obj={aId:alunoAtivo.id,nome:alunoAtivo.nome,tId:alunoAtivo.tId,ac,nota,resp,data:new Date().toLocaleString('pt-BR')};
- if(idx>=0)res[idx]=obj;else res.push(obj);save();renderCorr();ra();renderRel();cancelScan();alert('Salvo! '+alunoAtivo.nome+' agora está VERDE');
+window.delT=(id)=>{turmas=turmas.filter(t=>t.id!=id); save(); render();};
+function buildG(){let q=+$('qtd').value||10, al=+$('alt').value; $('boxG').innerHTML=''; for(let i=0;i<q;i++){let v=gab[i]||''; $('boxG').innerHTML+=`<div style="border:1px solid #ddd;padding:4px;text-align:center"><b>${i+1}</b><select id="g${i}"><option value="">-</option>${L.slice(0,al).map(l=>`<option ${l==v?'selected':''}>${l}</option>`).join('')}</select></div>`}}
+$('btnT').addEventListener('click',()=>{let n=$('inT').value.trim(); if(!n){log('Turma vazia'); return alert('Digite turma');} turmas.push({id:Date.now(),nome:n}); $('inT').value=''; save(); render(); log('Turma add: '+n);});
+$('btnG').addEventListener('click',()=>{let q=+$('qtd').value, al=+$('alt').value, g=[]; for(let i=0;i<q;i++){let v=$('g'+i).value; if(!v){log('Gabarito falta Q'+(i+1)); return alert('Falta Q'+(i+1));} g.push(v);} gab=g; cfg={qtd:q,alt:al}; save(); $('msgG').textContent='✅ SALVO: '+gab.join(' '); log('Gabarito salvo '+gab.join(' '));});
+$('btnA').addEventListener('click',()=>{let n=$('inA').value.trim(), tid=+$('selT').value; if(!n||!tid){log('Aluno sem turma'); return alert('Escolha turma');} alunos.push({id:Date.now(),nome:n,tid}); $('inA').value=''; save(); render(); log('Aluno add '+n);});
+function renderC(){
+ let tid=+$('selTC').value; if(!tid){$('listC').innerHTML='Escolha turma';return}
+ let lista=alunos.filter(a=>a.tid==tid);
+ $('listC').innerHTML=lista.map(a=>{let nt=notas.find(x=>x.aid==a.id); return `<div class="item ${nt?'ok':''}"><span><b>${a.nome}</b> ${nt?`VERDE ${nt.ac}/${cfg.qtd}`:''}</span><button class="g" style="width:auto" onclick="abrir(${a.id})">Corrigir</button></div>`}).join('')||'Sem alunos';
 }
-function renderRel(){let tid=$('selRel').value;let lista=tid?res.filter(r=>r.tId==tid):res;let tb=$('tabRel').querySelector('tbody');tb.innerHTML='';lista.forEach(r=>{let t=turmas.find(x=>x.id==r.tId);tb.innerHTML+=`<tr><td>${t?t.nome:''}</td><td style="text-align:left">${r.nome}</td><td>${r.ac}/${cfg.n}</td><td>${r.nota.toFixed(1)}</td><td><button class="red" onclick="delR(${r.aId})">Apagar</button></td></tr>`});}
-function delR(id){res=res.filter(r=>r.aId!=id);save();renderRel();renderCorr();ra();}
-window.onload=()=>{rsel();buildGab();rt();ra();if(cfg.nome){$('nomeProva').value=cfg.nome;$('nQ').value=cfg.n;$('alts').value=cfg.alts;$('valor').value=cfg.valor;$('statusGab').textContent=gab.length?'Gabarito carregado: '+gab.join(' '):''}renderRel();}
+$('selTC').addEventListener('change',renderC);
+window.abrir=(id)=>{if(!gab.length){log('Sem gabarito'); return alert('Salve gabarito');} atual=alunos.find(a=>a.id==id); $('boxCor').classList.remove('hidden'); $('titC').textContent='Aluno: '+atual.nome; log('Abrindo aluno '+atual.nome);};
+
+let stream=null;
+$('btnCam').addEventListener('click',async()=>{
+ try{
+  log('Tentando abrir câmera...');
+  stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{exact:'environment'}}}).catch(async()=>{log('Tentando câmera traseira genérica'); return await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});});
+  $('video').srcObject=stream;
+  $('camBox').classList.remove('hidden');
+  $('btnCam').classList.add('hidden');
+  $('btnCap').classList.remove('hidden');
+  log('Câmera aberta OK');
+  $('statusTop').textContent='Câmera aberta - alinhe os quadrados';
+ }catch(e){log('Erro câmera: '+e.message); alert('Erro câmera: '+e.message+'\nUse o botão de arquivo abaixo. Precisa abrir no Chrome, não no WhatsApp.');}
+});
+$('btnCap').addEventListener('click',()=>{
+ let v=$('video'), c=$('can'), ctx=c.getContext('2d'); c.width=v.videoWidth; c.height=v.videoHeight; ctx.drawImage(v,0,0);
+ if(stream)stream.getTracks().forEach(t=>t.stop());
+ $('camBox').classList.add('hidden'); $('btnCap').classList.add('hidden'); $('btnCam').classList.remove('hidden');
+ process(c); log('Foto capturada '+c.width+'x'+c.height);
+});
+$('foto').addEventListener('change',e=>{
+ let f=e.target.files[0]; if(!f){log('Nenhum arquivo');return;} log('Arquivo: '+f.name+' '+f.size);
+ let img=new Image(); img.onload=()=>{let c=$('can'), ctx=c.getContext('2d'); c.width=img.width; c.height=img.height; ctx.drawImage(img,0,0); process(c); log('Imagem carregada '+img.width+'x'+img.height);}; img.src=URL.createObjectURL(f);
+});
+function process(can){
+ try{
+  let ctx=can.getContext('2d',{willReadFrequently:true}), w=can.width,h=can.height, d=ctx.getImageData(0,0,w,h).data;
+  function gray(x,y){let i=(y*w+x)*4; return (d[i]+d[i+1]+d[i+2])/3}
+  function find(x0,y0,x1,y1){let best=null, bd=1000; for(let y=y0;y<y1;y+=6)for(let x=x0;x<x1;x+=6){let g=gray(x,y); if(g<80&&g<bd){bd=g; best={x,y}}} return best;}
+  let tl=find(0,0,w*0.3,h*0.3), tr=find(w*0.7,0,w,h*0.3), bl=find(0,h*0.7,w*0.3,h), br=find(w*0.7,h*0.7,w,h);
+  log(`Cantos: tl=${!!tl} tr=${!!tr} bl=${!!bl} br=${!!br}`);
+  if(!tl||!tr||!bl||!br){$('msgAuto').innerHTML='<b style="color:red">Não achei os 4 quadrados pretos. Foto tem que pegar folha toda. Se imprimiu folha antiga, imprima a nova.</b>'; return;}
+  let left=Math.min(tl.x,bl.x), right=Math.max(tr.x,br.x), top=Math.min(tl.y,tr.y), bottom=Math.max(bl.y,br.y), bw=right-left, bh=bottom-top;
+  $('boxR').innerHTML=''; let leitura=[];
+  for(let i=0;i<cfg.qtd;i++){
+    let col=i%2, row=Math.floor(i/2), rows=Math.ceil(cfg.qtd/2);
+    let cellW=bw/2, cellH=bh*0.8/rows, baseY=top+bh*0.12+row*(bh*0.8/rows)+cellH*0.5, baseX=left+col*cellW;
+    let scores=[];
+    for(let a=0;a<cfg.alt;a++){let cx=baseX+cellW*0.3+a*cellW*0.13, cy=baseY, r=Math.max(7,Math.floor(w*0.016)), s=0,cnt=0; for(let yy=-r;yy<=r;yy++)for(let xx=-r;xx<=r;xx++)if(xx*xx+yy*yy<=r*r){let X=Math.min(w-1,Math.max(0,Math.round(cx+xx))), Y=Math.min(h-1,Math.max(0,Math.round(cy+yy))); s+=255-gray(X,Y); cnt++;} scores.push(s/cnt);}
+    let best=Math.max(...scores), idx=scores.indexOf(best), letra=best>35?L[idx]:''; leitura.push(letra);
+    $('boxR').innerHTML+=`<div style="border:1px solid #ddd;padding:4px;text-align:center"><b>${i+1}</b><select id="r${i}"><option value="">?</option>${L.slice(0,cfg.alt).map(l=>`<option ${l==letra?'selected':''}>${l}</option>`).join('')}</select><div style="font-size:10px">auto:${letra||'?'} gab:${gab[i]}</div></div>`;
+  }
+  $('msgAuto').innerHTML=`<b style="color:green">Leitura: ${leitura.filter(x=>x).length}/${cfg.qtd}</b>`;
+  $('btnConf').classList.remove('hidden');
+  log('Leitura feita: '+leitura.join(' '));
+ }catch(e){log('Erro process: '+e.message+' '+e.stack); alert('Erro ao processar: '+e.message);}
+}
+$('btnConf').addEventListener('click',()=>{
+ let resp=[]; for(let i=0;i<cfg.qtd;i++)resp.push($('r'+i).value||'');
+ let ac=0; resp.forEach((x,i)=>{if(x==gab[i])ac++;}); let nota=ac/cfg.qtd*10;
+ let idx=notas.findIndex(x=>x.aid==atual.id), obj={aid:atual.id,tid:atual.tid,ac,nota,resp};
+ if(idx>=0)notas[idx]=obj; else notas.push(obj); save(); render(); $('boxCor').classList.add('hidden'); log('Salvo verde '+atual.nome); alert('Salvo VERDE');
+});
+$('qtd').addEventListener('change',buildG); $('alt').addEventListener('change',buildG);
+window.addEventListener('load',()=>{log('Página carregada'); $('statusTop').textContent='Pronto - clique em TESTAR BOTÕES'; render(); buildG();});
 </script>
 </body>
 </html>
