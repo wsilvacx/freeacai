@@ -1,232 +1,162 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Correção Inteligente de Provas</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Correção Inteligente v3 - Turmas</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#f3f5f7;color:#202124;font-family:Arial,sans-serif}
-header{background:#174a73;color:#fff;padding:18px;text-align:center}header h1{margin:0;font-size:24px}header p{margin:6px 0 0}
-main{max-width:1050px;margin:auto;padding:14px}.card{background:#fff;border-radius:12px;padding:18px;margin:12px 0;box-shadow:0 2px 8px #0001}
-h2{color:#174a73;margin:0 0 12px;font-size:19px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
-label{font-weight:bold;font-size:14px}input,select{width:100%;padding:10px;border:1px solid #bbb;border-radius:7px;margin-top:5px;font:inherit}
-button{border:0;border-radius:8px;padding:11px 14px;margin:5px 3px 0 0;background:#174a73;color:#fff;font-weight:bold;cursor:pointer}
-button.green{background:#16834b}button.gray{background:#68737d}button.red{background:#b93838}
-.tabs{display:flex;gap:6px;overflow:auto;margin-bottom:10px}.tabs button{white-space:nowrap}.tabs button.active{background:#0b7a53}
+header{background:#174a73;color:#fff;padding:18px;text-align:center}header h1{margin:0}
+main{max-width:1100px;margin:auto;padding:14px}.card{background:#fff;border-radius:12px;padding:18px;margin:12px 0;box-shadow:0 2px 8px #0001}
+h2{color:#174a73;margin:0 0 12px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+label{font-weight:bold;font-size:13px}input,select{width:100%;padding:10px;border:1px solid #bbb;border-radius:7px;margin-top:5px}
+button{border:0;border-radius:8px;padding:10px 14px;margin:4px 3px 0 0;background:#174a73;color:#fff;font-weight:bold;cursor:pointer}
+button.green{background:#16834b}button.gray{background:#68737d}button.red{background:#b93838}button.orange{background:#d07a0b}
+.tabs{display:flex;gap:6px;overflow:auto;margin-bottom:10px}.tabs button.active{background:#0b7a53}
 .panel{display:none}.panel.active{display:block}
-.gab,.ans{display:grid;grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:8px}.q{background:#fafafa;border:1px solid #ddd;border-radius:8px;padding:8px}
-.q b{display:block;margin-bottom:5px}.notice{background:#fff5cf;padding:11px;border-radius:8px;font-size:13px;margin:10px 0}
-.big{font-size:30px;color:#174a73;font-weight:bold}.result{background:#edf7ff;padding:15px;border-radius:10px;margin-top:10px}
-table{width:100%;border-collapse:collapse;margin-top:12px;font-size:14px}th,td{padding:8px;border-bottom:1px solid #ddd;text-align:center}th{background:#eef2f5}
-.tablewrap{overflow:auto}.muted{color:#666;font-size:13px}.hidden{display:none!important}
-#scanCanvas{max-width:100%;border:1px solid #bbb;border-radius:8px;margin-top:10px}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}.stat{background:#f5f8fa;border-radius:9px;padding:12px;text-align:center}.stat strong{font-size:22px;color:#174a73;display:block}
-@media print{body{background:#fff}header,main>*:not(#folhaPrint){display:none!important}#folhaPrint{display:block!important}}
-#folhaPrint{display:none}
+.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:8px;border-bottom:1px solid #ddd;text-align:left}th{background:#eef2f5;text-align:center}
+.badge{padding:3px 8px;border-radius:12px;font-size:11px;font-weight:bold}.ok{background:#d1f5df;color:#0a5}.pend{background:#ffe6c1;color:#8a4a00}
+.aluno-card{display:flex;justify-content:space-between;align-items:center;padding:10px;border:1px solid #ddd;border-radius:8px;margin:6px 0}
+.aluno-card.done{background:#eafbf0;border-color:#2fb86a}.big{font-size:28px;color:#174a73;font-weight:bold}
+#scanCanvas{max-width:100%;border:1px solid #bbb;border-radius:8px;margin-top:10px}.hidden{display:none!important}
+.gab{display:grid;grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:8px}.q{background:#fafafa;border:1px solid #ddd;border-radius:8px;padding:8px}
+@media print{header,.tabs,main>.card:not(#printArea){display:none!important}#printArea{display:block!important}}
 </style>
 </head>
 <body>
-<header><h1>📝 Correção Inteligente de Provas</h1><p>Gabarito • Folha de respostas • Leitura por foto • Relatórios</p></header>
-
+<header><h1>📝 Correção Inteligente v3</h1><p>Turmas • Alunos • Gabarito • Correção por foto</p></header>
 <main>
 <div class="tabs">
-<button class="active" onclick="tab('prova',this)">1. Prova</button>
-<button onclick="tab('gabarito',this)">2. Gabarito</button>
-<button onclick="tab('folha',this)">3. Folha do aluno</button>
-<button onclick="tab('scanner',this)">4. Corrigir por foto</button>
-<button onclick="tab('manual',this)">5. Correção manual</button>
-<button onclick="tab('relatorio',this)">6. Relatório</button>
+<button class="active" onclick="tab('turmas',this)">1. Turmas</button>
+<button onclick="tab('alunos',this)">2. Alunos</button>
+<button onclick="tab('prova',this)">3. Prova/Gabarito</button>
+<button onclick="tab('correcao',this)">4. Corrigir</button>
+<button onclick="tab('relatorio',this)">5. Relatório</button>
 </div>
 
-<section id="prova" class="panel active card">
-<h2>Configuração da prova</h2>
+<section id="turmas" class="panel active card">
+<h2>Cadastrar Turmas</h2>
+<div class="grid"><label>Nome da Turma<input id="turmaNome" placeholder="Ex: 6º Ano A"></label></div>
+<button class="green" onclick="addTurma()">+ Adicionar Turma</button>
+<div class="tablewrap"><table id="tabTurmas"><thead><tr><th>Turma</th><th>Alunos</th><th>Ação</th></tr></thead><tbody></tbody></table></div>
+</section>
+
+<section id="alunos" class="panel card">
+<h2>Cadastrar Alunos</h2>
 <div class="grid">
-<label>Nome da prova<input id="nome" placeholder="Ex.: Avaliação - 1º Bimestre"></label>
-<label>Turma<input id="turma" placeholder="Ex.: 6º Ano A"></label>
-<label>Disciplina<input id="disciplina" placeholder="Matemática"></label>
-<label>Questões<select id="n" onchange="build()"><option>10</option><option>15</option><option>20</option><option>25</option><option>30</option><option>40</option><option>50</option></select></label>
-<label>Valor da prova<input id="valor" type="number" value="10" step=".1"></label>
-<label>Alternativas<select id="alts" onchange="build()"><option value="4">A a D</option><option value="5" selected>A a E</option></select></label>
+<label>Turma<select id="alunoTurmaSel"></select></label>
+<label>Nome do Aluno<input id="alunoNome" placeholder="Ex: Maria Silva"></label>
 </div>
-<button class="green" onclick="saveConfig()">💾 Salvar configuração</button>
+<button class="green" onclick="addAluno()">+ Adicionar Aluno</button>
+<button class="gray" onclick="addLote()">+ Adicionar em lote (cola lista)</button>
+<div class="tablewrap"><table id="tabAlunos"><thead><tr><th>Aluno</th><th>Turma</th><th>Status</th><th>Ação</th></tr></thead><tbody></tbody></table></div>
 </section>
 
-<section id="gabarito" class="panel card">
-<h2>Gabarito</h2>
-<p class="muted">Defina a resposta correta de cada questão. Depois salve.</p>
-<div id="gab" class="gab"></div>
-<button class="green" onclick="saveKey()">💾 Salvar gabarito</button>
-<button class="gray" onclick="fillExample()">Preencher exemplo</button>
-</section>
-
-<section id="folha" class="panel card">
-<h2>Gerar folha de respostas</h2>
-<div class="notice">Imprima esta folha e entregue aos alunos. Para a leitura automática funcionar melhor, peça que marquem <b>com caneta ou lápis escuro</b>, preenchendo a bolinha completamente, e tire a foto com a folha inteira visível e bem iluminada.</div>
+<section id="prova" class="panel card">
+<h2>Prova e Gabarito</h2>
 <div class="grid">
-<label>Nome do aluno<input id="folhaNome" placeholder="Nome (opcional)"></label>
+<label>Nome Prova<input id="nomeProva" placeholder="Avaliação 1"></label>
+<label>Disciplina<input id="disc" placeholder="Matemática"></label>
+<label>Qtd<input id="n" type="number" value="20" onchange="buildGab()"></label>
+<label>Alts<select id="alts" onchange="buildGab()"><option value="4">A-D</option><option value="5" selected>A-E</option></select></label>
+<label>Valor<input id="valor" type="number" value="10"></label>
 </div>
-<button class="green" onclick="printSheet()">🖨️ Imprimir folha</button>
-<p class="muted">A folha usa um modelo padronizado para o leitor identificar a posição das respostas.</p>
+<div id="gab" class="gab" style="margin-top:10px"></div>
+<button class="green" onclick="saveGabarito()">💾 Salvar Gabarito</button>
+<div id="gabStatus" style="margin-top:8px;font-weight:bold"></div>
 </section>
 
-<section id="scanner" class="panel card">
-<h2>Corrigir pela foto</h2>
-<div class="notice"><b>Como usar:</b> fotografe a folha inteira, sem cortar as bordas. A versão atual identifica automaticamente as marcações pela intensidade no centro das bolinhas. Em caso de foto inclinada ou sombra forte, confira o resultado antes de salvar.</div>
-<input id="photo" type="file" accept="image/*" capture="environment" onchange="scanFile(event)">
+<section id="correcao" class="panel card">
+<h2>Correção</h2>
+<div class="grid">
+<label>Selecione a Turma<select id="corrTurma" onchange="renderCorrecao()"></select></label>
+<label>Prova Selecionada<span id="corrProvaInfo" style="display:block;padding:10px;background:#eef2f5;border-radius:7px;margin-top:5px">-</span></label>
+</div>
+<div id="listaAlunosCorr"></div>
+<hr>
+<div id="areaScan" class="hidden">
+<h3 id="scanAlunoNome">Aluno: -</h3>
+<input id="photo" type="file" accept="image/*" capture="environment">
 <canvas id="scanCanvas"></canvas>
-<div id="scanInfo" class="result hidden"></div>
-<button id="saveScan" class="green hidden" onclick="saveScanResult()">✅ Salvar correção</button>
-<button id="retry" class="gray hidden" onclick="document.getElementById('photo').click()">📷 Tirar outra foto</button>
-</section>
-
-<section id="manual" class="panel card">
-<h2>Correção manual</h2>
-<label>Nome do aluno<input id="manualName" placeholder="Nome do aluno"></label>
-<div id="ans" class="ans" style="margin-top:10px"></div>
-<button class="green" onclick="manualCorrect()">✅ Corrigir e salvar</button>
-<div id="manualResult" class="result hidden"></div>
+<div id="scanInfo"></div>
+<div id="scanEdit" class="gab"></div>
+<button id="btnSalvarFoto" class="green hidden" onclick="salvarCorrecaoFoto()">✅ Confirmar e deixar VERDE</button>
+<button class="gray" onclick="cancelarScan()">Cancelar</button>
+</div>
 </section>
 
 <section id="relatorio" class="panel card">
-<h2>Relatório da turma</h2>
-<div id="stats" class="stats"></div>
-<div class="tablewrap"><table id="table"><thead><tr><th>Aluno</th><th>Acertos</th><th>Erros</th><th>%</th><th>Nota</th><th>Ação</th></tr></thead><tbody></tbody></table></div>
-<button class="green" onclick="csv()">📊 Exportar CSV</button>
-<button class="gray" onclick="exportReport()">📄 Imprimir relatório</button>
-<button class="red" onclick="clearResults()">Apagar resultados</button>
+<h2>Relatório por Turma</h2>
+<label>Filtrar Turma<select id="relTurma" onchange="renderRel()"><option value="">Todas</option></select></label>
+<div id="stats"></div>
+<div class="tablewrap"><table id="tabRel"><thead><tr><th>Turma</th><th>Aluno</th><th>Acertos</th><th>Nota</th><th>Data</th><th>Ação</th></tr></thead><tbody></tbody></table></div>
+<button class="green" onclick="exportCSV()">📊 Exportar CSV da turma</button>
 </section>
 </main>
 
-<div id="folhaPrint">
-<style>
-@page{size:A4;margin:10mm}#printSheet{font-family:Arial;color:#000;width:100%}
-#sheetBorder{border:3px solid #000;padding:12px}#sheetBorder h1{font-size:18px;text-align:center;margin:0 0 10px}
-.meta{font-size:12px;border-bottom:1px solid #000;padding-bottom:8px;margin-bottom:10px}
-.meta div{display:inline-block;width:49%;padding:4px 0}.bubblegrid{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}
-.sq{border:1px solid #000;padding:4px;font-size:11px;display:flex;align-items:center;gap:8px}.bub{display:inline-flex;width:16px;height:16px;border:2px solid #000;border-radius:50%;align-items:center;justify-content:center;font-size:9px}
-.inst{font-size:10px;margin:7px 0}
-</style>
-<div id="printSheet"><div id="sheetBorder">
-<h1>FOLHA DE RESPOSTAS</h1>
-<div class="meta"><div>Nome: <span id="pname"></span></div><div>Turma: <span id="pturma"></span></div><div>Prova: <span id="pprova"></span></div><div>Disciplina: <span id="pdisc"></span></div></div>
-<div class="inst">Marque <b>uma única alternativa</b> por questão, preenchendo a bolinha. Não faça rasuras.</div>
-<div id="printQs" class="bubblegrid"></div>
-</div></div>
-</div>
-
 <script>
-const letters=['A','B','C','D','E']; let key=[],results=[],scanData=null,config={};
+let turmas = JSON.parse(localStorage.getItem('v3_turmas')||'[]');
+let alunos = JSON.parse(localStorage.getItem('v3_alunos')||'[]');
+let gabarito = JSON.parse(localStorage.getItem('v3_gab')||'[]');
+let resultados = JSON.parse(localStorage.getItem('v3_res')||'[]');
+let config = JSON.parse(localStorage.getItem('v3_cfg')||'{}');
+let alunoCorrigindo = null;
 const $=id=>document.getElementById(id);
-function tab(id,btn){document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));btn.classList.add('active')}
-function getConfig(){return {nome:$('nome').value.trim(),turma:$('turma').value.trim(),disciplina:$('disciplina').value.trim(),n:+$('n').value,valor:+$('valor').value||10,alts:+$('alts').value}}
-function build(){
- const c=getConfig(); key=Array(c.n).fill('');
- const old=JSON.parse(localStorage.getItem('key')||'[]'); old.forEach((v,i)=>{if(i<c.n)key[i]=v});
- $('gab').innerHTML='';$('ans').innerHTML='';
+const letters=['A','B','C','D','E'];
+function tab(id,btn){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));$(id).classList.add('active');document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('active'));btn.classList.add('active'); if(id==='correcao')renderCorrecao(); if(id==='turmas')renderTurmas(); if(id==='alunos')renderAlunos(); if(id==='relatorio')renderRel();}
+function saveAll(){localStorage.setItem('v3_turmas',JSON.stringify(turmas));localStorage.setItem('v3_alunos',JSON.stringify(alunos));localStorage.setItem('v3_gab',JSON.stringify(gabarito));localStorage.setItem('v3_res',JSON.stringify(resultados));localStorage.setItem('v3_cfg',JSON.stringify(config));}
+
+// TURMAS
+function addTurma(){let nome=$('turmaNome').value.trim(); if(!nome)return alert('Nome'); turmas.push({id:Date.now(),nome}); $('turmaNome').value=''; saveAll(); renderTurmas(); renderSelects();}
+function renderTurmas(){let tb=$('tabTurmas').querySelector('tbody'); tb.innerHTML=''; turmas.forEach(t=>{let qtd=alunos.filter(a=>a.turmaId==t.id).length; tb.innerHTML+=`<tr><td>${t.nome}</td><td>${qtd}</td><td><button class="red" onclick="delTurma(${t.id})">Excluir</button></td></tr>`});}
+function delTurma(id){if(!confirm('Apagar turma e alunos?'))return; turmas=turmas.filter(t=>t.id!=id); alunos=alunos.filter(a=>a.turmaId!=id); saveAll(); renderTurmas(); renderAlunos(); renderSelects();}
+
+// ALUNOS
+function addAluno(){let nome=$('alunoNome').value.trim(); let turmaId=+$('alunoTurmaSel').value; if(!nome||!turmaId)return alert('Preencha'); alunos.push({id:Date.now(),nome,turmaId}); $('alunoNome').value=''; saveAll(); renderAlunos(); renderTurmas();}
+function addLote(){let txt=prompt('Cole um nome por linha:'); if(!txt)return; let turmaId=+$('alunoTurmaSel').value; if(!turmaId)return alert('Selecione turma'); txt.split('\n').forEach(l=>{l=l.trim(); if(l) alunos.push({id:Date.now()+Math.random(),nome:l,turmaId});}); saveAll(); renderAlunos(); renderTurmas();}
+function renderAlunos(){let tb=$('tabAlunos').querySelector('tbody'); tb.innerHTML=''; alunos.forEach(a=>{let t=turmas.find(x=>x.id==a.turmaId); let feito=resultados.some(r=>r.alunoId==a.id); tb.innerHTML+=`<tr><td>${a.nome}</td><td>${t?t.nome:'-'}</td><td><span class="badge ${feito?'ok':'pend'}">${feito?'CORRIGIDO':'PENDENTE'}</span></td><td><button class="red" onclick="delAluno(${a.id})">X</button></td></tr>`});}
+function delAluno(id){alunos=alunos.filter(a=>a.id!=id); resultados=resultados.filter(r=>r.alunoId!=id); saveAll(); renderAlunos(); renderTurmas();}
+
+// SELECTS
+function renderSelects(){let html=turmas.map(t=>`<option value="${t.id}">${t.nome}</option>`).join(''); $('alunoTurmaSel').innerHTML=html; $('corrTurma').innerHTML=html; $('relTurma').innerHTML='<option value="">Todas</option>'+html; renderCorrecao();}
+function buildGab(){let n=+$('n').value||20; let alts=+$('alts').value; $('gab').innerHTML=''; for(let i=0;i<n;i++){let val=gabarito[i]||''; $('gab').innerHTML+=`<div class="q"><b>${i+1}</b><select data-i="${i}" class="gabSel"><option value="">-</option>${letters.slice(0,alts).map(l=>`<option ${l==val?'selected':''}>${l}</option>`).join('')}</select></div>`}}
+function saveGabarito(){config={nome:$('nomeProva').value, disc:$('disc').value, n:+$('n').value, alts:+$('alts').value, valor:+$('valor').value||10}; gabarito=[...document.querySelectorAll('.gabSel')].map(s=>s.value); if(gabarito.some(v=>!v))return alert('Preencha todo gabarito'); saveAll(); $('gabStatus').textContent='Gabarito salvo: '+gabarito.join(''); $('corrProvaInfo').textContent=config.nome+' - '+gabarito.length+' questões';}
+
+// CORREÇÃO
+function renderCorrecao(){let turmaId=+$('corrTurma').value; if(!turmaId){$('listaAlunosCorr').innerHTML='<p>Selecione uma turma</p>';return} let lista=alunos.filter(a=>a.turmaId==turmaId); let html=`<p><b>${lista.length} alunos nesta turma</b></p>`; lista.forEach(a=>{let res=resultados.find(r=>r.alunoId==a.id); let done=!!res; html+=`<div class="aluno-card ${done?'done':''}"><div><b>${a.nome}</b> ${done?`• <span class="badge ok">VERDE - ${res.acertos}/${gabarito.length} - Nota ${res.nota.toFixed(1)}</span>`:`<span class="badge pend">PENDENTE</span>`}</div><div><button class="${done?'orange':'green'}" onclick="iniciarScan(${a.id})">${done?'Recorrigir':'Corrigir 📷'}</button></div></div>`}); $('listaAlunosCorr').innerHTML=html;}
+function iniciarScan(alunoId){if(!gabarito.length)return alert('Salve o gabarito primeiro em 3. Prova/Gabarito'); alunoCorrigindo=alunos.find(a=>a.id==alunoId); $('areaScan').classList.remove('hidden'); $('scanAlunoNome').textContent='Corrigindo: '+alunoCorrigindo.nome; window.scrollTo(0, document.body.scrollHeight);}
+function cancelarScan(){$('areaScan').classList.add('hidden'); alunoCorrigindo=null;}
+
+let scanData=[];
+$('photo').addEventListener('change',e=>{let f=e.target.files[0]; if(!f)return; let img=new Image(); img.onload=()=>processImg(img); img.src=URL.createObjectURL(f);});
+function processImg(img){
+ let can=$('scanCanvas'), ctx=can.getContext('2d',{willReadFrequently:true}); let maxW=1200, sc=Math.min(1,maxW/img.width); can.width=img.width*sc; can.height=img.height*sc; ctx.drawImage(img,0,0,can.width,can.height);
+ let w=can.width,h=can.height,d=ctx.getImageData(0,0,w,h).data; function gray(x,y){let i=(y*w+x)*4; return (d[i]+d[i+1]+d[i+2])/3}
+ let c=config; scanData=[];
  for(let i=0;i<c.n;i++){
-  $('gab').innerHTML+=qHTML(i,key[i],'gab');
-  $('ans').innerHTML+=qHTML(i,'','resp');
+  let col=i%2,row=Math.floor(i/2); let rows=Math.ceil(c.n/2);
+  let baseX=col*0.5+0.08, baseY=0.15+row*(0.8/rows);
+  let scores=[]; for(let a=0;a<c.alts;a++){let cxN=baseX+0.07+a*0.09, cyN=baseY; let cx=Math.floor(cxN*w), cy=Math.floor(cyN*h), r=Math.max(6,Math.floor(w*0.012)); let s=0,cnt=0; for(let yy=-r;yy<=r;yy++)for(let xx=-r;xx<=r;xx++)if(xx*xx+yy*yy<=r*r){let X=Math.min(w-1,Math.max(0,cx+xx)),Y=Math.min(h-1,Math.max(0,cy+yy)); s+=255-gray(X,Y); cnt++;} scores.push(s/cnt);}
+  let bi=scores.indexOf(Math.max(...scores)); scanData.push(scores[bi]>35?letters[bi]:'');
+  ctx.strokeStyle=scores[bi]>35?'#0f0':'#f00'; ctx.beginPath(); ctx.arc((baseX+0.07+bi*0.09)*w, baseY*h, 8,0,Math.PI*2); ctx.stroke();
  }
+ $('scanInfo').innerHTML='Lido: '+scanData.map((x,i)=>`${i+1}:${x||'?'}`).join(' ');
+ $('scanEdit').innerHTML=''; scanData.forEach((v,i)=>{$('scanEdit').innerHTML+=`<div class="q"><b>${i+1}</b><select class="editSel" data-i="${i}"><option value="">?</option>${letters.slice(0,c.alts).map(l=>`<option ${l==v?'selected':''}>${l}</option>`).join('')}</select></div>`});
+ $('btnSalvarFoto').classList.remove('hidden');
 }
-function qHTML(i,val,cls){let c=getConfig();return `<div class="q"><b>${i+1}ª</b><select class="${cls}" data-i="${i}"><option value="">—</option>${letters.slice(0,c.alts).map(x=>`<option ${x===val?'selected':''}>${x}</option>`).join('')}</select></div>`}
-function saveConfig(){config=getConfig();localStorage.setItem('config',JSON.stringify(config));alert('Configuração salva!')}
-function saveKey(){key=[...document.querySelectorAll('.gab')].map(x=>x.value);if(key.some(x=>!x)){alert('Preencha todas as respostas do gabarito.');return}localStorage.setItem('key',JSON.stringify(key));saveConfig();alert('Gabarito salvo!')}
-function fillExample(){document.querySelectorAll('.gab').forEach((x,i)=>x.value=letters[i%getConfig().alts]);}
-function grade(name,resp,source='manual'){
- if(!name){alert('Informe o nome do aluno.');return}
- if(key.length!==getConfig().n || key.some(x=>!x)){alert('Salve primeiro o gabarito completo.');return}
- let ac=0;resp.forEach((x,i)=>{if(x&&x===key[i])ac++});let total=key.length,err=total-ac,p=ac/total*100,nota=p/100*getConfig().valor;
- let row={name,ac,err,p,nota,source,answers:resp,date:new Date().toLocaleString('pt-BR')};
- results.push(row);localStorage.setItem('results',JSON.stringify(results));render();
- return row;
+function salvarCorrecaoFoto(){
+ let respostas=[...document.querySelectorAll('.editSel')].map(s=>s.value);
+ let ac=0; respostas.forEach((x,i)=>{if(x==gabarito[i])ac++;});
+ let p=ac/gabarito.length*100; let nota=p/100*config.valor;
+ let idx=resultados.findIndex(r=>r.alunoId==alunoCorrigindo.id);
+ let obj={alunoId:alunoCorrigindo.id, nome:alunoCorrigindo.nome, turmaId:alunoCorrigindo.turmaId, acertos:ac, nota, p, respostas, data:new Date().toLocaleString('pt-BR')};
+ if(idx>=0) resultados[idx]=obj; else resultados.push(obj);
+ saveAll(); renderCorrecao(); renderRel(); cancelarScan(); alert(`${alunoCorrigindo.nome} corrigido! Ficou VERDE`);
 }
-function manualCorrect(){
- const name=$('manualName').value.trim(),resp=[...document.querySelectorAll('.resp')].map(x=>x.value);
- const r=grade(name,resp);if(!r)return;
- $('manualResult').classList.remove('hidden');$('manualResult').innerHTML=`<b>${esc(name)}</b><br><span class="big">${r.ac}/${key.length}</span> acertos • ${r.p.toFixed(1)}% • Nota <b>${r.nota.toFixed(1)}</b>`;
- document.querySelectorAll('.resp').forEach(x=>x.value='');$('manualName').value='';
-}
-function printSheet(){
- const c=getConfig();$('pname').textContent=$('folhaNome').value||'';
- $('pturma').textContent=c.turma;$('pprova').textContent=c.nome;$('pdisc').textContent=c.disciplina;
- $('printQs').innerHTML='';
- for(let i=0;i<c.n;i++) $('printQs').innerHTML+=`<div class="sq"><b>${String(i+1).padStart(2,'0')}</b>${letters.slice(0,c.alts).map(x=>`<span class="bub">${x}</span>`).join('')}</div>`;
- window.print();
-}
-async function scanFile(e){
- const f=e.target.files[0];if(!f)return;
- const img=new Image();img.onload=()=>processImage(img);img.src=URL.createObjectURL(f);
-}
-function processImage(img){
- const can=$('scanCanvas'),ctx=can.getContext('2d',{willReadFrequently:true});
- let max=1200,scale=Math.min(1,max/img.width);can.width=img.width*scale;can.height=img.height*scale;ctx.drawImage(img,0,0,can.width,can.height);
- // Detect the outer sheet bounds from dark pixels near the image.
- const w=can.width,h=can.height,data=ctx.getImageData(0,0,w,h).data;
- function darkness(x,y){let i=(y*w+x)*4;return 255-((data[i]+data[i+1]+data[i+2])/3)}
- let minX=w,minY=h,maxX=0,maxY=0,step=Math.max(2,Math.floor(Math.min(w,h)/500));
- for(let y=0;y<h;y+=step)for(let x=0;x<w;x+=step){
-   if(darkness(x,y)>150){if(x<minX)minX=x;if(x>maxX)maxX=x;if(y<minY)minY=y;if(y>maxY)maxY=y}
- }
- // Ignore tiny/edge noise and use margins.
- if(maxX-minX<w*.35||maxY-minY<h*.35){minX=w*.03;maxX=w*.97;minY=h*.03;maxY=h*.97}
- const bw=maxX-minX,bh=maxY-minY,c=getConfig(),n=c.n,cols=2,rows=Math.ceil(n/cols);
- let answers=[];
- // These coordinates mirror the generated sheet: question grid below header.
- const top=.235,bottom=.965,left=.035,right=.965;
- for(let i=0;i<n;i++){
-   const col=i%cols,row=Math.floor(i/cols);
-   const cellW=(right-left)/cols,cellH=(bottom-top)/rows;
-   let cxN=left+col*cellW+cellW*.13;
-   let cyN=top+row*cellH+cellH*.50;
-   // Bubble centers are after question number; 4/5 bubbles spread across cell.
-   let gap=(cellW*.62)/c.alts;
-   let start=cxN+cellW*.08;
-   let scores=[];
-   for(let a=0;a<c.alts;a++){
-     let cx=minX+(start+gap*a)*bw,cy=minY+cyN*bh,r=Math.max(3,Math.min(bw,bh)*.012);
-     let sum=0,count=0;
-     for(let yy=-r;yy<=r;yy++)for(let xx=-r;xx<=r;xx++)if(xx*xx+yy*yy<=r*r){
-       let X=Math.max(0,Math.min(w-1,Math.round(cx+xx))),Y=Math.max(0,Math.min(h-1,Math.round(cy+yy)));
-       sum+=darkness(X,Y);count++;
-     }
-     scores.push(sum/count);
-   }
-   let best=scores.indexOf(Math.max(...scores));
-   answers.push(scores[best]>70?letters[best]:'');
- }
- scanData=answers;
- $('scanInfo').classList.remove('hidden');
- $('scanInfo').innerHTML=`<b>Leitura concluída.</b><br>Respostas identificadas: ${answers.map((x,i)=>`${i+1}: ${x||'—'}`).join(' • ')}<br><span class="muted">Confira visualmente a foto e corrija qualquer questão não reconhecida antes de salvar.</span>`;
- $('saveScan').classList.remove('hidden');$('retry').classList.remove('hidden');
-}
-function saveScanResult(){
- let name=prompt('Nome do aluno:');if(!name)return;
- const r=grade(name,scanData,'foto');if(!r)return;
- alert(`Correção salva: ${r.ac} acertos de ${key.length}.`);
- scanData=null;$('saveScan').classList.add('hidden');
-}
-function render(){
- const tb=$('table').querySelector('tbody');tb.innerHTML='';
- if(!results.length){$('stats').innerHTML='<div class="stat"><strong>0</strong> alunos</div>';return}
- let avg=results.reduce((s,x)=>s+x.nota,0)/results.length,avgp=results.reduce((s,x)=>s+x.p,0)/results.length;
- $('stats').innerHTML=`<div class="stat"><strong>${results.length}</strong>Alunos</div><div class="stat"><strong>${avg.toFixed(1)}</strong>Média</div><div class="stat"><strong>${avgp.toFixed(1)}%</strong>Aproveitamento</div>`;
- results.forEach((x,i)=>tb.innerHTML+=`<tr><td>${esc(x.name)}</td><td>${x.ac}</td><td>${x.err}</td><td>${x.p.toFixed(1)}%</td><td>${x.nota.toFixed(1)}</td><td><button class="red" onclick="del(${i})">Excluir</button></td></tr>`);
-}
-function del(i){if(confirm('Excluir este resultado?')){results.splice(i,1);localStorage.setItem('results',JSON.stringify(results));render()}}
-function clearResults(){if(confirm('Apagar todos os resultados?')){results=[];localStorage.removeItem('results');render()}}
-function csv(){
- if(!results.length){alert('Não há resultados.');return}
- let s='Aluno;Acertos;Erros;Aproveitamento;Nota;Origem;Data\\n';results.forEach(x=>s+=`"${x.name}";${x.ac};${x.err};${x.p.toFixed(1)}%;${x.nota.toFixed(1)};${x.source};${x.date}\\n`);
- let b=new Blob(['\\ufeff'+s],{type:'text/csv;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='resultado_prova.csv';a.click();
-}
-function exportReport(){window.print()}
-function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
-window.onload=()=>{
- try{config=JSON.parse(localStorage.getItem('config')||'{}');results=JSON.parse(localStorage.getItem('results')||'[]')}catch(e){}
- if(config.nome)$('nome').value=config.nome;if(config.turma)$('turma').value=config.turma;if(config.disciplina)$('disciplina').value=config.disciplina;
- if(config.n)$('n').value=config.n;if(config.valor)$('valor').value=config.valor;if(config.alts)$('alts').value=config.alts;
- build();render();
-}
+
+function renderRel(){let tid=$('relTurma').value; let lista=tid?resultados.filter(r=>r.turmaId==tid):resultados; let tb=$('tabRel').querySelector('tbody'); tb.innerHTML=''; lista.forEach(r=>{let t=turmas.find(x=>x.id==r.turmaId); tb.innerHTML+=`<tr><td>${t?t.nome:''}</td><td>${r.nome}</td><td>${r.acertos}</td><td>${r.nota.toFixed(1)}</td><td>${r.data}</td><td><button class="red" onclick="delRes(${r.alunoId})">Excluir</button></td></tr>`});}
+function delRes(id){resultados=resultados.filter(r=>r.alunoId!=id); saveAll(); renderRel(); renderCorrecao(); renderAlunos();}
+function exportCSV(){let tid=$('relTurma').value; let lista=tid?resultados.filter(r=>r.turmaId==tid):resultados; let s='Turma;Aluno;Acertos;Nota;%\n'; lista.forEach(r=>{let t=turmas.find(x=>x.id==r.turmaId); s+=`${t?t.nome:''};${r.nome};${r.acertos};${r.nota.toFixed(1)};${r.p.toFixed(1)}%\n`}); let b=new Blob(['\ufeff'+s],{type:'text/csv'}); let a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='relatorio.csv'; a.click();}
+window.onload=()=>{renderTurmas(); renderAlunos(); renderSelects(); buildGab(); if(config.nome){$('nomeProva').value=config.nome; $('disc').value=config.disc; $('n').value=config.n; $('alts').value=config.alts; $('valor').value=config.valor; $('corrProvaInfo').textContent=config.nome+' - '+config.n+' q';} renderRel();}
 </script>
 </body>
 </html>
