@@ -2,137 +2,165 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Correção v3.1 - Fix Gabarito</title>
+<title>v5 - Leitura Automática Real</title>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#f3f5f7;font-family:Arial}header{background:#174a73;color:#fff;padding:16px;text-align:center}
-main{max-width:1100px;margin:auto;padding:12px}.card{background:#fff;border-radius:12px;padding:16px;margin:10px 0;box-shadow:0 2px 8px #0001}
-.tabs{display:flex;gap:5px;overflow:auto}.tabs button{background:#68737d;color:#fff;border:0;padding:10px 14px;border-radius:8px;font-weight:bold;cursor:pointer}.tabs button.active{background:#0b7a53}
+body{margin:0;background:#f2f4f7;font-family:Arial}header{background:#174a73;color:#fff;padding:12px;text-align:center}
+main{max-width:1100px;margin:auto;padding:10px}.card{background:#fff;padding:14px;border-radius:10px;margin:8px 0;box-shadow:0 2px 6px #0001}
+.tabs{display:flex;gap:4px;overflow:auto}.tabs button{padding:10px;border:0;border-radius:8px;background:#666;color:#fff;font-weight:bold}.tabs button.active{background:#16834b}
 .panel{display:none}.panel.active{display:block}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px}input,select{width:100%;padding:9px;border:1px solid #bbb;border-radius:7px;margin-top:4px}
-button.green{background:#16834b;color:#fff;border:0;padding:10px 14px;border-radius:8px;font-weight:bold;cursor:pointer}button.red{background:#b93838;color:#fff;border:0;padding:8px 12px;border-radius:7px;cursor:pointer}button.gray{background:#68737d;color:#fff;border:0;padding:10px 14px;border-radius:8px;cursor:pointer}button.orange{background:#c77a0a;color:#fff;border:0;padding:10px 14px;border-radius:8px;cursor:pointer}
-table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:7px;border-bottom:1px solid #ddd;text-align:center}th{background:#eef2f5}
-.aluno-card{display:flex;justify-content:space-between;align-items:center;padding:10px;border:1px solid #ddd;border-radius:8px;margin:5px 0}.aluno-card.done{background:#d8f5e2;border-color:#27a65a}
-.badge{padding:2px 8px;border-radius:10px;font-size:11px;font-weight:bold}.ok{background:#d1f5df;color:#0a5}.pend{background:#ffe6c1;color:#8a4a00}
-.gab{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:6px}.q{background:#fafafa;border:1px solid #ddd;border-radius:8px;padding:6px;text-align:center}
-#scanCanvas{max-width:100%;border:2px dashed #888;border-radius:8px;margin-top:8px}.hidden{display:none!important}
-#printArea{display:none}
-@media print{#printArea{display:block!important}header,.tabs,main>.card:not(#printArea){display:none!important}}
+input,select{padding:9px;border:1px solid #aaa;border-radius:6px;width:100%;margin-top:4px}
+.btn{padding:10px 14px;border:0;border-radius:8px;font-weight:bold;color:#fff;cursor:pointer}.g{background:#16834b}.gr{background:#666}.r{background:#b33}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:6px;border-bottom:1px solid #ddd;text-align:center}
+.item{display:flex;justify-content:space-between;align-items:center;padding:9px;border:1px solid #ddd;border-radius:8px;margin:5px 0}.item.ok{background:#d6f5de;border-color:#2e9d4a}
+.badge{padding:3px 8px;border-radius:10px;font-size:11px;font-weight:bold}.ok{background:#bff0cc}.pend{background:#ffe0a3}
+.gab{display:grid;grid-template-columns:repeat(auto-fill,minmax(95px,1fr));gap:5px}.q{background:#fafafa;border:1px solid #ddd;border-radius:6px;padding:5px;text-align:center}
+#can{max-width:100%;border:2px solid #333;border-radius:8px;margin-top:8px;display:block}.hidden{display:none}
+#print{display:none}
+@media print{#print{display:block!important}header,.tabs,main>.card:not(#print){display:none!important}}
 </style>
 </head>
 <body>
-<header><h1>📝 Correção v3.1 - TURMAS + LEITURA FIX</h1></header>
+<header><h1>v5 - LEITURA AUTOMÁTICA</h1><p>Precisa imprimir pela v5 para funcionar</p></header>
 <main>
 <div class="tabs">
-<button class="active" onclick="tab('turmas',this)">1.Turmas</button>
-<button onclick="tab('alunos',this)">2.Alunos</button>
-<button onclick="tab('prova',this)">3.Gabarito</button>
-<button onclick="tab('corrigir',this)">4.Corrigir</button>
-<button onclick="tab('rel',this)">5.Relatório</button>
+<button class="active" onclick="go('t',this)">1 Turmas</button>
+<button onclick="go('a',this)">2 Alunos</button>
+<button onclick="go('g',this)">3 Gabarito</button>
+<button onclick="go('c',this)">4 Corrigir AUTO</button>
 </div>
 
-<section id="turmas" class="panel active card">
-<h2>1. Turmas</h2>
-<input id="turmaNome" placeholder="Ex: 6º A"><button class="green" onclick="addTurma()">Adicionar</button>
-<table id="tabTurmas"><thead><tr><th>Turma</th><th>Qtd</th><th></th></tr></thead><tbody></tbody></table>
-</section>
-
-<section id="alunos" class="panel card">
-<h2>2. Alunos</h2>
-<div class="grid"><label>Turma<select id="selTurmaAluno"></select></label><label>Aluno<input id="nomeAluno" placeholder="Nome completo"></label></div>
-<button class="green" onclick="addAluno()">Adicionar</button><button class="gray" onclick="addLote()">Colar lista (um por linha)</button>
-<table id="tabAlunos"><thead><tr><th>Aluno</th><th>Turma</th><th>Status</th><th></th></tr></thead><tbody></tbody></table>
-</section>
-
-<section id="prova" class="panel card">
-<h2>3. Gabarito - ISSO PRECISA SALVAR ANTES DE LER</h2>
-<div class="grid">
-<label>Prova<input id="nomeProva" value="Avaliação"></label><label>Qtd questões<input id="nQ" type="number" value="20" onchange="buildGab()"></label>
-<label>Alternativas<select id="alts" onchange="buildGab()"><option value="4">A-D</option><option value="5" selected>A-E</option></select></label><label>Valor<input id="valor" type="number" value="10"></label>
+<div id="t" class="panel active card">
+<input id="inT" placeholder="Nome turma ex: 6A"><button class="btn g" onclick="addT()">Add Turma</button><div id="listT"></div>
 </div>
-<div id="areaGab" class="gab" style="margin-top:10px"></div>
-<button class="green" onclick="saveGab()">💾 SALVAR GABARITO</button><span id="statusGab" style="margin-left:10px;font-weight:bold;color:#16834b"></span>
-<hr>
-<button class="gray" onclick="imprimirFolha()">🖨️ IMPRIMIR FOLHA PADRÃO (use esta para foto funcionar)</button>
-</section>
 
-<section id="corrigir" class="panel card">
-<h2>4. Corrigir por Turma</h2>
-<label>Escolha a turma<select id="selTurmaCorr" onchange="renderCorr()"></select></label>
-<div id="listaCorr" style="margin-top:10px"></div>
-<div id="boxScan" class="hidden" style="margin-top:15px;border-top:3px solid #174a73;padding-top:10px">
-<h3 id="tituloScan"></h3>
-<p style="font-size:13px">1. Tire foto da folha INTEIRA com os 4 cantos pretos aparecendo. 2. Confira abaixo.</p>
+<div id="a" class="panel card">
+<select id="selTA"></select><input id="inA" placeholder="Nome aluno"><button class="btn g" onclick="addA()">Add</button><button class="btn gr" onclick="addLote()">Colar lista</button><div id="listA"></div>
+</div>
+
+<div id="g" class="panel card">
+<div style="display:flex;gap:6px"><input id="qtd" type="number" value="20" style="width:80px"><select id="alt" style="width:80px"><option value="4">A-D</option><option value="5" selected>A-E</option></select><input id="nomeP" value="Prova 1"></div>
+<div id="boxG" class="gab" style="margin-top:8px"></div>
+<button class="btn g" onclick="saveG()" style="width:100%;margin-top:8px;font-size:18px">💾 SALVAR GABARITO</button><div id="msgG" style="font-weight:bold;color:green;margin-top:6px"></div>
+<button class="btn gr" onclick="imp()" style="width:100%;margin-top:8px">🖨️ IMPRIMIR FOLHA OFICIAL v5 (OBRIGATÓRIO)</button>
+</div>
+
+<div id="c" class="panel card">
+<select id="selTC" onchange="renderC()"></select><div id="listC"></div>
+<div id="boxCor" class="hidden" style="border-top:3px solid #174a73;margin-top:10px;padding-top:8px">
+<h3 id="titC"></h3>
 <input id="foto" type="file" accept="image/*" capture="environment">
-<canvas id="scanCanvas"></canvas>
-<div id="infoScan" style="background:#edf7ff;padding:10px;border-radius:8px;margin-top:8px"></div>
-<div id="editScan" class="gab" style="margin-top:8px"></div>
-<button id="btnConf" class="green hidden" onclick="confirmar()">✅ CONFIRMAR - DEIXAR VERDE</button><button class="gray" onclick="cancelScan()">Cancelar</button>
+<canvas id="can"></canvas>
+<div id="msgAuto" style="background:#e8f5ff;padding:8px;border-radius:6px;margin-top:6px"></div>
+<div id="boxR" class="gab"></div>
+<button class="btn g hidden" id="btnConf" onclick="conf()" style="width:100%;margin-top:8px;font-size:18px">✅ CONFIRMAR AUTO E DEIXAR VERDE</button>
 </div>
-</section>
+</div>
 
-<section id="rel" class="panel card">
-<h2>5. Relatório</h2><select id="selRel" onchange="renderRel()"><option value="">Todas turmas</option></select>
-<table id="tabRel"><thead><tr><th>Turma</th><th>Aluno</th><th>Acertos</th><th>Nota</th><th></th></tr></thead><tbody></tbody></table>
-</section>
-
-<div id="printArea">
-<div style="border:4px solid #000;padding:10px;font-family:Arial;color:#000">
-<div style="display:flex;justify-content:space-between"><div style="width:20px;height:20px;background:#000"></div><div style="width:20px;height:20px;background:#000"></div></div>
-<h2 style="text-align:center;margin:5px 0">FOLHA DE RESPOSTAS - <span id="pProva"></span></h2>
-<div style="font-size:12px">Nome: ________________________________ Turma: <span id="pTurma"></span> Data: ___/___/___</div>
-<div id="pQuestoes" style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:8px"></div>
-<div style="display:flex;justify-content:space-between;margin-top:10px"><div style="width:20px;height:20px;background:#000"></div><div style="width:20px;height:20px;background:#000"></div></div>
-<div style="text-align:center;font-size:10px;margin-top:5px">PREENCHA TOTALMENTE A BOLINHA COM CANETA PRETA</div>
+<div id="print">
+<div style="border:5px solid #000;padding:8px;color:#000;font-family:Arial">
+<div style="display:flex;justify-content:space-between"><div style="width:28px;height:28px;background:#000"></div><div style="width:28px;height:28px;background:#000"></div></div>
+<h2 style="text-align:center;margin:4px 0">FOLHA v5 - <span id="pNome"></span></h2>
+<div id="pGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:4px"></div>
+<div style="display:flex;justify-content:space-between;margin-top:8px"><div style="width:28px;height:28px;background:#000"></div><div style="width:28px;height:28px;background:#000"></div></div>
 </div>
 </div>
 </main>
 <script>
-let turmas=JSON.parse(localStorage.getItem('v31_t')||'[]'), alunos=JSON.parse(localStorage.getItem('v31_a')||'[]'), gab=JSON.parse(localStorage.getItem('v31_g')||'[]'), res=JSON.parse(localStorage.getItem('v31_r')||'[]'), cfg=JSON.parse(localStorage.getItem('v31_c')||'{}');
-let alunoAtivo=null, leitura=[];
+let turmas=JSON.parse(localStorage.getItem('t5')||'[]'), alunos=JSON.parse(localStorage.getItem('a5')||'[]'), gab=JSON.parse(localStorage.getItem('g5')||'[]'), notas=JSON.parse(localStorage.getItem('n5')||'[]'), cfg=JSON.parse(localStorage.getItem('c5')||'{"qtd":20,"alt":5,"nome":"Prova 1"}');
+let atual=null, leituraAuto=[];
 const $=id=>document.getElementById(id), L=['A','B','C','D','E'];
-function tab(id,b){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));$(id).classList.add('active');document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));b.classList.add('active'); if(id=='turmas')rt(); if(id=='alunos')ra(); if(id=='corrigir')renderCorr(); if(id=='rel')renderRel();}
-function save(){localStorage.setItem('v31_t',JSON.stringify(turmas));localStorage.setItem('v31_a',JSON.stringify(alunos));localStorage.setItem('v31_g',JSON.stringify(gab));localStorage.setItem('v31_r',JSON.stringify(res));localStorage.setItem('v31_c',JSON.stringify(cfg));}
-function addTurma(){let n=$('turmaNome').value.trim();if(!n)return;turmas.push({id:Date.now(),nome:n});$('turmaNome').value='';save();rt();rsel();}
-function rt(){let tb=$('tabTurmas').querySelector('tbody');tb.innerHTML='';turmas.forEach(t=>{let q=alunos.filter(a=>a.tId==t.id).length;tb.innerHTML+=`<tr><td>${t.nome}</td><td>${q}</td><td><button class="red" onclick="delT(${t.id})">X</button></td></tr>`});}
-function delT(id){if(!confirm('Apagar?'))return;turmas=turmas.filter(t=>t.id!=id);alunos=alunos.filter(a=>a.tId!=id);save();rt();ra();rsel();}
-function addAluno(){let n=$('nomeAluno').value.trim(), tid=+$('selTurmaAluno').value;if(!n||!tid)return alert('Selecione turma');alunos.push({id:Date.now(),nome:n,tId:tid});$('nomeAluno').value='';save();ra();rt();}
-function addLote(){let txt=prompt('Cole nomes, um por linha');if(!txt)return;let tid=+$('selTurmaAluno').value;if(!tid)return alert('Selecione turma');txt.split('\n').forEach(s=>{s=s.trim();if(s)alunos.push({id:Date.now()+Math.random(),nome:s,tId:tid})});save();ra();rt();}
-function ra(){let tb=$('tabAlunos').querySelector('tbody');tb.innerHTML='';alunos.forEach(a=>{let t=turmas.find(x=>x.id==a.tId);let ok=res.some(r=>r.aId==a.id);tb.innerHTML+=`<tr><td style="text-align:left">${a.nome}</td><td>${t?t.nome:''}</td><td><span class="badge ${ok?'ok':'pend'}">${ok?'CORRIGIDO':''}</span></td><td><button class="red" onclick="delA(${a.id})">X</button></td></tr>`});}
-function delA(id){alunos=alunos.filter(a=>a.id!=id);res=res.filter(r=>r.aId!=id);save();ra();rt();renderCorr();}
-function rsel(){let h=turmas.map(t=>`<option value="${t.id}">${t.nome}</option>`).join('');$('selTurmaAluno').innerHTML=h;$('selTurmaCorr').innerHTML=h;$('selRel').innerHTML='<option value="">Todas</option>'+h;}
-function buildGab(){let n=+$('nQ').value||20, al=+$('alts').value; $('areaGab').innerHTML='';for(let i=0;i<n;i++){let v=gab[i]||'';$('areaGab').innerHTML+=`<div class="q"><b>${i+1}</b><select class="gSel" data-i="${i}"><option value="">-</option>${L.slice(0,al).map(l=>`<option ${l==v?'selected':''}>${l}</option>`).join('')}</select></div>`}}
-function saveGab(){cfg={nome:$('nomeProva').value,n: +$('nQ').value, alts:+$('alts').value, valor:+$('valor').value||10};gab=[...document.querySelectorAll('.gSel')].map(s=>s.value);if(gab.some(v=>!v))return alert('Preencha TODAS as questões do gabarito, não pode deixar em branco');save();$('statusGab').textContent='GABARITO SALVO! '+gab.join(' ');alert('Gabarito salvo com sucesso! Agora você pode ir em 4.Corrigir');}
-function imprimirFolha(){if(!gab.length)return alert('Salve o gabarito primeiro!');$('pProva').textContent=cfg.nome;$('pTurma').textContent='';$('pQuestoes').innerHTML='';for(let i=0;i<cfg.n;i++){let b=L.slice(0,cfg.alts).map(l=>`<span style="display:inline-flex;gap:2px;align-items:center"><span style="width:16px;height:16px;border:2px solid #000;border-radius:50%;display:inline-flex;justify-content:center;align-items:center;font-size:9px">${l}</span></span>`).join(' ');$('pQuestoes').innerHTML+=`<div style="border:1px solid #000;padding:5px;display:flex;justify-content:space-between;font-size:12px"><b>${i+1}</b><span>${b}</span></div>`}window.print();}
-function renderCorr(){let tid=+$('selTurmaCorr').value;if(!tid){$('listaCorr').innerHTML='Selecione a turma acima';return}let lista=alunos.filter(a=>a.tId==tid);if(!lista.length){$('listaCorr').innerHTML='Nenhum aluno nesta turma. Cadastre em 2.Alunos';return}let h=`<b>${lista.length} alunos - ${turmas.find(t=>t.id==tid).nome}</b>`;lista.forEach(a=>{let r=res.find(x=>x.aId==a.id);let ok=!!r;h+=`<div class="aluno-card ${ok?'done':''}"><div><b>${a.nome}</b> ${ok?`<span class="badge ok">VERDE ${r.ac}/${cfg.n} Nota ${r.nota.toFixed(1)}</span>`:'<span class="badge pend">PENDENTE</span>'}</div><div><button class="${ok?'orange':'green'}" onclick="abrirScan(${a.id})">${ok?'Recorrigir':'Corrigir 📷'}</button></div></div>`});$('listaCorr').innerHTML=h;}
-function abrirScan(id){if(!gab.length||gab.some(v=>!v))return alert('ERRO: Gabarito não salvo! Vá em 3.Gabarito e clique em SALVAR GABARITO');alunoAtivo=alunos.find(a=>a.id==id);$('boxScan').classList.remove('hidden');$('tituloScan').textContent='Aluno: '+alunoAtivo.nome;window.scrollTo(0,$('boxScan').offsetTop);}
-function cancelScan(){$('boxScan').classList.add('hidden');alunoAtivo=null;leitura=[]; $('foto').value='';}
-$('foto').addEventListener('change',e=>{let f=e.target.files[0];if(!f)return;let img=new Image();img.onload=()=>ler(img);img.src=URL.createObjectURL(f);});
-function ler(img){
- let can=$('scanCanvas'), ctx=can.getContext('2d',{willReadFrequently:true});let maxW=1000, sc=Math.min(1,maxW/img.width);can.width=img.width*sc;can.height=img.height*sc;ctx.drawImage(img,0,0,can.width,can.height);
- let w=can.width,h=can.height, d=ctx.getImageData(0,0,w,h).data; function g(x,y){let i=(y*w+x)*4;return (d[i]+d[i+1]+d[i+2])/3}
- leitura=[];
- for(let i=0;i<cfg.n;i++){
-  let col=i%2,row=Math.floor(i/2), rows=Math.ceil(cfg.n/2);
-  let baseX=col*0.5+0.10, baseY=0.18+row*(0.75/rows);
-  let scores=[];for(let a=0;a<cfg.alts;a++){let cxN=baseX+0.08+a*0.10, cyN=baseY;let cx=Math.floor(cxN*w),cy=Math.floor(cyN*h),r=Math.max(7,Math.floor(w*0.015));let s=0,c=0;for(let yy=-r;yy<=r;yy++)for(let xx=-r;xx<=r;xx++)if(xx*xx+yy*yy<=r*r){let X=Math.min(w-1,Math.max(0,cx+xx)),Y=Math.min(h-1,Math.max(0,cy+yy));s+=255-g(X,Y);c++;}scores.push(s/c);}
-  let bi=scores.indexOf(Math.max(...scores)); let best=scores[bi];
-  leitura.push(best>35?L[bi]:'');
-  ctx.lineWidth=3;ctx.strokeStyle=best>35?'#00c800':'#ff0000';ctx.beginPath();ctx.arc((baseX+0.08+bi*0.10)*w, baseY*h, 10,0,Math.PI*2);ctx.stroke();
+function go(id,b){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));$(id).classList.add('active');document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));b.classList.add('active'); upd();}
+function save(){localStorage.setItem('t5',JSON.stringify(turmas));localStorage.setItem('a5',JSON.stringify(alunos));localStorage.setItem('g5',JSON.stringify(gab));localStorage.setItem('n5',JSON.stringify(notas));localStorage.setItem('c5',JSON.stringify(cfg));}
+function addT(){let n=$('inT').value.trim();if(!n)return;turmas.push({id:Date.now(),nome:n});$('inT').value='';save();upd();}
+function addA(){let n=$('inA').value.trim(),tid=+$('selTA').value;if(!n||!tid)return;alunos.push({id:Date.now(),nome:n,tid});$('inA').value='';save();upd();}
+function addLote(){let t=prompt('Cole nomes 1 por linha');if(!t)return;let tid=+$('selTA').value;if(!tid)return;t.split('\n').forEach(x=>{x=x.trim();if(x)alunos.push({id:Date.now()+Math.random(),nome:x,tid})});save();upd();}
+function upd(){
+ $('listT').innerHTML=turmas.map(t=>`<div class="item"><span>${t.nome} (${alunos.filter(a=>a.tid==t.id).length})</span><button class="btn r" onclick="delT(${t.id})">X</button></div>`).join('');
+ let sel=turmas.map(t=>`<option value="${t.id}">${t.nome}</option>`).join('');$('selTA').innerHTML=sel;$('selTC').innerHTML=sel;
+ $('listA').innerHTML=alunos.map(a=>{let tt=turmas.find(x=>x.id==a.tid);return `<div class="item"><span>${a.nome} - ${tt?tt.nome:''}</span><button class="btn r" onclick="delA(${a.id})">X</button></div>`).join('');
+ buildG(); renderC(); $('msgG').textContent=gab.length? 'Gabarito: '+gab.join(' '):'SEM GABARITO';
+}
+function delT(id){turmas=turmas.filter(t=>t.id!=id);alunos=alunos.filter(a=>a.tid!=id);save();upd();}
+function delA(id){alunos=alunos.filter(a=>a.id!=id);notas=notas.filter(n=>n.aid!=id);save();upd();}
+function buildG(){let q=+$('qtd').value||20, al=+$('alt').value; $('boxG').innerHTML=''; for(let i=0;i<q;i++){let v=gab[i]||'';$('boxG').innerHTML+=`<div class="q"><b>${i+1}</b><select id="g${i}"><option value="">-</option>${L.slice(0,al).map(l=>`<option ${l==v?'selected':''}>${l}</option>`).join('')}</select></div>`}}
+function saveG(){let q=+$('qtd').value, al=+$('alt').value; let g=[]; for(let i=0;i<q;i++){let v=$('g'+i).value; if(!v)return alert('Falta Q'+(i+1)); g.push(v);} gab=g; cfg={qtd:q,alt:al,nome:$('nomeP').value}; save(); $('msgG').textContent='✅ SALVO '+gab.join(' '); alert('Gabarito salvo! Agora imprima a folha oficial');}
+function imp(){if(!gab.length)return alert('Salve gabarito'); $('pNome').textContent=cfg.nome; $('pGrid').innerHTML=''; for(let i=0;i<cfg.qtd;i++){let bubs=L.slice(0,cfg.alt).map(l=>`<span style="display:inline-flex;align-items:center;gap:2px"><span style="width:18px;height:18px;border:2.5px solid #000;border-radius:50%;display:inline-flex;justify-content:center;align-items:center;font-size:9px;font-weight:bold">${l}</span></span>`).join(' '); $('pGrid').innerHTML+=`<div style="border:1.5px solid #000;padding:6px;display:flex;justify-content:space-between"><b>${i+1}</b><span>${bubs}</span></div>`} window.print();}
+function renderC(){let tid=+$('selTC').value; if(!tid){$('listC').innerHTML='Escolha turma';return} let lista=alunos.filter(a=>a.tid==tid); $('listC').innerHTML=lista.map(a=>{let n=notas.find(x=>x.aid==a.id); let ok=!!n; return `<div class="item ${ok?'ok':''}"><span><b>${a.nome}</b> ${ok?` <span class="badge ok">VERDE ${n.ac}/${cfg.qtd} Nota ${n.nota.toFixed(1)}</span>`:''}</span><button class="btn ${ok?'':'g'}" onclick="abrir(${a.id})">${ok?'Recorrigir':'Ler AUTO'}</button></div>`}).join('');}
+function abrir(id){if(!gab.length)return alert('Salve gabarito em 3'); atual=alunos.find(a=>a.id==id); $('boxCor').classList.remove('hidden'); $('titC').textContent='Lendo: '+atual.nome; $('boxR').innerHTML=''; $('msgAuto').textContent='Tire a foto agora pegando os 4 quadrados pretos';}
+$('foto').addEventListener('change',e=>{let f=e.target.files[0]; if(!f)return; let img=new Image(); img.onload=()=>runAuto(img); img.src=URL.createObjectURL(f);});
+
+function runAuto(img){
+ let can=$('can'), ctx=can.getContext('2d',{willReadFrequently:true});
+ let maxW=1200, sc=Math.min(1,maxW/img.width); can.width=img.width*sc; can.height=img.height*sc; ctx.drawImage(img,0,0,can.width,can.height);
+ let w=can.width,h=can.height, data=ctx.getImageData(0,0,w,h).data;
+ function gray(x,y){let i=(y*w+x)*4; return (data[i]+data[i+1]+data[i+2])/3}
+ // 1. Acha folha pelos 4 quadrados pretos
+ let pts=[]; // procura cantos
+ function findDarkIn(x0,y0,x1,y1){
+   let best=null, bestD=999;
+   for(let y=y0;y<y1;y+=3)for(let x=x0;x<x1;x+=3){
+     let d=gray(x,y); if(d<60){ // bem preto
+       if(d<bestD){bestD=d; best={x,y}}
+     }
+   }
+   return best;
  }
- $('infoScan').innerHTML='<b>Leitura:</b> '+leitura.map((x,i)=>`${i+1}:${x||'?'} `).join(' ')+'<br><small style="color:#666">Se aparecer? ou vermelho, é porque a bolinha está clara. Corrija manualmente abaixo.</small>';
- $('editScan').innerHTML='';leitura.forEach((v,i)=>{$('editScan').innerHTML+=`<div class="q"><b>${i+1}</b><select class="eSel"><option value="">?</option>${L.slice(0,cfg.alts).map(l=>`<option ${l==v?'selected':''}>${l}</option>`).join('')}</select></div>`});
+ let topLeft=findDarkIn(0,0,w*0.25,h*0.25);
+ let topRight=findDarkIn(w*0.75,0,w-1,h*0.25);
+ let bottomLeft=findDarkIn(0,h*0.75,w*0.25,h-1);
+ let bottomRight=findDarkIn(w*0.75,h*0.75,w-1,h-1);
+ if(!topLeft||!topRight||!bottomLeft||!bottomRight){
+   $('msgAuto').innerHTML='<b style="color:red">Não achei os 4 quadrados pretos. Tira a foto mais de cima, com mais luz, pegando a folha toda.</b>';
+   return;
+ }
+ // desenha
+ [topLeft,topRight,bottomLeft,bottomRight].forEach(p=>{ctx.fillStyle='#00ff00';ctx.fillRect(p.x-5,p.y-5,10,10);});
+
+ let left=Math.min(topLeft.x,bottomLeft.x), right=Math.max(topRight.x,bottomRight.x), top=Math.min(topLeft.y,topRight.y), bottom=Math.max(bottomLeft.y,bottomRight.y);
+ let bw=right-left, bh=bottom-top;
+
+ leituraAuto=[];
+ $('boxR').innerHTML='';
+ for(let i=0;i<cfg.qtd;i++){
+   let col=i%2, row=Math.floor(i/2), rows=Math.ceil(cfg.qtd/2);
+   // mesma matemática da impressão: 2 colunas
+   let cellW=bw/2, cellH=bh/rows*0.85;
+   let baseX=left+col*cellW+cellW*0.08;
+   let baseY=top+bh*0.12+row*(bh*0.78/rows)+cellH*0.5;
+   let scores=[];
+   for(let a=0;a<cfg.alt;a++){
+     let cx=baseX+18+a*32*(w/1000), cy=baseY;
+     // ajusta proporcional
+     cx=baseX+cellW*0.25+a*cellW*0.14;
+     let r=Math.max(8,Math.floor(w*0.018));
+     let sum=0,cnt=0;
+     for(let yy=-r;yy<=r;yy++)for(let xx=-r;xx<=r;xx++)if(xx*xx+yy*yy<=r*r){
+       let X=Math.min(w-1,Math.max(0,Math.round(cx+xx))), Y=Math.min(h-1,Math.max(0,Math.round(cy+yy)));
+       sum+=255-gray(X,Y); cnt++;
+     }
+     scores.push(sum/cnt);
+     // desenha busca
+     ctx.strokeStyle='yellow'; ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.stroke();
+   }
+   let best=Math.max(...scores), idx=scores.indexOf(best);
+   // se for bem marcado, best > 50
+   let letra=best>40?L[idx]:'';
+   leituraAuto.push(letra);
+   // destaca escolhido
+   let cxSel=baseX+cellW*0.25+idx*cellW*0.14, cySel=baseY;
+   ctx.strokeStyle=letra?'#00ff00':'#ff0000'; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(cxSel,cySel,12,0,Math.PI*2); ctx.stroke();
+   $('boxR').innerHTML+=`<div class="q"><b>${i+1}</b><select id="r${i}"><option value="">?</option>${L.slice(0,cfg.alt).map(l=>`<option ${l==letra?'selected':''}>${l}</option>`).join('')}</select><div style="font-size:10px">auto:${letra||'?'} gab:${gab[i]}</div></div>`;
+ }
+ $('msgAuto').innerHTML=`<b>Leitura automática feita: ${leituraAuto.filter(x=>x).length}/${cfg.qtd} detectadas</b><br>Verde = detectado, Vermelho = não achou. Confira e corrija antes de salvar.`;
  $('btnConf').classList.remove('hidden');
 }
-function confirmar(){
- let resp=[...document.querySelectorAll('.eSel')].map(s=>s.value); if(resp.some(v=>!v))if(!confirm('Tem questão em branco (?), confirmar mesmo assim?'))return;
- let ac=0;resp.forEach((x,i)=>{if(x==gab[i])ac++;});let nota=ac/gab.length*cfg.valor;
- let idx=res.findIndex(r=>r.aId==alunoAtivo.id);
- let obj={aId:alunoAtivo.id,nome:alunoAtivo.nome,tId:alunoAtivo.tId,ac,nota,resp,data:new Date().toLocaleString('pt-BR')};
- if(idx>=0)res[idx]=obj;else res.push(obj);save();renderCorr();ra();renderRel();cancelScan();alert('Salvo! '+alunoAtivo.nome+' agora está VERDE');
+function conf(){
+ let resp=[]; for(let i=0;i<cfg.qtd;i++){let v=$('r'+i).value; if(!v){if(!confirm('Q'+(i+1)+' vazia, salvar assim mesmo?'))return; } resp.push(v);}
+ let ac=0; resp.forEach((x,i)=>{if(x==gab[i])ac++;}); let nota=ac/cfg.qtd*10;
+ let idx=notas.findIndex(x=>x.aid==atual.id); let obj={aid:atual.id,tid:atual.tid,ac,nota,resp}; if(idx>=0)notas[idx]=obj; else notas.push(obj);
+ save(); renderC(); $('boxCor').classList.add('hidden'); alert('Salvo! '+atual.nome+' ficou VERDE');
 }
-function renderRel(){let tid=$('selRel').value;let lista=tid?res.filter(r=>r.tId==tid):res;let tb=$('tabRel').querySelector('tbody');tb.innerHTML='';lista.forEach(r=>{let t=turmas.find(x=>x.id==r.tId);tb.innerHTML+=`<tr><td>${t?t.nome:''}</td><td style="text-align:left">${r.nome}</td><td>${r.ac}/${cfg.n}</td><td>${r.nota.toFixed(1)}</td><td><button class="red" onclick="delR(${r.aId})">Apagar</button></td></tr>`});}
-function delR(id){res=res.filter(r=>r.aId!=id);save();renderRel();renderCorr();ra();}
-window.onload=()=>{rsel();buildGab();rt();ra();if(cfg.nome){$('nomeProva').value=cfg.nome;$('nQ').value=cfg.n;$('alts').value=cfg.alts;$('valor').value=cfg.valor;$('statusGab').textContent=gab.length?'Gabarito carregado: '+gab.join(' '):''}renderRel();}
+window.onload=()=>{upd(); if(cfg.qtd){$('qtd').value=cfg.qtd;$('alt').value=cfg.alt;$('nomeP').value=cfg.nome;}}
 </script>
 </body>
 </html>
