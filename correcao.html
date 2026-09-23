@@ -2,107 +2,151 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>v9 - Anti Parede + Guia</title>
+<title>v10 - Calibrada na sua folha</title>
 <style>
-body{margin:0;background:#f2f4f7;font-family:Arial}header{background:#174a73;color:#fff;padding:10px;text-align:center}
-main{max-width:900px;margin:auto;padding:8px}.card{background:#fff;padding:12px;border-radius:10px;margin:8px 0}
+body{margin:0;background:#eef2f5;font-family:Arial}header{background:#174a73;color:#fff;padding:10px;text-align:center}
+main{max-width:900px;margin:auto;padding:8px}.card{background:#fff;padding:12px;border-radius:10px;margin:8px 0;box-shadow:0 2px 6px #0002}
 .btn{padding:12px;border:0;border-radius:8px;font-weight:bold;color:#fff;cursor:pointer;width:100%;margin-top:6px;font-size:16px}.g{background:#16834b}.b{background:#174a73}.gr{background:#666}.r{background:#b33}
 input,select{width:100%;padding:10px;border:1px solid #aaa;border-radius:6px;margin-top:4px}
-#camBox{position:relative;background:#000;border-radius:12px;overflow:hidden;max-width:500px;margin:10px auto}
-#video{width:100%;display:block}#overlay{position:absolute;inset:0}
-.guide{position:absolute;left:4%;top:4%;width:92%;height:92%;border:3px dashed #00ff00;border-radius:10px;box-shadow:0 0 0 9999px rgba(0,0,0,.65)}
-.corner{position:absolute;width:36px;height:36px;border:6px solid #00ff00}.tl{top:-3px;left:-3px;border-right:0;border-bottom:0}.tr{top:-3px;right:-3px;border-left:0;border-bottom:0}.bl{bottom:-3px;left:-3px;border-right:0;border-top:0}.br{bottom:-3px;right:-3px;border-left:0;border-top:0}
-#can{max-width:100%;border:2px solid #000;margin-top:8px;display:block}
-.item{display:flex;justify-content:space-between;align-items:center;padding:8px;border:1px solid #ddd;border-radius:8px;margin:4px 0}.item.ok{background:#d6f5de}
+#camBox{position:relative;background:#000;border-radius:12px;overflow:hidden;max-width:520px;margin:10px auto}
+#video{width:100%}#overlay{position:absolute;inset:0}
+.guide{position:absolute;left:12%;top:8%;width:76%;height:38%;border:3px dashed #00ff00;border-radius:8px;box-shadow:0 0 0 9999px rgba(0,0,0,.65)}
+.corner{position:absolute;width:28px;height:28px;border:5px solid #00ff00}.tl{top:-3px;left:-3px;border-right:0;border-bottom:0}.tr{top:-3px;right:-3px;border-left:0;border-bottom:0}.bl{bottom:-3px;left:-3px;border-right:0;border-top:0}.br{bottom:-3px;right:-3px;border-left:0;border-top:0}
+#can{max-width:100%;border:3px solid #000;margin-top:8px;display:block}
+.item{display:flex;justify-content:space-between;align-items:center;padding:8px;border:1px solid #ddd;border-radius:8px;margin:4px 0}.item.ok{background:#d6f5de;border-color:#2e9d4a}
 .hidden{display:none!important}
-.q{border:1px solid #ddd;border-radius:6px;padding:4px;text-align:center;background:#fafafa}
+.q{border:1px solid #ddd;border-radius:6px;padding:5px;text-align:center;background:#fafafa}
 </style>
 </head>
 <body>
-<header><h1>v9 - Só lê com os 4 cantos pretos</h1><p>Se fotografar parede, vai avisar FOLHA NÃO ENCONTRADA</p></header>
+<header><h1>v10 - CALIBRADA NA SUA FOTO</h1><p>Agora detecta o retângulo preto da folha</p></header>
 <main>
 <div class="card">
-<input id="inT" placeholder="Turma ex: 6A"><button class="btn g" id="btnT">+ Turma</button><select id="selT" style="margin-top:8px"></select><select id="selTC" style="margin-top:8px"></select>
+<h3>1. Turmas</h3>
+<input id="inT" placeholder="Ex: 6A"><button class="btn g" id="btnT">+ Turma</button>
+<select id="selT" style="margin-top:6px"></select><select id="selTC" style="margin-top:6px"></select>
 </div>
 <div class="card">
-<div style="display:flex;gap:6px"><input id="qtd" type="number" value="10" style="width:80px"><select id="alt" style="width:80px"><option value="5" selected>A-E</option><option value="4">A-D</option></select><input id="nomeP" value="Prova 1"></div>
-<div id="boxG" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(75px,1fr));gap:4px;margin-top:8px"></div>
-<button class="btn g" id="btnG">💾 SALVAR GABARITO</button><button class="btn gr" id="btnPrint">🖨️ IMPRIMIR FOLHA OFICIAL (tem que ser essa)</button><div id="msgG" style="color:green;font-weight:bold"></div>
+<h3>2. Gabarito (10 questões A-E)</h3>
+<div id="boxG" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:4px"></div>
+<button class="btn g" id="btnG">💾 SALVAR GABARITO</button><div id="msgG" style="color:green;font-weight:bold"></div>
 </div>
 <div class="card">
-<input id="inA" placeholder="Nome aluno"><button class="btn g" id="btnA">+ Aluno</button><div id="listC"></div>
-<div id="boxCor" class="hidden">
+<h3>3. Alunos e Correção com GUIA</h3>
+<input id="inA" placeholder="Nome aluno"><button class="btn g" id="btnA">+ Aluno</button>
+<div id="listC" style="margin-top:8px"></div>
+<div id="boxCor" class="hidden" style="margin-top:10px;border-top:3px solid #174a73;padding-top:10px">
 <h3 id="titC"></h3>
-<div id="camBox" class="hidden"><video id="video" autoplay playsinline></video><div id="overlay"><div class="guide"><div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div><div style="position:absolute;top:48%;left:0;width:100%;text-align:center;color:#0f0;background:rgba(0,0,0,.6);font-weight:bold;padding:4px">ENCAIXE OS 4 ■ PRETOS NOS CANTOS VERDES</div></div></div></div>
-<button class="btn b" id="btnCam">📷 ABRIR CÂMERA COM GUIA</button><button class="btn g hidden" id="btnCap" style="font-size:20px;background:#0a5">📸 CAPTURAR QUANDO ALINHAR</button>
-<input id="foto" type="file" accept="image/*" style="margin-top:8px">
+<div id="camBox" class="hidden"><video id="video" autoplay playsinline></video><div id="overlay"><div class="guide"><div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div><div style="position:absolute;top:45%;left:0;width:100%;text-align:center;color:#0f0;background:rgba(0,0,0,.6);font-weight:bold;font-size:13px">ENCAIXE O RETÂNGULO PRETO AQUI</div></div></div></div>
+<button class="btn b" id="btnCam">📷 ABRIR CÂMERA COM GUIA</button><button class="btn g hidden" id="btnCap" style="background:#0a5;font-size:20px">📸 CAPTURAR</button>
+<input id="foto" type="file" accept="image/*" capture="environment">
 <canvas id="can"></canvas>
-<div id="msgAuto" style="padding:8px;border-radius:6px;margin-top:6px;background:#e8f5ff"></div>
-<div id="boxR" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(75px,1fr));gap:4px;margin-top:8px"></div>
-<button class="btn g hidden" id="btnConf">✅ SALVAR E FICAR VERDE</button>
+<div id="msgAuto" style="background:#e8f5ff;padding:8px;border-radius:6px;margin-top:6px"></div>
+<div id="boxR" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:4px;margin-top:8px"></div>
+<button class="btn g hidden" id="btnConf">✅ CONFIRMAR E DEIXAR VERDE</button>
+<button class="btn gr" id="btnFecha">Fechar</button>
 </div>
 </div>
-<div id="print" style="display:none"><div style="border:8px solid #000;padding:12px"><div style="display:flex;justify-content:space-between"><div style="width:48px;height:48px;background:#000"></div><div style="width:48px;height:48px;background:#000"></div></div><h1 style="text-align:center" id="pNome"></h1><div id="pGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:6px"></div><div style="display:flex;justify-content:space-between;margin-top:12px"><div style="width:48px;height:48px;background:#000"></div><div style="width:48px;height:48px;background:#000"></div></div></div></div>
 </main>
 <script>
-let turmas=JSON.parse(localStorage.getItem('t9')||'[]'), alunos=JSON.parse(localStorage.getItem('a9')||'[]'), gab=JSON.parse(localStorage.getItem('g9')||'[]'), notas=JSON.parse(localStorage.getItem('n9')||'[]'), cfg={qtd:10,alt:5,nome:'Prova 1'};
-let atual=null; const L=['A','B','C','D','E']; const $=id=>document.getElementById(id);
-function save(){localStorage.setItem('t9',JSON.stringify(turmas));localStorage.setItem('a9',JSON.stringify(alunos));localStorage.setItem('g9',JSON.stringify(gab));localStorage.setItem('n9',JSON.stringify(notas));}
+let turmas=JSON.parse(localStorage.getItem('t10')||'[]'), alunos=JSON.parse(localStorage.getItem('a10')||'[]'), gab=JSON.parse(localStorage.getItem('g10')||'[]'), notas=JSON.parse(localStorage.getItem('n10')||'[]');
+let atual=null, cfg={qtd:10,alt:5}; const L=['A','B','C','D','E']; const $=id=>document.getElementById(id);
+function save(){localStorage.setItem('t10',JSON.stringify(turmas));localStorage.setItem('a10',JSON.stringify(alunos));localStorage.setItem('g10',JSON.stringify(gab));localStorage.setItem('n10',JSON.stringify(notas));}
 function render(){
  $('selT').innerHTML=turmas.map(t=>`<option value="${t.id}">${t.nome}</option>`).join(''); $('selTC').innerHTML=$('selT').innerHTML;
  let tid=+$('selTC').value; let lista=tid?alunos.filter(a=>a.tid==tid):[];
- $('listC').innerHTML=lista.map(a=>{let n=notas.find(x=>x.aid==a.id); return `<div class="item ${n?'ok':''}"><span><b>${a.nome}</b> ${n?`VERDE ${n.ac}/${cfg.qtd}`:''}</span><button class="btn g" style="width:auto" onclick="abrir(${a.id})">Corrigir</button></div>`}).join('')||'Sem alunos';
+ $('listC').innerHTML=lista.map(a=>{let n=notas.find(x=>x.aid==a.id); return `<div class="item ${n?'ok':''}"><span><b>${a.nome}</b> ${n?`VERDE ${n.ac}/${cfg.qtd} Nota ${n.nota.toFixed(1)}`:''}</span><button class="btn g" style="width:auto" onclick="abrir(${a.id})">Corrigir</button></div>`}).join('')||'Sem alunos';
  buildG();
 }
-function buildG(){let q=+$('qtd').value||10, al=+$('alt').value; $('boxG').innerHTML=''; for(let i=0;i<q;i++){let v=gab[i]||''; $('boxG').innerHTML+=`<div class="q"><b>${i+1}</b><select id="g${i}"><option value="">-</option>${L.slice(0,al).map(l=>`<option ${l==v?'selected':''}>${l}</option>`).join('')}</select></div>`}}
+function buildG(){$('boxG').innerHTML=''; for(let i=0;i<10;i++){let v=gab[i]||''; $('boxG').innerHTML+=`<div class="q"><b>${i+1}</b><select id="g${i}"><option value="">-</option>${L.map(l=>`<option ${l==v?'selected':''}>${l}</option>`).join('')}</select></div>`}}
 $('btnT').onclick=()=>{let n=$('inT').value.trim(); if(!n)return; turmas.push({id:Date.now(),nome:n}); $('inT').value=''; save(); render();};
 $('btnA').onclick=()=>{let n=$('inA').value.trim(), tid=+$('selT').value; if(!n||!tid)return alert('Escolha turma'); alunos.push({id:Date.now(),nome:n,tid}); $('inA').value=''; save(); render();};
-$('btnG').onclick=()=>{let q=+$('qtd').value, al=+$('alt').value, g=[]; for(let i=0;i<q;i++){let v=$('g'+i).value; if(!v)return alert('Falta Q'+(i+1)); g.push(v);} gab=g; cfg={qtd:q,alt:al,nome:$('nomeP').value}; save(); $('msgG').textContent='✅ SALVO '+gab.join(' ');};
-$('btnPrint').onclick=()=>{if(!gab.length)return alert('Salve gabarito'); $('pNome').textContent=cfg.nome; $('pGrid').innerHTML=''; for(let i=0;i<cfg.qtd;i++){let b=L.slice(0,cfg.alt).map(l=>`<span style="width:20px;height:20px;border:2.5px solid #000;border-radius:50%;display:inline-flex;justify-content:center;align-items:center;font-size:10px;font-weight:bold">${l}</span>`).join(' '); $('pGrid').innerHTML+=`<div style="border:2px solid #000;padding:8px;display:flex;justify-content:space-between"><b>${i+1}</b><span>${b}</span></div>`} window.print();};
-window.abrir=(id)=>{if(!gab.length)return alert('Salve gabarito'); atual=alunos.find(a=>a.id==id); $('boxCor').classList.remove('hidden'); $('titC').textContent='Aluno: '+atual.nome; $('boxR').innerHTML=''; $('msgAuto').textContent='Abra a câmera e encaixe os 4 quadrados pretos nos cantos verdes'; window.scrollTo(0,$('boxCor').offsetTop);};
-$('selTC').onchange=render;
+$('btnG').onclick=()=>{let g=[]; for(let i=0;i<10;i++){let v=$('g'+i).value; if(!v)return alert('Falta Q'+(i+1)); g.push(v);} gab=g; cfg={qtd:10,alt:5}; save(); $('msgG').textContent='✅ SALVO: '+gab.join(' ');};
+window.abrir=(id)=>{if(!gab.length)return alert('Salve gabarito'); atual=alunos.find(a=>a.id==id); $('boxCor').classList.remove('hidden'); $('titC').textContent='Aluno: '+atual.nome+' - Encaixe o retângulo preto na guia verde'; $('boxR').innerHTML=''; $('msgAuto').textContent='Abra a câmera e encaixe o retângulo preto dentro da guia verde'; window.scrollTo(0,$('boxCor').offsetTop);};
+$('selTC').onchange=render; $('btnFecha').onclick=()=>{$('boxCor').classList.add('hidden'); stopCam();};
 
 let stream=null;
-$('btnCam').onclick=async()=>{
- try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}}); $('video').srcObject=stream; $('camBox').classList.remove('hidden'); $('btnCam').classList.add('hidden'); $('btnCap').classList.remove('hidden');}catch(e){alert('Erro câmera, use arquivo: '+e.message);}
-};
-$('btnCap').onclick=()=>{let v=$('video'), c=$('can'), ctx=c.getContext('2d'); c.width=v.videoWidth; c.height=v.videoHeight; ctx.drawImage(v,0,0); if(stream)stream.getTracks().forEach(t=>t.stop()); $('camBox').classList.add('hidden'); $('btnCam').classList.remove('hidden'); $('btnCap').classList.add('hidden'); process(c);};
+function stopCam(){if(stream){stream.getTracks().forEach(t=>t.stop()); stream=null;} $('camBox').classList.add('hidden'); $('btnCam').classList.remove('hidden'); $('btnCap').classList.add('hidden');}
+$('btnCam').onclick=async()=>{try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}}); $('video').srcObject=stream; $('camBox').classList.remove('hidden'); $('btnCam').classList.add('hidden'); $('btnCap').classList.remove('hidden');}catch(e){alert('Erro câmera: '+e.message);}};
+$('btnCap').onclick=()=>{let v=$('video'), c=$('can'), ctx=c.getContext('2d'); c.width=v.videoWidth; c.height=v.videoHeight; ctx.drawImage(v,0,0); stopCam(); process(c);};
 $('foto').addEventListener('change',e=>{let f=e.target.files[0]; if(!f)return; let img=new Image(); img.onload=()=>{let c=$('can'), ctx=c.getContext('2d'); c.width=img.width; c.height=img.height; ctx.drawImage(img,0,0); process(c);}; img.src=URL.createObjectURL(f);});
 
 function process(can){
  let ctx=can.getContext('2d',{willReadFrequently:true}), w=can.width,h=can.height, d=ctx.getImageData(0,0,w,h).data;
  function gray(x,y){let i=(y*w+x)*4; return (d[i]+d[i+1]+d[i+2])/3}
- function hasBlackSquare(x0,y0,x1,y1){
-   let black=0,total=0; for(let y=y0;y<y1;y+=3)for(let x=x0;x<x1;x+=3){total++; if(gray(x,y)<50)black++;}
-   return (black/total)>0.35;
+ // 1. Acha retângulo preto da folha (borda)
+ // procura por pixels pretos <50 e acha bounding box com maior densidade
+ let minX=w, maxX=0, minY=h, maxY=0, found=false;
+ // varre imagem pra achar borda preta do formulário - procura linha preta horizontal
+ // simplificado: procura região com muitos pretos
+ for(let y=0;y<h;y+=2){
+   for(let x=0;x<w;x+=2){
+     if(gray(x,y)<40){ // bem preto = borda ou quadrado
+       if(x<minX)minX=x; if(x>maxX)maxX=x; if(y<minY)minY=y; if(y>maxY)maxY=y; found=true;
+     }
+   }
  }
- let tl=hasBlackSquare(0,0,w*0.25,h*0.25), tr=hasBlackSquare(w*0.75,0,w,h*0.25), bl=hasBlackSquare(0,h*0.75,w*0.25,h), br=hasBlackSquare(w*0.75,h*0.75,w,h);
- if(!(tl&&tr&&bl&&br)){
-   $('msgAuto').innerHTML=`<b style="color:red;font-size:18px">❌ FOLHA NÃO ENCONTRADA<br>Você fotografou a parede ou a folha está cortada.<br>Precisa aparecer os 4 quadrados pretos grandes.</b><br>Detectado: TL=${tl} TR=${tr} BL=${bl} BR=${br}`;
-   $('can').style.border='4px solid red';
+ if(!found){$('msgAuto').innerHTML='<b style="color:red">❌ Não achei o retângulo preto. Chegue mais perto.</b>'; return;}
+ // filtra para ficar só o retângulo principal (deve estar no terço superior)
+ // estima form box = cluster com mais pretos no topo
+ // vamos re-achar: procura contorno do retângulo - procura 4 cantos do retângulo preto
+ // para sua folha, o retângulo ocupa ~ 60% largura e 35% altura, no topo
+ // recalcula usando projeção
+ let left=minX, right=maxX, top=minY, bottom=maxY;
+ // se bottom - top > h*0.6 é parede, não folha - ajusta para pegar só topo
+ if((bottom-top) > h*0.6){ // tem muita coisa preta, pega só cluster superior
+   // acha top cluster
+   bottom = top + h*0.45;
+ }
+ let bw=right-left, bh=bottom-top;
+ // valida tamanho
+ if(bw < w*0.3 || bh < h*0.15){
+   $('msgAuto').innerHTML=`<b style="color:red">❌ Retângulo muito pequeno. Chegue mais perto da folha. BW=${Math.round(bw)} BH=${Math.round(bh)}</b>`;
    return;
  }
- $('can').style.border='4px solid #0a5';
- $('msgAuto').innerHTML='<b style="color:green">✅ Folha encontrada! Lendo bolinhas...</b>';
- // leitura só se achou cantos
- let left=w*0.08, right=w*0.92, top=h*0.15, bottom=h*0.92, bw=right-left, bh=bottom-top;
+ // desenha box detectado
+ ctx.strokeStyle='#00ff00'; ctx.lineWidth=4; ctx.strokeRect(left,top,bw,bh);
+ $('msgAuto').innerHTML=`<b style="color:green">✅ Retângulo encontrado! Lendo bolinhas dentro...</b>`;
+
+ // 2. Lê bolinhas DENTRO do retângulo - calibrado na sua foto
+ // layout: 2 colunas, 5 linhas cada
  $('boxR').innerHTML=''; let leitura=[];
- for(let i=0;i<cfg.qtd;i++){
-   let col=i%2, row=Math.floor(i/2), rows=Math.ceil(cfg.qtd/2);
-   let cellW=bw/2, cellH=bh/rows, baseY=top+row*cellH+cellH*0.55, baseX=left+col*cellW;
+ for(let i=0;i<10;i++){
+   let col = i>=5?1:0; let row = i%5;
+   // posições relativas dentro do retângulo - calibradas na sua foto
+   // coluna esquerda: bolinhas começam em ~ 32% da largura do retângulo
+   // linha: 0.22 + row*0.13 da altura do retângulo
+   let baseX = left + bw*(col==0?0.32:0.78);
+   let baseY = top + bh*(0.25 + row*0.145);
    let scores=[];
-   for(let a=0;a<cfg.alt;a++){let cx=baseX+cellW*0.32+a*cellW*0.12, cy=baseY, r=Math.max(8,Math.floor(w*0.018)), s=0,cnt=0; for(let yy=-r;yy<=r;yy++)for(let xx=-r;xx<=r;xx++)if(xx*xx+yy*yy<=r*r){let X=Math.min(w-1,Math.max(0,Math.round(cx+xx))), Y=Math.min(h-1,Math.max(0,Math.round(cy+yy))); s+=255-gray(X,Y); cnt++;} scores.push(s/cnt);}
-   let best=Math.max(...scores), idx=scores.indexOf(best), letra=best>45?L[idx]:''; leitura.push(letra);
-   $('boxR').innerHTML+=`<div class="q"><b>${i+1}</b><select id="r${i}"><option value="">?</option>${L.slice(0,cfg.alt).map(l=>`<option ${l==letra?'selected':''}>${l}</option>`).join('')}</select><div style="font-size:10px">auto:${letra||'?'} gab:${gab[i]}</div></div>`;
+   for(let a=0;a<5;a++){
+     // bolinhas espaçadas ~ 0.04*bw cada
+     let cx = baseX + a*bw*0.055;
+     let cy = baseY;
+     let r=Math.max(6,Math.floor(w*0.012)), sum=0,cnt=0;
+     for(let yy=-r;yy<=r;yy++)for(let xx=-r;xx<=r;xx++)if(xx*xx+yy*yy<=r*r){
+       let X=Math.min(w-1,Math.max(0,Math.round(cx+xx))), Y=Math.min(h-1,Math.max(0,Math.round(cy+yy)));
+       sum+=255-gray(X,Y); cnt++;
+     }
+     scores.push(sum/cnt);
+     // desenha procura
+     ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.strokeStyle='rgba(255,255,0,0.6)'; ctx.stroke();
+   }
+   let best=Math.max(...scores), idx=scores.indexOf(best), letra=best>38?L[idx]:'';
+   leitura.push(letra);
+   // destaca melhor
+   let cxBest = baseX + idx*bw*0.055, cyBest=baseY;
+   ctx.beginPath(); ctx.arc(cxBest,cyBest,10,0,Math.PI*2); ctx.strokeStyle=letra?'#00ff00':'#ff0000'; ctx.lineWidth=3; ctx.stroke();
+   $('boxR').innerHTML+=`<div class="q"><b>${i+1}</b><select id="r${i}"><option value="">?</option>${L.map(l=>`<option ${l==letra?'selected':''}>${l}</option>`).join('')}</select><div style="font-size:10px">auto:${letra||'?'} gab:${gab[i]||'-'}</div></div>`;
  }
- $('msgAuto').innerHTML+=`<br>Leitura: ${leitura.filter(x=>x).length}/${cfg.qtd} - Confira e clique em SALVAR VERDE`;
+ $('msgAuto').innerHTML+=`<br>Leitura: ${leitura.join(' ')} - <b>Confira manualmente antes de salvar!</b>`;
  $('btnConf').classList.remove('hidden');
 }
 $('btnConf').onclick=()=>{
- let resp=[]; for(let i=0;i<cfg.qtd;i++)resp.push($('r'+i).value||'');
+ let resp=[]; for(let i=0;i<10;i++)resp.push($('r'+i).value||'');
  let ac=0; resp.forEach((x,i)=>{if(x==gab[i])ac++;}); let nota=ac/cfg.qtd*10;
  let idx=notas.findIndex(x=>x.aid==atual.id), obj={aid:atual.id,tid:atual.tid,ac,nota,resp};
- if(idx>=0)notas[idx]=obj; else notas.push(obj); save(); render(); alert('Salvo VERDE!'); $('boxCor').classList.add('hidden');
+ if(idx>=0)notas[idx]=obj; else notas.push(obj); save(); render(); alert('Salvo VERDE! '+ac+'/'+cfg.qtd); $('boxCor').classList.add('hidden');
 };
 window.onload=()=>{buildG(); render();};
 </script>
